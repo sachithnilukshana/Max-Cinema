@@ -1,4 +1,5 @@
-export const CINESCOPE_API_BASE = import.meta.env.VITE_CINESCOPE_API_URL || 'https://cinescope-api-9ukz.onrender.com'
+// Base URL is set via VITE_CINESCOPE_API_URL in Netlify environment variables
+export const CINESCOPE_API_BASE = import.meta.env.VITE_CINESCOPE_API_URL || ''
 
 /**
  * Perform a safe GET request to the CineScope backend with timeout and graceful fallback

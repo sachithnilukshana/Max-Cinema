@@ -2,6 +2,10 @@
   command = "npm run build"
   publish = "dist"
 
+[build.environment]
+  SECRETS_SCAN_OMIT_KEYS = "VITE_CINESCOPE_API_URL,SUPABASE_URL,VITE_SUPABASE_URL"
+  SECRETS_SCAN_OMIT_PATHS = "index.html,src/lib/cinescopeApi.js,server/index.mjs,netlify.toml"
+
 [functions]
   directory = "netlify/functions"
 
@@ -18,7 +22,7 @@
 [[headers]]
   for = "/*"
   [headers.values]
-    Content-Security-Policy = "default-src 'self'; base-uri 'self'; connect-src 'self' https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://ihenxsggtzkhnqiepysd.supabase.co wss://ihenxsggtzkhnqiepysd.supabase.co; font-src 'self' https://fonts.gstatic.com; frame-ancestors 'self'; frame-src 'self' https://www.youtube-nocookie.com https:; img-src 'self' https://image.tmdb.org https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net data:; object-src 'none'; script-src 'self' https://pagead2.googlesyndication.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com"
+    Content-Security-Policy = "default-src 'self'; base-uri 'self'; connect-src 'self' https://cinescope-api-9ukz.onrender.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://ihenxsggtzkhnqiepysd.supabase.co wss://ihenxsggtzkhnqiepysd.supabase.co; font-src 'self' https://fonts.gstatic.com; frame-ancestors 'self'; frame-src 'self' https://www.youtube-nocookie.com https:; img-src 'self' https://image.tmdb.org https://cinescope-api-9ukz.onrender.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net data: https:; object-src 'none'; script-src 'self' https://cinescope-api-9ukz.onrender.com https://pagead2.googlesyndication.com 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com"
     Permissions-Policy = "geolocation=(), microphone=(), camera=(), payment=()"
     Referrer-Policy = "strict-origin-when-cross-origin"
     X-Content-Type-Options = "nosniff"
