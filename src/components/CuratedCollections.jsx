@@ -3,7 +3,7 @@ import { cinescopeApi, normalizeCinescopeItem } from '../lib/cinescopeApi.js'
 import MediaGrid from './MediaGrid.jsx'
 import styles from './CuratedCollections.module.css'
 
-export default function CuratedCollections({ onSelectTitle, selectedId, onAddToWatchlist }) {
+export default function CuratedCollections({ onSelectTitle, selectedId }) {
   const [collections, setCollections] = useState([])
   const [activeCollectionId, setActiveCollectionId] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -78,7 +78,6 @@ export default function CuratedCollections({ onSelectTitle, selectedId, onAddToW
               type="movie"
               onSelect={onSelectTitle}
               selectedId={selectedId}
-              onAddToWatchlist={onAddToWatchlist}
             />
           ) : (
             <p className={styles.emptyNote}>No titles added to this collection yet.</p>

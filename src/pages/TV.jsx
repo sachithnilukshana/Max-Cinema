@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { api, apiErrorMessage, tvEmbedUrl, formatRating, getYear } from '../lib/api.js'
-import { addToWatchlist, loadLibrary, markEpisodeWatched, recordContinueWatching, setEpisodeWatched } from '../lib/profile.js'
+import { loadLibrary, markEpisodeWatched, recordContinueWatching, setEpisodeWatched } from '../lib/profile.js'
 import MediaGrid from '../components/MediaGrid.jsx'
 import Player from '../components/Player.jsx'
 import SeasonPicker from '../components/SeasonPicker.jsx'
@@ -10,7 +10,6 @@ import PersonalControls from '../components/PersonalControls.jsx'
 import ContinueWatching from '../components/ContinueWatching.jsx'
 import TasteRecommendations from '../components/TasteRecommendations.jsx'
 import SearchSuggestions from '../components/SearchSuggestions.jsx'
-import { DEFAULT_NEED_WATCH_ITEMS } from './NeedWatch.jsx'
 import styles from './TV.module.css'
 
 const PINNED_SHOW_ID = 5920 // The Mentalist
@@ -159,11 +158,6 @@ export default function TV({ profile, pinnedShowId = PINNED_SHOW_ID }) {
     setTimeout(() => playerAnchorRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80)
   }
 
-  function addItem(item) {
-    const { added } = addToWatchlist(profile.id, { ...item, media_type: 'tv' }, DEFAULT_NEED_WATCH_ITEMS)
-    setNotice(added ? `${item.name} was added to Need Watch.` : `${item.name} is already in Need Watch.`)
-  }
-
   function toggleEpisode(season, episode) {
     if (!selected) return
     const next = setEpisodeWatched(profile.id, selected.id, season, episode)
@@ -211,7 +205,7 @@ export default function TV({ profile, pinnedShowId = PINNED_SHOW_ID }) {
 
       <ContinueWatching profile={profile} mediaType="tv" onSelect={resumeShow} />
 
-      <TasteRecommendations onSelect={selectShow} onAddToWatchlist={addItem} />
+      <TasteRecommendations onSelect={selectShow} />
 
       {notice && <p className={styles.notice} role="status">{notice}</p>}
       {error && <p className={styles.error} role="alert">{error}</p>}
@@ -230,7 +224,6 @@ export default function TV({ profile, pinnedShowId = PINNED_SHOW_ID }) {
         onSelect={selectShow}
         selectedId={selected?.id}
         pinnedId={Number(pinnedShowId)}
-        onAddToWatchlist={addItem}
       />
     </div>
   )

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { api, apiErrorMessage, movieEmbedUrl, formatRating, getYear, posterUrl } from '../lib/api.js'
-import { addToWatchlist, recordContinueWatching } from '../lib/profile.js'
+import { recordContinueWatching } from '../lib/profile.js'
 import { cinescopeApi, normalizeCinescopeItem, trackMovieView, trackSearch, trackTrailerClick } from '../lib/cinescopeApi.js'
 import MediaGrid from '../components/MediaGrid.jsx'
 import Player from '../components/Player.jsx'
@@ -11,7 +11,6 @@ import ContinueWatching from '../components/ContinueWatching.jsx'
 import SearchSuggestions from '../components/SearchSuggestions.jsx'
 import CuratedCollections from '../components/CuratedCollections.jsx'
 import CineScopeAd from '../components/CineScopeAd.jsx'
-import { DEFAULT_NEED_WATCH_ITEMS } from './NeedWatch.jsx'
 import styles from './Movies.module.css'
 
 const MOODS = [
@@ -183,12 +182,6 @@ export default function Movies({ profile, adminConfig }) {
     persist('mv_player', null)
   }
 
-  function addItem(item) {
-    const { added } = addToWatchlist(profile.id, item, DEFAULT_NEED_WATCH_ITEMS)
-    const title = item.title || item.name || 'Title'
-    setNotice(added ? `${title} was added to Need Watch.` : `${title} is already in Need Watch.`)
-  }
-
   function selectSuggestion(item) {
     setQuery(item.title || '')
     select(item)
@@ -292,7 +285,6 @@ export default function Movies({ profile, adminConfig }) {
             type="movie"
             onSelect={select}
             selectedId={player?.selectedId}
-            onAddToWatchlist={addItem}
           />
         </div>
       )}
@@ -301,7 +293,6 @@ export default function Movies({ profile, adminConfig }) {
       <CuratedCollections
         onSelectTitle={select}
         selectedId={player?.selectedId}
-        onAddToWatchlist={addItem}
       />
 
       <p className={styles.sectionLabel}>{label}</p>
@@ -311,7 +302,6 @@ export default function Movies({ profile, adminConfig }) {
         loading={loading}
         onSelect={select}
         selectedId={player?.selectedId}
-        onAddToWatchlist={addItem}
         emptyAction={() => {
           setQuery('')
           persist('mv_query', null)

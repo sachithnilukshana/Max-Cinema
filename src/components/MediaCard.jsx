@@ -27,15 +27,6 @@ export default function MediaCard({ item, type = 'movie', onClick, selected, pin
           {rating && <div className={styles.cardMeta}>{mediaType === 'tv' ? 'Series' : 'Movie'} · ★ {rating}</div>}
         </div>
       </button>
-      {onToggleWatched && (
-        <div className={styles.actions}>
-          <button type="button" className={styles.watchStatus} aria-pressed={watched} onClick={() => onToggleWatched(item)}>
-            {watched ? 'Watched' : 'Need watch'}
-          </button>
-          <button type="button" className={styles.remove} aria-label={`Remove ${title} from Need Watch`} onClick={() => onRemove(item)}>×</button>
-        </div>
-      )}
-      {onAddToWatchlist && <button type="button" className={styles.addToList} onClick={() => onAddToWatchlist(item)}>+ Need Watch</button>}
     </article>
   )
 }

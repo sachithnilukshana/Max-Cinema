@@ -33,7 +33,6 @@ export default function TasteRecommendations({ onSelect, onAddToWatchlist }) {
               {item.poster_path ? <img src={posterUrl(item.poster_path)} alt="" loading="lazy" /> : <div className={styles.noPoster} />}
               <span>{item.name}</span>
             </button>
-            <button type="button" className={styles.add} onClick={() => onAddToWatchlist(item)}>+ Need Watch</button>
           </article>
         ))}
       </div>
