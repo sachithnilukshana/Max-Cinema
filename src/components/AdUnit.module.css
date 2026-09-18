@@ -1,0 +1,15 @@
+.wrap {
+  min-height: 44px;
+  margin: 1.5rem 0;
+  overflow: hidden;
+}
+
+.label {
+  display: block;
+  color: var(--text-dim);
+  font-family: Arial, sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-align: center;
+  text-transform: uppercase;
+}

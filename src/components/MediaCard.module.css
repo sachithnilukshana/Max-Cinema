@@ -1,0 +1,230 @@
+.card {
+  cursor: pointer;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--bg-card);
+  border: 0.5px solid var(--border);
+  transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+  animation: fadeIn 0.35s ease both;
+}
+
+.cardOpen {
+  display: block;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font-family: var(--font);
+  padding: 0;
+  text-align: left;
+}
+
+.cardOpen:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: -3px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.card:hover {
+  border-color: rgba(200, 169, 110, 0.45);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+}
+
+.card.selected {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 1px rgba(200,169,110,0.3);
+}
+
+.poster {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  overflow: hidden;
+  background: #161616;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.posterOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.78), rgba(0, 0, 0, 0.05) 65%);
+  color: #fff;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.posterOverlay span {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.38);
+  font-size: 13px;
+}
+
+.posterOverlay small {
+  position: absolute;
+  bottom: 9px;
+  left: 9px;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+}
+
+.poster img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.35s ease;
+}
+
+.pinnedBadge {
+  position: absolute;
+  top: 9px;
+  left: 9px;
+  padding: 4px 7px;
+  border: 1px solid rgba(200, 169, 110, 0.55);
+  border-radius: 999px;
+  background: rgba(12, 12, 12, 0.78);
+  color: var(--gold);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.card:hover .poster img {
+  transform: scale(1.05);
+}
+
+.card:hover .posterOverlay,
+.cardOpen:focus-visible .posterOverlay {
+  opacity: 1;
+}
+
+.noPoster {
+  font-size: 2rem;
+  color: var(--text-dim);
+  font-style: italic;
+}
+
+.info {
+  padding: 8px 10px 10px;
+  position: relative;
+}
+
+.rating {
+  float: right;
+  font-size: 10px;
+  color: var(--gold);
+  margin-top: 1px;
+}
+
+.title {
+  font-size: 12px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 38px;
+  line-height: 1.3;
+}
+
+.year {
+  font-size: 11px;
+  color: #444;
+  margin-top: 3px;
+}
+
+.cardMeta {
+  overflow: hidden;
+  color: var(--text-dim);
+  font-size: 10px;
+  letter-spacing: 0.03em;
+  margin-top: 5px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (hover: none) {
+  .posterOverlay {
+    opacity: 1;
+  }
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.watchStatus,
+.remove {
+  border: 0.5px solid #303030;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-family: var(--font);
+  font-size: 10px;
+  line-height: 1;
+}
+
+.watchStatus {
+  padding: 4px 6px;
+  border-radius: 4px;
+}
+
+.watchStatus[aria-pressed="true"] {
+  border-color: rgba(200, 169, 110, 0.5);
+  color: var(--gold);
+}
+
+.remove {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  font-size: 15px;
+}
+
+.watchStatus:hover,
+.remove:hover,
+.watchStatus:focus-visible,
+.remove:focus-visible {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.addToList {
+  width: 100%;
+  margin-top: 8px;
+  border: 0.5px solid rgba(200, 169, 110, 0.42);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--gold);
+  cursor: pointer;
+  font-family: var(--font);
+  font-size: 10px;
+  line-height: 1;
+  padding: 5px 6px;
+}
+
+.addToList:hover,
+.addToList:focus-visible {
+  background: rgba(200, 169, 110, 0.12);
+}

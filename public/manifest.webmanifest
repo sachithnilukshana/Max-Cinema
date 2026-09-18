@@ -1,0 +1,23 @@
+{
+  "name": "Max Cinema",
+  "short_name": "Max Cinema",
+  "description": "Discover, save, and track what to watch next with Max Cinema.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#0a0a0a",
+  "icons": [
+    {
+      "src": "/max-cinema-logo.png",
+      "sizes": "1280x1280",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon.ico",
+      "sizes": "any",
+      "type": "image/x-icon",
+      "purpose": "any"
+    }
+  ]
+}

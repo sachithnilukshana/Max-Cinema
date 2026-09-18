@@ -1,0 +1,102 @@
+.section {
+  margin: 2.5rem 0;
+}
+
+.header {
+  margin-bottom: 1.25rem;
+}
+
+.eyebrow {
+  margin: 0;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #d4af37;
+}
+
+.heading {
+  margin: 0.35rem 0 0;
+  font-family: 'EB Garamond', serif;
+  font-size: 1.85rem;
+  font-weight: 500;
+  color: var(--text, #ffffff);
+}
+
+.collectionTabs {
+  display: flex;
+  gap: 0.75rem;
+  overflow-x: auto;
+  padding-bottom: 0.75rem;
+  margin-bottom: 1.5rem;
+  scrollbar-width: thin;
+}
+
+.tabBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: #141414;
+  border: 1px solid #282828;
+  border-radius: 8px;
+  padding: 0.6rem 1rem;
+  color: #d0d0d0;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.tabBtn:hover {
+  border-color: #555555;
+  color: #ffffff;
+}
+
+.activeTab {
+  border-color: #d4af37;
+  background: #1c1913;
+  color: #d4af37;
+}
+
+.tabThumb {
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  object-fit: cover;
+}
+
+.tabText {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+}
+
+.tabTitle {
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.tabCount {
+  font-size: 0.75rem;
+  color: #888888;
+}
+
+.collectionInfo {
+  margin-top: 0.5rem;
+}
+
+.description {
+  color: #b0b0b0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin-bottom: 1.25rem;
+  max-width: 700px;
+}
+
+.emptyNote {
+  color: #777777;
+  font-size: 0.9rem;
+  font-style: italic;
+  padding: 1.5rem 0;
+}
+

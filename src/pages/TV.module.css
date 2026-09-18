@@ -1,0 +1,84 @@
+.searchRow {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 2rem;
+}
+
+.input {
+  flex: 1;
+  background: var(--bg-input);
+  border: 0.5px solid var(--border);
+  color: var(--text);
+  padding: 11px 16px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-family: var(--font);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.input:focus {
+  border-color: rgba(200, 169, 110, 0.45);
+}
+
+.input::placeholder {
+  color: var(--text-dim);
+}
+
+.btn {
+  padding: 11px 28px;
+  background: var(--gold);
+  color: #0a0a0a;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  font-family: var(--font);
+  transition: background 0.2s, transform 0.15s;
+}
+
+.btn:hover {
+  background: var(--gold-hover);
+  transform: translateY(-1px);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.sectionLabel {
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+.notice,
+.error {
+  margin-bottom: 1rem;
+  border-radius: 7px;
+  font-size: 13px;
+  padding: 9px 12px;
+}
+
+.notice {
+  position: fixed;
+  z-index: 100;
+  right: max(1rem, env(safe-area-inset-right));
+  bottom: max(1.25rem, env(safe-area-inset-bottom));
+  max-width: min(360px, calc(100vw - 2rem));
+  border: 0.5px solid rgba(200, 169, 110, 0.35);
+  background: rgba(200, 169, 110, 0.08);
+  animation: toastIn .25s ease both;
+  color: var(--gold);
+}
+
+@keyframes toastIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+.error {
+  border: 0.5px solid rgba(211, 95, 95, 0.4);
+  background: rgba(211, 95, 95, 0.08);
+  color: #e79393;
+}

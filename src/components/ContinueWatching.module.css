@@ -1,0 +1,85 @@
+.wrap {
+  margin-bottom: 2rem;
+}
+
+.heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 9px;
+}
+
+.heading p {
+  color: var(--text);
+  font-size: 1.2rem;
+  font-style: italic;
+}
+
+.heading span {
+  color: var(--text-dim);
+  font-size: 11px;
+}
+
+.row {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 5px;
+}
+
+.card {
+  flex: 0 0 125px;
+  overflow: hidden;
+  border: 0.5px solid var(--border);
+  border-radius: 7px;
+  background: var(--bg-card);
+  color: var(--text-muted);
+  cursor: pointer;
+  font-family: var(--font);
+  font-size: 12px;
+  text-align: left;
+}
+
+.card img,
+.noPoster {
+  display: block;
+  width: 100%;
+  height: 104px;
+  background: #181818;
+  object-fit: cover;
+}
+
+.card span,
+.card small {
+  display: block;
+  overflow: hidden;
+  padding: 3px 7px 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card small {
+  color: var(--gold);
+  font-size: 10px;
+  padding-bottom: 6px;
+}
+
+.card:hover,
+.card:focus-visible {
+  border-color: rgba(200, 169, 110, 0.55);
+}
+
+.progress {
+  height: 3px;
+  margin: 8px 7px 8px;
+  overflow: hidden;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.progress i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--gold);
+}

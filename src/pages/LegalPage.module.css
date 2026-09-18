@@ -1,0 +1,100 @@
+.page {
+  width: min(800px, 100%);
+  margin: 0 auto;
+  color: var(--text-muted);
+}
+
+.back {
+  border: 0;
+  background: transparent;
+  color: var(--gold);
+  font-family: var(--font);
+  font-size: 14px;
+  padding: 0;
+}
+
+.back:hover,
+.back:focus-visible {
+  color: var(--gold-hover);
+  text-decoration: underline;
+}
+
+.eyebrow {
+  margin-top: 2rem;
+  color: var(--gold);
+  font-size: 12px;
+  font-style: normal;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.title {
+  margin-top: 0.25rem;
+  color: var(--text);
+  font-size: clamp(2.1rem, 7vw, 3.5rem);
+  font-weight: 500;
+  line-height: 1.08;
+}
+
+.updated {
+  margin-top: 0.75rem;
+  color: var(--text-dim);
+  font-size: 13px;
+}
+
+.intro {
+  margin-top: 2rem;
+  font-size: 18px;
+  line-height: 1.7;
+}
+
+.section {
+  margin-top: 2.5rem;
+}
+
+.section h2 {
+  color: var(--text);
+  font-size: 1.55rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.section p,
+.section li {
+  margin-top: 0.8rem;
+}
+
+.section ul {
+  padding-left: 1.3rem;
+}
+
+.section li::marker {
+  color: var(--gold);
+}
+
+.note {
+  margin-top: 2.5rem;
+  border: 0.5px solid var(--border);
+  border-left: 3px solid var(--gold);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--bg-card) 86%, transparent);
+  color: var(--text-muted);
+  font-size: 14px;
+  padding: 1rem 1.1rem;
+}
+
+.choiceButton {
+  margin-top: 0.5rem;
+  border: 0.5px solid var(--gold);
+  border-radius: 5px;
+  background: transparent;
+  color: var(--gold);
+  font-family: var(--font);
+  font-size: 14px;
+  padding: 8px 11px;
+}
+
+.choiceButton:hover,
+.choiceButton:focus-visible {
+  background: rgba(200, 169, 110, 0.12);
+}

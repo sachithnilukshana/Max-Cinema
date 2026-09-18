@@ -1,0 +1,24 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[functions]
+  directory = "netlify/functions"
+
+[[redirects]]
+  from = "/privacy-policy"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/terms"
+  to = "/index.html"
+  status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Content-Security-Policy = "default-src 'self'; base-uri 'self'; connect-src 'self' https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://ihenxsggtzkhnqiepysd.supabase.co wss://ihenxsggtzkhnqiepysd.supabase.co; font-src 'self' https://fonts.gstatic.com; frame-ancestors 'self'; frame-src 'self' https://www.youtube-nocookie.com https:; img-src 'self' https://image.tmdb.org https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net data:; object-src 'none'; script-src 'self' https://pagead2.googlesyndication.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com"
+    Permissions-Policy = "geolocation=(), microphone=(), camera=(), payment=()"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    X-Content-Type-Options = "nosniff"

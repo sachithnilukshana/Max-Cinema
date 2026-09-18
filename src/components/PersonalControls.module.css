@@ -1,0 +1,129 @@
+.wrap {
+  margin: 1rem 0;
+  border: 0.5px solid var(--border);
+  border-radius: 9px;
+  background: #0d0d0d;
+  padding: 12px;
+}
+
+.topRow,
+.collections,
+.createCollection {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.favorite,
+.save,
+.collections button,
+.createCollection button {
+  border: 0.5px solid #383838;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-family: var(--font);
+  font-size: 12px;
+  padding: 6px 8px;
+}
+
+.favorite.active,
+.save,
+.collections button:hover,
+.collections button:focus-visible {
+  border-color: rgba(200, 169, 110, 0.5);
+  color: var(--gold);
+}
+
+.save,
+.createCollection button {
+  background: var(--gold);
+  color: #0a0a0a;
+  font-weight: 700;
+}
+
+.rating {
+  color: var(--text-dim);
+  font-size: 11px;
+}
+
+.rating select {
+  margin-left: 6px;
+  border: 0.5px solid #383838;
+  border-radius: 4px;
+  background: #151515;
+  color: var(--gold);
+  font-family: var(--font);
+  padding: 4px;
+}
+
+.note {
+  display: block;
+  color: var(--text-dim);
+  font-size: 11px;
+  margin-top: 12px;
+}
+
+.note textarea {
+  display: block;
+  width: 100%;
+  min-height: 58px;
+  margin-top: 4px;
+  border: 0.5px solid #333;
+  border-radius: 5px;
+  background: #151515;
+  color: var(--text);
+  font-family: var(--font);
+  resize: vertical;
+  padding: 7px;
+}
+
+.collections {
+  color: var(--text-dim);
+  font-size: 11px;
+  margin-top: 12px;
+}
+
+.collections em {
+  color: #555;
+}
+
+.createCollection {
+  margin-top: 9px;
+}
+
+.createCollection input {
+  flex: 1;
+  min-width: 160px;
+  border: 0.5px solid #333;
+  border-radius: 5px;
+  background: #151515;
+  color: var(--text);
+  font-family: var(--font);
+  padding: 6px 8px;
+}
+
+.report {
+  margin-top: 12px;
+  border: 0;
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  font-family: var(--font);
+  font-size: 11px;
+  padding: 0;
+  text-decoration: underline;
+}
+
+.report:hover,
+.report:focus-visible {
+  color: #e79393;
+}
+
+.report:disabled {
+  cursor: default;
+  color: var(--gold);
+  text-decoration: none;
+}

@@ -1,0 +1,12 @@
+.wrap { max-width: 700px; }
+.eyebrow { color: var(--gold); font-size: 11px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; }
+.wrap h1 { color: #fff; font-size: 2rem; font-style: italic; }
+.description { color: var(--text-muted); font-size: 14px; margin-top: 6px; }
+.form { display: grid; gap: 12px; margin: 1.5rem 0; border: .5px solid var(--border); border-radius: 9px; background: #0e0e0e; padding: 15px; }
+.form label { color: var(--text-muted); font-size: 12px; }
+.form input, .form textarea { display: block; width: 100%; margin-top: 4px; border: .5px solid #383838; border-radius: 5px; background: #151515; color: var(--text); font-family: var(--font); padding: 8px; }
+.form textarea { min-height: 64px; resize: vertical; }
+.form button { justify-self: start; border: 0; border-radius: 5px; background: var(--gold); color: #0a0a0a; cursor: pointer; font-family: var(--font); font-weight: 700; padding: 8px 10px; }
+.reports h2 { color: #eee; font-size: 1.15rem; font-style: italic; }
+.reports p { border-bottom: .5px solid #252525; color: var(--text-muted); font-size: 13px; padding: 8px 0; }
+.reports span { color: var(--text-dim); }

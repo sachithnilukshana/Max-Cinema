@@ -1,0 +1,63 @@
+.wrap {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 1.5rem;
+  border: 0.5px solid rgba(200, 169, 110, 0.32);
+  border-radius: 9px;
+  background: rgba(200, 169, 110, 0.05);
+  padding: 12px;
+}
+
+.eyebrow {
+  color: var(--gold);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.wrap h3 {
+  color: #e6e6e6;
+  font-size: 1rem;
+  font-style: italic;
+}
+
+.items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.items span {
+  border: 0.5px solid #393125;
+  border-radius: 4px;
+  color: var(--text-muted);
+  font-size: 11px;
+  padding: 3px 6px;
+}
+
+.items b {
+  color: var(--gold);
+  font-weight: 400;
+}
+
+.wrap button {
+  justify-self: start;
+  border: 0.5px solid rgba(200, 169, 110, 0.55);
+  border-radius: 5px;
+  background: transparent;
+  color: var(--gold);
+  cursor: pointer;
+  font-family: var(--font);
+  font-size: 12px;
+  padding: 6px 9px;
+}
+
+.wrap button.enabled {
+  background: rgba(200, 169, 110, 0.15);
+}
+
+.note {
+  color: var(--text-dim);
+  font-size: 10px;
+}
