@@ -2,13 +2,14 @@ import React, { useEffect, useState } from 'react'
 import Movies from './pages/Movies.jsx'
 import TV from './pages/TV.jsx'
 import NeedWatch from './pages/NeedWatch.jsx'
-import Admin from './pages/Admin.jsx'
+import NeedWatchGate from './components/NeedWatchGate.jsx'
 import PrivacyPolicy from './pages/PrivacyPolicy.jsx'
 import Terms from './pages/Terms.jsx'
 import { getActiveProfile, getProfileSnapshot, restoreProfileSnapshot, saveActiveProfile, saveActiveProfileRecord } from './lib/profile.js'
-import { loadAdminConfig } from './lib/admin.js'
 import { createAccountWithEmail, observeAuth, readableAuthError, readCloudProfile, signInWithEmail, signInWithGoogle, signOutUser, supabaseConfigured, writeCloudProfile } from './lib/supabase.js'
 import styles from './App.module.css'
+
+const AUTHORIZED_NEED_WATCH_EMAIL = 'sachithnilukshana64@gmail.com'
 
 function clearMovieSession() {
   try { ['mv_query', 'mv_player'].forEach(k => sessionStorage.removeItem(k)) } catch {}
@@ -31,8 +32,6 @@ export default function App() {
   const [profile, setProfile] = useState(getActiveProfile)
   const [profileOpen, setProfileOpen] = useState(false)
   const [profileName, setProfileName] = useState(profile.name)
-  const [adminConfig, setAdminConfig] = useState(loadAdminConfig)
-  const adminEnabled = import.meta.env.VITE_ADMIN_MODE === 'true'
   const [theme, setTheme] = useState(readTheme)
   const [commandOpen, setCommandOpen] = useState(false)
   const [commandQuery, setCommandQuery] = useState('')
@@ -42,9 +41,13 @@ export default function App() {
   const [cloudReady, setCloudReady] = useState(!supabaseConfigured)
   const [authBusy, setAuthBusy] = useState(false)
   const [authError, setAuthError] = useState('')
+  const [authSuccess, setAuthSuccess] = useState('')
   const [authMode, setAuthMode] = useState('signin')
   const [authEmail, setAuthEmail] = useState('')
   const [authPassword, setAuthPassword] = useState('')
+  const [showAuthPassword, setShowAuthPassword] = useState(false)
+
+  const isNeedWatchAuthorized = authUser?.email?.toLowerCase() === AUTHORIZED_NEED_WATCH_EMAIL
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme
@@ -75,7 +78,6 @@ export default function App() {
   }, [])
 
   useEffect(() => {
-    if (!supabaseConfigured) return undefined
     let cancelled = false
     const stop = observeAuth(async user => {
       if (!user) {
@@ -188,6 +190,7 @@ export default function App() {
   async function handleGoogleSignIn() {
     setAuthBusy(true)
     setAuthError('')
+    setAuthSuccess('')
     try {
       await signInWithGoogle()
       setProfileOpen(false)
@@ -202,11 +205,22 @@ export default function App() {
     event.preventDefault()
     setAuthBusy(true)
     setAuthError('')
+    setAuthSuccess('')
     try {
-      if (authMode === 'create') await createAccountWithEmail(authEmail, authPassword, profileName)
-      else await signInWithEmail(authEmail, authPassword)
-      setAuthPassword('')
-      setProfileOpen(false)
+      if (authMode === 'create') {
+        const res = await createAccountWithEmail(authEmail, authPassword, profileName)
+        if (res?.session) {
+          setAuthPassword('')
+          setProfileOpen(false)
+        } else {
+          setAuthSuccess('Account created! Please sign in with your credentials.')
+          setAuthMode('signin')
+        }
+      } else {
+        await signInWithEmail(authEmail, authPassword)
+        setAuthPassword('')
+        setProfileOpen(false)
+      }
     } catch (error) {
       setAuthError(readableAuthError(error))
     } finally {
@@ -217,6 +231,7 @@ export default function App() {
   async function handleSignOut() {
     setAuthBusy(true)
     setAuthError('')
+    setAuthSuccess('')
     try {
       await signOutUser()
       const guest = saveActiveProfile('Guest')
@@ -272,9 +287,8 @@ export default function App() {
             className={`${styles.tab} ${tab === 'need-watch' ? styles.active : ''}`}
             onClick={() => goTab('need-watch')}
           >
-            Need Watch
+            Need Watch {!isNeedWatchAuthorized && '🔒'}
           </button>
-          {adminEnabled && <button className={`${styles.tab} ${tab === 'admin' ? styles.active : ''}`} onClick={() => goTab('admin')}>Admin</button>}
         </nav>
         <div className={styles.profileWrap}>
           <button
@@ -300,14 +314,58 @@ export default function App() {
                   <button type="button" className={styles.googleButton} onClick={handleGoogleSignIn} disabled={authBusy}>Continue with Google</button>
                   <p className={styles.divider}><span>or</span></p>
                   <form onSubmit={handleEmailAuth}>
-                    {authMode === 'create' && <><label htmlFor="profile-name">Display name</label><input id="profile-name" value={profileName} maxLength="32" onChange={event => setProfileName(event.target.value)} /></>}
+                    {authMode === 'create' && (
+                      <>
+                        <label htmlFor="profile-name">Display name</label>
+                        <input id="profile-name" value={profileName} maxLength="32" onChange={event => setProfileName(event.target.value)} />
+                      </>
+                    )}
                     <label htmlFor="auth-email">Email address</label>
                     <input id="auth-email" type="email" value={authEmail} onChange={event => setAuthEmail(event.target.value)} autoComplete="email" required />
                     <label htmlFor="auth-password">Password</label>
-                    <input id="auth-password" type="password" minLength="6" value={authPassword} onChange={event => setAuthPassword(event.target.value)} autoComplete={authMode === 'create' ? 'new-password' : 'current-password'} required />
+                    <div style={{ position: 'relative' }}>
+                      <input
+                        id="auth-password"
+                        type={showAuthPassword ? 'text' : 'password'}
+                        minLength="6"
+                        value={authPassword}
+                        onChange={event => setAuthPassword(event.target.value)}
+                        autoComplete={authMode === 'create' ? 'new-password' : 'current-password'}
+                        required
+                        style={{ paddingRight: '45px' }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowAuthPassword(p => !p)}
+                        style={{
+                          position: 'absolute',
+                          right: '6px',
+                          top: '11px',
+                          background: 'none',
+                          border: 'none',
+                          color: '#888',
+                          fontSize: '11px',
+                          cursor: 'pointer',
+                          width: 'auto',
+                          padding: '0 4px',
+                        }}
+                      >
+                        {showAuthPassword ? 'Hide' : 'Show'}
+                      </button>
+                    </div>
                     <button type="submit" disabled={authBusy}>{authBusy ? 'Please wait…' : authMode === 'create' ? 'Create account' : 'Sign in'}</button>
                   </form>
-                  <button type="button" className={styles.modeButton} onClick={() => { setAuthMode(mode => mode === 'create' ? 'signin' : 'create'); setAuthError('') }}>
+                  {authSuccess && <p className={styles.authSuccess} role="status">{authSuccess}</p>}
+                  {authError && <p className={styles.authError} role="alert">{authError}</p>}
+                  <button
+                    type="button"
+                    className={styles.modeButton}
+                    onClick={() => {
+                      setAuthMode(mode => mode === 'create' ? 'signin' : 'create')
+                      setAuthError('')
+                      setAuthSuccess('')
+                    }}
+                  >
                     {authMode === 'create' ? 'Already have an account? Sign in' : 'New here? Create an account'}
                   </button>
                 </>
@@ -318,7 +376,6 @@ export default function App() {
                   <button type="submit">Save profile</button>
                 </form>
               )}
-              {authError && <p className={styles.authError} role="alert">{authError}</p>}
             </div>
           )}
         </div>
@@ -334,12 +391,21 @@ export default function App() {
           <Terms onBack={goHome} />
         ) : (
           <>
-            {supabaseConfigured && !cloudReady ? <section className={styles.syncLoading} aria-live="polite">Restoring your Max Cinema profile…</section> : <>
-              {tab === 'movies' && <Movies key={homeKey} profile={profile} adminConfig={adminConfig} />}
-              {tab === 'tv' && <TV profile={profile} pinnedShowId={adminConfig.pinnedTvId} />}
-              {tab === 'need-watch' && <NeedWatch profile={profile} onBrowse={() => goTab('movies')} />}
-              {tab === 'admin' && adminEnabled && <Admin profile={profile} config={adminConfig} onSave={setAdminConfig} />}
-            </>}
+            {supabaseConfigured && !cloudReady ? (
+              <section className={styles.syncLoading} aria-live="polite">Restoring your Max Cinema profile…</section>
+            ) : (
+              <>
+                {tab === 'movies' && <Movies key={homeKey} profile={profile} />}
+                {tab === 'tv' && <TV profile={profile} pinnedShowId="5920" />}
+                {tab === 'need-watch' && (
+                  isNeedWatchAuthorized ? (
+                    <NeedWatch profile={profile} onBrowse={() => goTab('movies')} />
+                  ) : (
+                    <NeedWatchGate authUser={authUser} onBrowse={() => goTab('movies')} />
+                  )
+                )}
+              </>
+            )}
           </>
         )}
       </main>
@@ -370,7 +436,9 @@ export default function App() {
       <nav className={styles.mobileNav} aria-label="Mobile navigation">
         <button className={tab === 'movies' ? styles.mobileActive : ''} onClick={() => goTab('movies')}>⌂<span>Movies</span></button>
         <button className={tab === 'tv' ? styles.mobileActive : ''} onClick={() => goTab('tv')}>▣<span>TV</span></button>
-        <button className={tab === 'need-watch' ? styles.mobileActive : ''} onClick={() => goTab('need-watch')}>♡<span>Need Watch</span></button>
+        <button className={tab === 'need-watch' ? styles.mobileActive : ''} onClick={() => goTab('need-watch')}>
+          ♡<span>Need Watch</span>
+        </button>
         <button onClick={() => setProfileOpen(true)}>◉<span>Profile</span></button>
       </nav>
 
