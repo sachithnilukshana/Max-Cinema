@@ -2,7 +2,7 @@ import React from 'react'
 import MediaCard from './MediaCard.jsx'
 import styles from './MediaGrid.module.css'
 
-export default function MediaGrid({ items, type, onSelect, selectedId, loading, pinnedId, emptyAction, emptyActionLabel = 'Browse titles' }) {
+export default function MediaGrid({ items, type, onSelect, selectedId, loading, emptyAction, emptyActionLabel = 'Browse titles' }) {
   if (loading) {
     return (
       <div className={styles.grid}>
@@ -37,7 +37,6 @@ export default function MediaGrid({ items, type, onSelect, selectedId, loading, 
           type={type}
           onClick={onSelect}
           selected={item.id === selectedId}
-          pinned={item.pinned || item.id === pinnedId}
         />
       ))}
     </div>

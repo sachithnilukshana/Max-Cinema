@@ -12,24 +12,16 @@ import ContinueWatching from '../components/ContinueWatching.jsx'
 import SearchSuggestions from '../components/SearchSuggestions.jsx'
 import styles from './TV.module.css'
 
-const PINNED_SHOW_ID = 5920 // The Mentalist
-
 function persist(key, val) { try { sessionStorage.setItem(key, JSON.stringify(val)) } catch {} }
 function hydrate(key) { try { const v = sessionStorage.getItem(key); return v ? JSON.parse(v) : null } catch { return null } }
 
-function addPinnedShow(items, pinnedShow) {
-  if (!pinnedShow) return items
-  return [pinnedShow, ...items.filter(item => item.id !== pinnedShow.id)]
-}
-
-export default function TV({ profile, pinnedShowId = PINNED_SHOW_ID }) {
+export default function TV({ profile }) {
   const [query, setQuery] = useState(() => hydrate('tv_query') || '')
   const [results, setResults] = useState([])
   const [loading, setLoading] = useState(true)
   const [selected, setSelected] = useState(() => hydrate('tv_selected'))
   const [player, setPlayer] = useState(null)
   const [showPicker, setShowPicker] = useState(false)
-  const [pinnedShow, setPinnedShow] = useState(null)
   const [error, setError] = useState('')
   const [notice, setNotice] = useState('')
   const [episodeProgress, setEpisodeProgress] = useState(() => loadLibrary(profile.id).episodeProgress)
@@ -50,11 +42,7 @@ export default function TV({ profile, pinnedShowId = PINNED_SHOW_ID }) {
         .catch(error => setError(apiErrorMessage(error, 'Trending series')))
         .finally(() => setLoading(false))
     }
-
-    api.tvDetails(pinnedShowId)
-      .then(setPinnedShow)
-      .catch(() => {})
-  }, [pinnedShowId])
+  }, [])
 
   useEffect(() => {
     setEpisodeProgress(loadLibrary(profile.id).episodeProgress)
@@ -212,12 +200,11 @@ export default function TV({ profile, pinnedShowId = PINNED_SHOW_ID }) {
 
       <p className={styles.sectionLabel}>{hydrate('tv_query') ? 'Results' : 'Trending Now'}</p>
       <MediaGrid
-        items={addPinnedShow(results, pinnedShow)}
+        items={results}
         type="tv"
         loading={loading}
         onSelect={selectShow}
         selectedId={selected?.id}
-        pinnedId={Number(pinnedShowId)}
       />
     </div>
   )

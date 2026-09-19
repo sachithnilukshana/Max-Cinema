@@ -2,7 +2,7 @@ import React from 'react'
 import { posterUrl, formatRating, getYear } from '../lib/api.js'
 import styles from './MediaCard.module.css'
 
-export default function MediaCard({ item, type = 'movie', onClick, selected, pinned, watched, onToggleWatched, onRemove, onAddToWatchlist }) {
+export default function MediaCard({ item, type = 'movie', onClick, selected }) {
   const mediaType = item.media_type || type
   const title = mediaType === 'movie' ? item.title : item.name
   const date = mediaType === 'movie' ? item.release_date : item.first_air_date
@@ -17,7 +17,6 @@ export default function MediaCard({ item, type = 'movie', onClick, selected, pin
           {poster
             ? <img src={poster} alt="" loading="lazy" />
             : <div className={styles.noPoster} aria-hidden="true">{title?.slice(0, 2)}</div>}
-          {pinned && <span className={styles.pinnedBadge}>Pinned</span>}
           <div className={styles.posterOverlay} aria-hidden="true"><span>▶</span><small>{year || 'Explore'}</small></div>
         </div>
         <div className={styles.info}>

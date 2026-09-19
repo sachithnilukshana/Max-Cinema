@@ -170,7 +170,7 @@ export default function App() {
         ) : (
           <>
             {tab === 'movies' && <Movies key={homeKey} profile={profile} />}
-            {tab === 'tv' && <TV profile={profile} pinnedShowId="5920" />}
+            {tab === 'tv' && <TV profile={profile} />}
             {tab === 'history' && <WatchHistory profile={profile} onBrowse={() => goTab('movies')} />}
           </>
         )}
