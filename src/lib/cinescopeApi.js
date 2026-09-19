@@ -1,5 +1,5 @@
 // Base URL is set via VITE_CINESCOPE_API_URL in Netlify environment variables
-export const CINESCOPE_API_BASE = import.meta.env.VITE_CINESCOPE_API_URL || ''
+export const CINESCOPE_API_BASE = import.meta.env.VITE_CINESCOPE_API_URL || 'https://cinescope-api-9ukz.onrender.com'
 
 /**
  * Perform a safe GET request to the CineScope backend with timeout and graceful fallback
@@ -67,37 +67,48 @@ export function normalizeCinescopeItem(item) {
 }
 
 // ----------------------------------------------------------------------
-// Telemetry & User Action Tracking
+// Telemetry & User Action Tracking (Safe with guards)
 // ----------------------------------------------------------------------
 
 export function trackMovieView(movie) {
   if (!movie) return
   if (typeof window !== 'undefined' && window.cinescope) {
-    window.cinescope.trackMovieView(movie.id || movie.tmdbId, movie.title || movie.name)
+    if (typeof window.cinescope.trackMovieView === 'function') {
+      window.cinescope.trackMovieView(movie.id || movie.tmdbId, movie.title || movie.name)
+    } else if (typeof window.cinescope.track === 'function') {
+      window.cinescope.track('movie_view', { movieId: movie.id || movie.tmdbId, title: movie.title || movie.name })
+    }
   }
 }
 
 export function trackTVView(show) {
   if (!show) return
   if (typeof window !== 'undefined' && window.cinescope) {
-    window.cinescope.trackTVView(show.id || show.tmdbId, show.name || show.title)
+    if (typeof window.cinescope.trackTVView === 'function') {
+      window.cinescope.trackTVView(show.id || show.tmdbId, show.name || show.title)
+    } else if (typeof window.cinescope.track === 'function') {
+      window.cinescope.track('tv_view', { showId: show.id || show.tmdbId, title: show.name || show.title })
+    }
   }
 }
 
 export function trackSearch(query) {
   if (!query || !query.trim()) return
   if (typeof window !== 'undefined' && window.cinescope) {
-    window.cinescope.trackSearch(query.trim())
+    if (typeof window.cinescope.trackSearch === 'function') {
+      window.cinescope.trackSearch(query.trim())
+    } else if (typeof window.cinescope.track === 'function') {
+      window.cinescope.track('search', { query: query.trim() })
+    }
   }
 }
 
 export function trackTrailerClick(movie) {
   if (!movie) return
-  if (typeof window !== 'undefined' && window.cinescope) {
+  if (typeof window !== 'undefined' && window.cinescope && typeof window.cinescope.track === 'function') {
     window.cinescope.track('trailer_click', {
       movieId: movie.id || movie.tmdbId,
       title: movie.title || movie.name,
     })
   }
 }
-

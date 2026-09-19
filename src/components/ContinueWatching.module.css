@@ -6,13 +6,20 @@
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  margin-bottom: 9px;
+  margin-bottom: 12px;
+}
+
+.titleGroup {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
 }
 
 .heading p {
   color: var(--text);
   font-size: 1.2rem;
   font-style: italic;
+  margin: 0;
 }
 
 .heading span {
@@ -20,66 +27,151 @@
   font-size: 11px;
 }
 
+.clearBtn {
+  background: transparent;
+  border: none;
+  color: #888888;
+  font-size: 11px;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: color 0.2s ease;
+}
+
+.clearBtn:hover {
+  color: #ff6b6b;
+}
+
 .row {
   display: flex;
-  gap: 10px;
+  gap: 12px;
   overflow-x: auto;
-  padding-bottom: 5px;
+  padding-bottom: 8px;
 }
 
 .card {
-  flex: 0 0 125px;
+  flex: 0 0 135px;
   overflow: hidden;
   border: 0.5px solid var(--border);
-  border-radius: 7px;
+  border-radius: 8px;
   background: var(--bg-card);
   color: var(--text-muted);
   cursor: pointer;
   font-family: var(--font);
   font-size: 12px;
   text-align: left;
+  transition: transform 0.2s ease, border-color 0.2s ease;
 }
 
-.card img,
+.card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(212, 175, 55, 0.4);
+}
+
+.posterBox {
+  position: relative;
+  width: 100%;
+  height: 110px;
+  background: #181818;
+  overflow: hidden;
+}
+
+.posterBox img,
 .noPoster {
   display: block;
   width: 100%;
-  height: 104px;
-  background: #181818;
+  height: 100%;
   object-fit: cover;
 }
 
-.card span,
-.card small {
+.noPoster {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-dim);
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.card:hover .overlay {
+  opacity: 1;
+}
+
+.overlay span {
+  width: 28px;
+  height: 28px;
+  background: var(--gold);
+  color: #0a0a0a;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  padding-left: 2px;
+}
+
+.removeBtn {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 22px;
+  height: 22px;
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  border-radius: 50%;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: all 0.2s ease;
+  z-index: 2;
+}
+
+.removeBtn:hover {
+  opacity: 1;
+  background: #ff4757;
+  border-color: #ff4757;
+}
+
+.cardTitle {
   display: block;
   overflow: hidden;
-  padding: 3px 7px 0;
+  padding: 6px 8px 2px;
   text-overflow: ellipsis;
   white-space: nowrap;
+  font-weight: 600;
+  color: var(--text);
 }
 
-.card small {
+.badge {
+  display: block;
+  padding: 0 8px 4px;
   color: var(--gold);
   font-size: 10px;
-  padding-bottom: 6px;
-}
-
-.card:hover,
-.card:focus-visible {
-  border-color: rgba(200, 169, 110, 0.55);
+  font-weight: 600;
 }
 
 .progress {
   height: 3px;
-  margin: 8px 7px 8px;
-  overflow: hidden;
-  border-radius: 99px;
-  background: rgba(255, 255, 255, 0.12);
+  background: #252525;
 }
 
 .progress i {
   display: block;
   height: 100%;
-  border-radius: inherit;
   background: var(--gold);
 }

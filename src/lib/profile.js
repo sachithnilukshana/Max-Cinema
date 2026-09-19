@@ -166,8 +166,6 @@ export function recordContinueWatching(profileId, item) {
     const entry = {
       ...item,
       media_type: item.media_type || item.mediaType || (item.name ? 'tv' : 'movie'),
-      // Cross-origin embeds do not expose a reliable playhead. Preserve a useful
-      // local resume marker until a first-party player is connected.
       progress: Number.isFinite(item.progress) ? item.progress : 12,
       lastPlayedAt: new Date().toISOString(),
     }
@@ -175,7 +173,29 @@ export function recordContinueWatching(profileId, item) {
     const entries = [entry, ...library.continueWatching.filter(existing => {
       const existingKey = titleKey(existing) + (existing.season && existing.episode ? `:${existing.season}:${existing.episode}` : '')
       return existingKey !== key
-    })].slice(0, 12)
+    })].slice(0, 50)
+    return { ...library, continueWatching: entries }
+  })
+}
+
+export function removeFromContinueWatching(profileId, item) {
+  return updateLibrary(profileId, library => {
+    const key = typeof item === 'string'
+      ? item
+      : titleKey(item) + (item.season && item.episode ? `:${item.season}:${item.episode}` : '')
+    const entries = library.continueWatching.filter(existing => {
+      const existingKey = titleKey(existing) + (existing.season && existing.episode ? `:${existing.season}:${existing.episode}` : '')
+      return existingKey !== key
+    })
+    return { ...library, continueWatching: entries }
+  })
+}
+
+export function clearContinueWatching(profileId, mediaType = null) {
+  return updateLibrary(profileId, library => {
+    const entries = mediaType
+      ? library.continueWatching.filter(existing => (existing.media_type || (existing.name ? 'tv' : 'movie')) !== mediaType)
+      : []
     return { ...library, continueWatching: entries }
   })
 }

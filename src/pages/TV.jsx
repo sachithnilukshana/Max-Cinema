@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { api, apiErrorMessage, tvEmbedUrl, formatRating, getYear } from '../lib/api.js'
 import { loadLibrary, markEpisodeWatched, recordContinueWatching, setEpisodeWatched } from '../lib/profile.js'
+import { trackSearch, trackTVView } from '../lib/cinescopeApi.js'
 import MediaGrid from '../components/MediaGrid.jsx'
 import Player from '../components/Player.jsx'
 import SeasonPicker from '../components/SeasonPicker.jsx'
@@ -8,7 +9,6 @@ import WatchOptions from '../components/WatchOptions.jsx'
 import TitleDetails from '../components/TitleDetails.jsx'
 import PersonalControls from '../components/PersonalControls.jsx'
 import ContinueWatching from '../components/ContinueWatching.jsx'
-import TasteRecommendations from '../components/TasteRecommendations.jsx'
 import SearchSuggestions from '../components/SearchSuggestions.jsx'
 import styles from './TV.module.css'
 
@@ -81,9 +81,7 @@ export default function TV({ profile, pinnedShowId = PINNED_SHOW_ID }) {
     e.preventDefault()
     const q = query.trim()
     if (!q) return
-    if (window.cinescope) {
-      window.cinescope.trackSearch(q)
-    }
+    trackSearch(q)
     setLoading(true)
     setError('')
     setNotice('')
@@ -100,9 +98,7 @@ export default function TV({ profile, pinnedShowId = PINNED_SHOW_ID }) {
   }
 
   function selectShow(item) {
-    if (window.cinescope) {
-      window.cinescope.trackTVView(item.id || item.tmdbId, item.name || item.title)
-    }
+    trackTVView(item)
     setSelected(item)
     persist('tv_selected', item)
     setShowPicker(true)
@@ -204,8 +200,6 @@ export default function TV({ profile, pinnedShowId = PINNED_SHOW_ID }) {
       )}
 
       <ContinueWatching profile={profile} mediaType="tv" onSelect={resumeShow} />
-
-      <TasteRecommendations onSelect={selectShow} />
 
       {notice && <p className={styles.notice} role="status">{notice}</p>}
       {error && <p className={styles.error} role="alert">{error}</p>}

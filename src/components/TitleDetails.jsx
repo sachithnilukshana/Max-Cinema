@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { api, formatRating, getYear, posterUrl } from '../lib/api.js'
+import { trackMovieView, trackTVView, trackTrailerClick } from '../lib/cinescopeApi.js'
 import WatchOptions from './WatchOptions.jsx'
 import styles from './TitleDetails.module.css'
 
@@ -49,12 +50,10 @@ export default function TitleDetails({ id, mediaType, onSelect }) {
         setRecommendations((recommendedData.results || []).slice(0, 6))
         setTrailer((videoData.results || []).find(video => video.site === 'YouTube' && video.type === 'Trailer') || null)
 
-        if (window.cinescope) {
-          if (mediaType === 'tv') {
-            window.cinescope.trackTVView(title.id || title.tmdbId, title.name || title.title)
-          } else {
-            window.cinescope.trackMovieView(title.id || title.tmdbId, title.title)
-          }
+        if (mediaType === 'tv') {
+          trackTVView(title)
+        } else {
+          trackMovieView(title)
         }
       })
       .catch(() => {
@@ -86,9 +85,7 @@ export default function TitleDetails({ id, mediaType, onSelect }) {
               type="button"
               className={styles.trailer}
               onClick={() => {
-                if (window.cinescope) {
-                  window.cinescope.track('trailer_click', { movieId: details.id || details.tmdbId || id, title })
-                }
+                trackTrailerClick(details)
                 setTrailerOpen(true)
               }}
             >

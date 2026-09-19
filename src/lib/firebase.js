@@ -177,3 +177,4 @@ export function readableAuthError(error) {
   }
   return message.replace(/^Firebase:\s*/i, '').replace(/\s*\(auth\/[^)]+\)\.?$/, '') || 'Authentication error. Please try again.'
 }
+

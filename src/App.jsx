@@ -1,18 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import Movies from './pages/Movies.jsx'
 import TV from './pages/TV.jsx'
+import WatchHistory from './pages/WatchHistory.jsx'
 import PrivacyPolicy from './pages/PrivacyPolicy.jsx'
 import Terms from './pages/Terms.jsx'
-import { getActiveProfile, saveActiveProfile, saveActiveProfileRecord } from './lib/profile.js'
-import {
-  observeAuth,
-  signInWithEmail,
-  createAccountWithEmail,
-  signInWithGoogle,
-  signOutUser,
-  resetPassword,
-  readableAuthError,
-} from './lib/firebase.js'
+import { getActiveProfile } from './lib/profile.js'
+import { trackSearch } from './lib/cinescopeApi.js'
 import styles from './App.module.css'
 
 function clearMovieSession() {
@@ -27,25 +20,15 @@ function readPath() { return window.location.pathname.replace(/\/+$/, '') || '/'
 export default function App() {
   const [tab, setTab] = useState(() => {
     const saved = readSession('cs_tab')
-    return saved === 'tv' ? 'tv' : 'movies'
+    return ['movies', 'tv', 'history'].includes(saved) ? saved : 'movies'
   })
   const [homeKey, setHomeKey] = useState(0)
-  const [profile, setProfile] = useState(getActiveProfile)
-  const [profileOpen, setProfileOpen] = useState(false)
-  const [profileName, setProfileName] = useState(profile.name)
+  const [profile] = useState(getActiveProfile)
   const [theme, setTheme] = useState(readTheme)
   const [commandOpen, setCommandOpen] = useState(false)
   const [commandQuery, setCommandQuery] = useState('')
   const [path, setPath] = useState(readPath)
   const [privacyNotice, setPrivacyNotice] = useState('')
-  const [authUser, setAuthUser] = useState(null)
-  const [authBusy, setAuthBusy] = useState(false)
-  const [authError, setAuthError] = useState('')
-  const [authSuccess, setAuthSuccess] = useState('')
-  const [authMode, setAuthMode] = useState('signin') // 'signin' | 'create' | 'reset'
-  const [authEmail, setAuthEmail] = useState('')
-  const [authPassword, setAuthPassword] = useState('')
-  const [showAuthPassword, setShowAuthPassword] = useState(false)
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme
@@ -73,24 +56,6 @@ export default function App() {
     const handlePopState = () => setPath(readPath())
     window.addEventListener('popstate', handlePopState)
     return () => window.removeEventListener('popstate', handlePopState)
-  }, [])
-
-  // Firebase auth state observer
-  useEffect(() => {
-    const unsubscribe = observeAuth(user => {
-      if (user) {
-        setAuthUser(user)
-        const savedProfile = saveActiveProfileRecord({
-          id: user.uid || user.id,
-          name: user.displayName || user.email?.split('@')[0] || 'Member',
-        })
-        setProfile(savedProfile)
-        setProfileName(savedProfile.name)
-      } else {
-        setAuthUser(null)
-      }
-    })
-    return () => unsubscribe()
   }, [])
 
   useEffect(() => {
@@ -132,78 +97,11 @@ export default function App() {
     setPrivacyNotice('Privacy choices will appear here after the Google consent message is published in AdSense.')
   }
 
-  function updateProfile(event) {
-    event.preventDefault()
-    const nextProfile = saveActiveProfile(profileName)
-    setProfile(nextProfile)
-    setProfileName(nextProfile.name)
-    setProfileOpen(false)
-  }
-
-  async function handleGoogleSignIn() {
-    setAuthBusy(true)
-    setAuthError('')
-    setAuthSuccess('')
-    try {
-      await signInWithGoogle()
-      setProfileOpen(false)
-    } catch (error) {
-      setAuthError(readableAuthError(error))
-    } finally {
-      setAuthBusy(false)
-    }
-  }
-
-  async function handleEmailAuth(event) {
-    event.preventDefault()
-    setAuthBusy(true)
-    setAuthError('')
-    setAuthSuccess('')
-    try {
-      if (authMode === 'reset') {
-        await resetPassword(authEmail)
-        setAuthSuccess(`Password reset email sent to ${authEmail}. Please check your inbox.`)
-      } else if (authMode === 'create') {
-        await createAccountWithEmail(authEmail, authPassword, profileName)
-        setAuthSuccess('Account created successfully!')
-        setAuthPassword('')
-        setProfileOpen(false)
-      } else {
-        await signInWithEmail(authEmail, authPassword)
-        setAuthPassword('')
-        setProfileOpen(false)
-      }
-    } catch (error) {
-      setAuthError(readableAuthError(error))
-    } finally {
-      setAuthBusy(false)
-    }
-  }
-
-  async function handleSignOut() {
-    setAuthBusy(true)
-    setAuthError('')
-    setAuthSuccess('')
-    try {
-      await signOutUser()
-      const guest = saveActiveProfile('Guest')
-      setProfile(guest)
-      setProfileName(guest.name)
-      setAuthUser(null)
-    } catch (error) {
-      setAuthError(readableAuthError(error))
-    } finally {
-      setAuthBusy(false)
-    }
-  }
-
   function runCommand(event) {
     event.preventDefault()
     const query = commandQuery.trim()
     if (query) {
-      if (window.cinescope) {
-        window.cinescope.trackSearch(query)
-      }
+      trackSearch(query)
       writeSession('mv_query', JSON.stringify(query))
       setHomeKey(key => key + 1)
     }
@@ -236,185 +134,32 @@ export default function App() {
           >
             TV Series
           </button>
+          <button
+            className={`${styles.tab} ${tab === 'history' ? styles.active : ''}`}
+            onClick={() => goTab('history')}
+          >
+            Watch History
+          </button>
         </nav>
-        <div className={styles.profileWrap}>
+        <div className={styles.headerRight}>
           <button
             type="button"
-            className={styles.profileButton}
-            aria-expanded={profileOpen}
-            onClick={() => setProfileOpen(open => !open)}
+            className={styles.searchTrigger}
+            onClick={() => setCommandOpen(true)}
+            aria-label="Search movies and series"
+            title="Search (Ctrl+K or /)"
           >
-            {authUser ? (authUser.displayName || authUser.email?.split('@')[0] || profile.name) : profile.name}
+            🔍 Search
           </button>
-          {profileOpen && (
-            <div className={styles.profilePanel}>
-              {authUser ? (
-                <>
-                  <p className={styles.accountHeading}>Signed in</p>
-                  <p className={styles.accountEmail}>{authUser.email}</p>
-                  <p className={styles.syncState}>Welcome back to Max Cinema.</p>
-                  <button type="button" onClick={handleSignOut} disabled={authBusy}>Sign out</button>
-                </>
-              ) : (
-                <>
-                  <p className={styles.accountHeading}>
-                    {authMode === 'create'
-                      ? 'Create account'
-                      : authMode === 'reset'
-                        ? 'Reset password'
-                        : 'Sign in'}
-                  </p>
-
-                  {authMode !== 'reset' && (
-                    <>
-                      <button type="button" className={styles.googleButton} onClick={handleGoogleSignIn} disabled={authBusy}>
-                        Continue with Google
-                      </button>
-                      <p className={styles.divider}><span>or</span></p>
-                    </>
-                  )}
-
-                  <form onSubmit={handleEmailAuth}>
-                    {authMode === 'create' && (
-                      <>
-                        <label htmlFor="profile-name">Display name</label>
-                        <input
-                          id="profile-name"
-                          value={profileName}
-                          maxLength="32"
-                          onChange={event => setProfileName(event.target.value)}
-                          placeholder="Your name"
-                        />
-                      </>
-                    )}
-
-                    <label htmlFor="auth-email">Email address</label>
-                    <input
-                      id="auth-email"
-                      type="email"
-                      value={authEmail}
-                      onChange={event => setAuthEmail(event.target.value)}
-                      autoComplete="email"
-                      placeholder="name@example.com"
-                      required
-                    />
-
-                    {authMode !== 'reset' && (
-                      <>
-                        <label htmlFor="auth-password">Password</label>
-                        <div style={{ position: 'relative' }}>
-                          <input
-                            id="auth-password"
-                            type={showAuthPassword ? 'text' : 'password'}
-                            minLength="6"
-                            value={authPassword}
-                            onChange={event => setAuthPassword(event.target.value)}
-                            autoComplete={authMode === 'create' ? 'new-password' : 'current-password'}
-                            placeholder="Enter password"
-                            required
-                            style={{ paddingRight: '48px' }}
-                          />
-                          <button
-                            type="button"
-                            onClick={() => setShowAuthPassword(p => !p)}
-                            style={{
-                              position: 'absolute',
-                              right: '6px',
-                              top: '10px',
-                              background: 'none',
-                              border: 'none',
-                              color: '#888',
-                              fontSize: '11px',
-                              cursor: 'pointer',
-                              width: 'auto',
-                              padding: '0 4px',
-                            }}
-                          >
-                            {showAuthPassword ? 'Hide' : 'Show'}
-                          </button>
-                        </div>
-                      </>
-                    )}
-
-                    <button type="submit" disabled={authBusy}>
-                      {authBusy
-                        ? 'Please wait…'
-                        : authMode === 'create'
-                          ? 'Create account'
-                          : authMode === 'reset'
-                            ? 'Send reset email'
-                            : 'Sign in'}
-                    </button>
-                  </form>
-
-                  {authSuccess && <p className={styles.authSuccess} role="status">{authSuccess}</p>}
-                  {authError && <p className={styles.authError} role="alert">{authError}</p>}
-
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '10px' }}>
-                    {authMode === 'signin' && (
-                      <>
-                        <button
-                          type="button"
-                          className={styles.modeButton}
-                          onClick={() => {
-                            setAuthMode('create')
-                            setAuthError('')
-                            setAuthSuccess('')
-                          }}
-                        >
-                          New here? Create an account
-                        </button>
-                        <button
-                          type="button"
-                          className={styles.modeButton}
-                          style={{ fontSize: '11px', color: '#888' }}
-                          onClick={() => {
-                            setAuthMode('reset')
-                            setAuthError('')
-                            setAuthSuccess('')
-                          }}
-                        >
-                          Forgot password?
-                        </button>
-                      </>
-                    )}
-
-                    {authMode === 'create' && (
-                      <button
-                        type="button"
-                        className={styles.modeButton}
-                        onClick={() => {
-                          setAuthMode('signin')
-                          setAuthError('')
-                          setAuthSuccess('')
-                        }}
-                      >
-                        Already have an account? Sign in
-                      </button>
-                    )}
-
-                    {authMode === 'reset' && (
-                      <button
-                        type="button"
-                        className={styles.modeButton}
-                        onClick={() => {
-                          setAuthMode('signin')
-                          setAuthError('')
-                          setAuthSuccess('')
-                        }}
-                      >
-                        Back to sign in
-                      </button>
-                    )}
-                  </div>
-                </>
-              )}
-            </div>
-          )}
+          <button
+            type="button"
+            className={styles.themeButton}
+            onClick={() => setTheme(current => current === 'dark' ? 'light' : 'dark')}
+            aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
+          >
+            {theme === 'dark' ? '☀' : '☾'}
+          </button>
         </div>
-        <button type="button" className={styles.themeButton} onClick={() => setTheme(current => current === 'dark' ? 'light' : 'dark')} aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}>
-          {theme === 'dark' ? '☀' : '☾'}
-        </button>
       </header>
 
       <main className={styles.main}>
@@ -426,6 +171,7 @@ export default function App() {
           <>
             {tab === 'movies' && <Movies key={homeKey} profile={profile} />}
             {tab === 'tv' && <TV profile={profile} pinnedShowId="5920" />}
+            {tab === 'history' && <WatchHistory profile={profile} onBrowse={() => goTab('movies')} />}
           </>
         )}
       </main>
@@ -456,17 +202,19 @@ export default function App() {
       <nav className={styles.mobileNav} aria-label="Mobile navigation">
         <button className={tab === 'movies' ? styles.mobileActive : ''} onClick={() => goTab('movies')}>⌂<span>Movies</span></button>
         <button className={tab === 'tv' ? styles.mobileActive : ''} onClick={() => goTab('tv')}>▣<span>TV</span></button>
-        <button onClick={() => setProfileOpen(true)}>◉<span>Profile</span></button>
+        <button className={tab === 'history' ? styles.mobileActive : ''} onClick={() => goTab('history')}>⏱<span>History</span></button>
+        <button onClick={() => setCommandOpen(true)}>🔍<span>Search</span></button>
       </nav>
 
       {commandOpen && (
         <div className={styles.commandBackdrop} onMouseDown={() => setCommandOpen(false)}>
           <form className={styles.commandPalette} onSubmit={runCommand} onMouseDown={event => event.stopPropagation()}>
-            <input autoFocus value={commandQuery} onChange={event => setCommandQuery(event.target.value)} placeholder="Search any movie…" aria-label="Command palette search" />
+            <input autoFocus value={commandQuery} onChange={event => setCommandQuery(event.target.value)} placeholder="Search any movie or TV show…" aria-label="Command palette search" />
             <button type="submit">Search movies</button>
             <div className={styles.commandActions}>
+              <button type="button" onClick={() => { goTab('movies'); setCommandOpen(false) }}>Browse Movies</button>
               <button type="button" onClick={() => { goTab('tv'); setCommandOpen(false) }}>Browse TV</button>
-              <button type="button" onClick={() => { setProfileOpen(true); setCommandOpen(false) }}>Profile settings</button>
+              <button type="button" onClick={() => { goTab('history'); setCommandOpen(false) }}>Open History</button>
             </div>
             <small>Press Esc to close · Ctrl+K or / to reopen</small>
           </form>
