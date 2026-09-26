@@ -1,144 +1,133 @@
-.railWrap {
-  margin-bottom: 2.8rem;
-  position: relative;
+/* ── Rail container ─────────────────────────────────────────────────── */
+.rail {
+  margin: 2rem 0;
 }
 
-.railHeader {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  margin-bottom: 14px;
-}
-
-.titleRow {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.top10Badge {
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.1em;
-  background: #e50914;
-  color: #fff;
-  padding: 3px 8px;
-  border-radius: 4px;
-  box-shadow: 0 2px 8px rgba(229, 9, 20, 0.4);
+.header {
+  margin-bottom: 0.85rem;
+  padding: 0 0.25rem;
 }
 
 .title {
+  font-family: var(--font-heading, 'Cinzel', serif);
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text, #e5e5e5);
   margin: 0;
-  font-size: clamp(1.2rem, 2.2vw, 1.45rem);
-  font-weight: 700;
-  color: var(--text, #fff);
-  letter-spacing: -0.01em;
+  letter-spacing: 0.02em;
 }
 
 .subtitle {
-  margin: 4px 0 0;
-  font-size: 13px;
+  font-size: 0.8rem;
   color: var(--text-muted, #888);
+  margin: 0.2rem 0 0;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
 }
 
-.controls {
+/* ── Track + chevron wrapper ────────────────────────────────────────── */
+.trackWrap {
+  position: relative;
+}
+
+.track {
   display: flex;
-  gap: 6px;
+  gap: 0.65rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding-bottom: 0.5rem;
+  /* hide scrollbar */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
-.scrollBtn {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: #ccc;
-  font-size: 22px;
+.track::-webkit-scrollbar {
+  display: none;
+}
+
+/* ── Individual card wrapper (for rank badge) ───────────────────────── */
+.cardWrap {
+  position: relative;
+  flex-shrink: 0;
+  scroll-snap-align: start;
+}
+
+/* ── Top-10 rank badge ─────────────────────────────────────────────── */
+.rankBadge {
+  position: absolute;
+  bottom: 48px;   /* sits just above the card's info block */
+  left: -8px;
+  z-index: 2;
+  font-family: var(--font-heading, 'Cinzel', serif);
+  font-size: 3.5rem;
+  font-weight: 900;
+  line-height: 1;
+  color: transparent;
+  -webkit-text-stroke: 2px var(--gold, #D4AF37);
+  text-stroke: 2px var(--gold, #D4AF37);
+  text-shadow: none;
+  pointer-events: none;
+  user-select: none;
+  letter-spacing: -0.04em;
+}
+
+/* ── Chevron scroll buttons ─────────────────────────────────────────── */
+.chevron {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-60%);
+  z-index: 10;
+  width: 38px;
+  height: 72px;
+  border: none;
+  border-radius: 6px;
+  background: rgba(10, 10, 10, 0.85);
+  color: #fff;
+  font-size: 1.8rem;
   line-height: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.18s ease;
+  transition: background 0.2s, color 0.2s;
+  backdrop-filter: blur(4px);
 }
 
-.scrollBtn:hover {
-  background: rgba(255, 255, 255, 0.2);
-  color: #fff;
-  border-color: var(--gold, #d4af37);
-  transform: scale(1.08);
+.chevron:hover {
+  background: rgba(212, 175, 55, 0.2);
+  color: var(--gold, #D4AF37);
 }
 
-.railTrack {
-  display: flex;
-  gap: 16px;
-  overflow-x: auto;
-  scroll-behavior: smooth;
-  padding: 8px 4px 18px;
-  margin: 0 -4px;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
-}
+.chevronLeft  { left: -14px; }
+.chevronRight { right: -14px; }
 
-.railTrack::-webkit-scrollbar {
-  height: 6px;
-}
-
-.railTrack::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.18);
-  border-radius: 999px;
-}
-
-.railTrack::-webkit-scrollbar-thumb:hover {
-  background: var(--gold, #d4af37);
-}
-
-.cardItem {
-  flex: 0 0 170px;
-  max-width: 170px;
-}
-
-@media (max-width: 640px) {
-  .cardItem {
-    flex: 0 0 140px;
-    max-width: 140px;
-  }
-}
-
-/* Skeleton Loading styles */
-.skeletonCard {
-  flex: 0 0 170px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.skeletonPoster {
-  width: 100%;
-  aspect-ratio: 2 / 3;
-  border-radius: 8px;
-  background: #18181c;
-  animation: shimmer 1.5s infinite linear;
-}
-
-.skeletonLine {
-  width: 80%;
-  height: 12px;
-  border-radius: 4px;
-  background: #1e1e24;
-  animation: shimmer 1.5s infinite linear;
-}
-
-.skeletonSub {
-  width: 50%;
-  height: 10px;
-  border-radius: 4px;
-  background: #18181c;
-  animation: shimmer 1.5s infinite linear;
-}
-
+/* ── Skeleton shimmer cards ─────────────────────────────────────────── */
 @keyframes shimmer {
-  0% { opacity: 0.5; }
-  50% { opacity: 0.9; }
-  100% { opacity: 0.5; }
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+.skeleton {
+  flex-shrink: 0;
+  width: 140px;
+  height: 210px;
+  border-radius: 8px;
+  background: linear-gradient(90deg, #141414 25%, #222222 50%, #141414 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.4s infinite linear;
+}
+
+/* ── Responsive ─────────────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .rankBadge {
+    font-size: 2.5rem;
+    left: -4px;
+  }
+  .chevron {
+    width: 28px;
+    height: 56px;
+    font-size: 1.4rem;
+  }
+  .chevronLeft  { left: -8px; }
+  .chevronRight { right: -8px; }
 }

@@ -1,265 +1,248 @@
-.carousel {
+/* ── Hero section ───────────────────────────────────────────────────── */
+.hero {
   position: relative;
   width: 100%;
-  min-height: min(60vw, 480px);
-  border-radius: 14px;
+  min-height: 500px;
+  height: min(56vw, 640px);
   overflow: hidden;
-  margin-bottom: 2.2rem;
-  background-color: #121214;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
-  display: flex;
-  align-items: flex-end;
+  border-radius: 12px;
+  margin-bottom: 2.5rem;
+  user-select: none;
 }
 
-.backdropSlide {
+/* ── Backdrop ───────────────────────────────────────────────────────── */
+.backdrop {
   position: absolute;
   inset: 0;
-  background-size: cover;
-  background-position: center 20%;
-  opacity: 0;
-  transition: opacity 1s cubic-bezier(0.4, 0, 0.2, 1), transform 8s linear;
-  transform: scale(1);
-  will-change: opacity, transform;
+  z-index: 0;
 }
 
-.activeSlide {
-  opacity: 1;
-  transform: scale(1.04);
+.backdropImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
 }
 
-.overlayGradient {
+.backdropFallback {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #0d0d0d 0%, #1a1410 100%);
+}
+
+.backdropGrad {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(90deg, rgba(10, 10, 12, 0.95) 0%, rgba(10, 10, 12, 0.65) 50%, rgba(10, 10, 12, 0.2) 100%),
-    linear-gradient(0deg, rgba(10, 10, 12, 0.98) 0%, rgba(10, 10, 12, 0.4) 60%, transparent 100%);
-  z-index: 1;
+    linear-gradient(to right, rgba(7,7,7,0.96) 0%, rgba(7,7,7,0.55) 55%, rgba(7,7,7,0.1) 100%),
+    linear-gradient(to top, rgba(7,7,7,0.92) 0%, transparent 50%);
 }
 
-.contentWrap {
+/* ── Content overlay ────────────────────────────────────────────────── */
+.content {
   position: relative;
   z-index: 2;
-  max-width: 680px;
-  padding: clamp(1.5rem, 5vw, 3.5rem);
-}
-
-.eyebrow {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 12px;
+  gap: 2rem;
+  height: 100%;
+  padding: 2.5rem 3rem;
+}
+
+.poster {
+  width: 140px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.8);
+  object-fit: cover;
+  aspect-ratio: 2/3;
+}
+
+.meta {
+  flex: 1;
+  max-width: 560px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* ── Badges ─────────────────────────────────────────────────────────── */
+.badges {
+  display: flex;
+  gap: 0.5rem;
   flex-wrap: wrap;
 }
 
-.spotlightTag {
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  background: rgba(229, 9, 20, 0.85);
-  color: #fff;
-  padding: 3px 8px;
+.badge {
+  padding: 0.2rem 0.65rem;
   border-radius: 4px;
-}
-
-.goldRating {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--gold, #d4af37);
-  background: rgba(200, 169, 110, 0.15);
-  border: 1px solid rgba(200, 169, 110, 0.35);
-  padding: 2px 8px;
-  border-radius: 12px;
-}
-
-.pill {
-  font-size: 12px;
+  background: rgba(255,255,255,0.1);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
   color: #ccc;
-  background: rgba(255, 255, 255, 0.12);
-  padding: 2px 8px;
-  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.12);
 }
 
+.badgeGold {
+  composes: badge;
+  background: rgba(212,175,55,0.15);
+  border-color: rgba(212,175,55,0.3);
+  color: var(--gold, #D4AF37);
+}
+
+/* ── Title & overview ───────────────────────────────────────────────── */
 .title {
+  font-family: var(--font-heading, 'Cinzel', serif);
+  font-size: clamp(1.4rem, 3.5vw, 2.8rem);
+  font-weight: 700;
   color: #fff;
-  font-size: clamp(1.8rem, 4.5vw, 3.2rem);
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  line-height: 1.15;
-  margin: 0 0 12px;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+  line-height: 1.1;
+  text-shadow: 0 2px 12px rgba(0,0,0,0.8);
+  letter-spacing: 0.01em;
 }
 
 .overview {
-  color: #dedede;
-  font-size: clamp(13px, 1.6vw, 15px);
-  line-height: 1.6;
-  margin: 0 0 20px;
-  max-width: 580px;
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: #c0c0c0;
+  max-width: 480px;
 }
 
+/* ── Action buttons ─────────────────────────────────────────────────── */
 .actions {
   display: flex;
-  align-items: center;
-  gap: 12px;
+  gap: 0.65rem;
   flex-wrap: wrap;
+  margin-top: 0.25rem;
 }
 
-.playButton {
-  background: var(--gold, #d4af37);
-  color: #0b0b0d;
+.btnPlay {
+  padding: 0.6rem 1.6rem;
+  background: var(--gold, #D4AF37);
+  color: #070707;
+  border: none;
+  border-radius: 6px;
   font-weight: 700;
-  font-size: 14px;
-  padding: 10px 22px;
-  border: 0;
-  border-radius: 6px;
+  font-size: 0.9rem;
   cursor: pointer;
-  box-shadow: 0 4px 16px rgba(212, 175, 55, 0.35);
-  transition: all 0.2s ease;
+  transition: background 0.2s, transform 0.15s;
 }
 
-.playButton:hover {
-  background: #f5d36e;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(212, 175, 55, 0.5);
+.btnPlay:hover {
+  background: var(--gold-hover, #e0c04a);
+  transform: scale(1.03);
 }
 
-.trailerButton {
-  background: rgba(255, 255, 255, 0.15);
+.btnTrailer {
+  padding: 0.6rem 1.2rem;
+  background: rgba(255,255,255,0.1);
   color: #fff;
-  font-weight: 600;
-  font-size: 14px;
-  padding: 10px 18px;
-  border: 1px solid rgba(255, 255, 255, 0.28);
+  border: 1px solid rgba(255,255,255,0.25);
   border-radius: 6px;
+  font-size: 0.9rem;
   cursor: pointer;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  transition: all 0.2s ease;
+  backdrop-filter: blur(6px);
+  transition: background 0.2s;
 }
 
-.trailerButton:hover {
-  background: rgba(255, 255, 255, 0.26);
-  border-color: rgba(255, 255, 255, 0.5);
-  transform: translateY(-2px);
+.btnTrailer:hover {
+  background: rgba(255,255,255,0.18);
 }
 
-.favButton {
-  background: transparent;
-  color: #ccc;
-  font-weight: 600;
-  font-size: 13px;
-  padding: 9px 14px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.favButton:hover {
-  color: #fff;
-  border-color: var(--gold, #d4af37);
-}
-
-.activeFav {
-  color: var(--gold, #d4af37);
-  border-color: rgba(200, 169, 110, 0.5);
-  background: rgba(200, 169, 110, 0.12);
-}
-
-/* Nav arrows */
-.navArrow {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 44px;
-  height: 44px;
+.btnFav {
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  background: rgba(0, 0, 0, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.2);
   color: #fff;
-  font-size: 28px;
-  line-height: 1;
+  font-size: 1.2rem;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  z-index: 3;
-  opacity: 0;
-  transition: all 0.2s ease;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
 }
 
-.carousel:hover .navArrow {
-  opacity: 1;
+.btnFav:hover, .favActive {
+  background: rgba(212,175,55,0.15) !important;
+  border-color: var(--gold, #D4AF37) !important;
+  color: var(--gold, #D4AF37) !important;
 }
 
-.prevArrow {
-  left: 16px;
+.btnInfo {
+  padding: 0.6rem 1.1rem;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.2);
+  color: #ccc;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
 }
 
-.nextArrow {
-  right: 16px;
+.btnInfo:hover {
+  border-color: rgba(255,255,255,0.45);
+  color: #fff;
 }
 
-.navArrow:hover {
-  background: rgba(0, 0, 0, 0.85);
-  border-color: var(--gold, #d4af37);
-  color: var(--gold, #d4af37);
-  transform: translateY(-50%) scale(1.1);
+/* ── Prev / Next navigation ─────────────────────────────────────────── */
+.nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 5;
+  width: 44px;
+  height: 80px;
+  background: rgba(7,7,7,0.6);
+  border: none;
+  color: #fff;
+  font-size: 2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: background 0.2s;
 }
 
-/* Indicators */
+.nav:hover { background: rgba(212,175,55,0.25); }
+.navPrev   { left: 12px; }
+.navNext   { right: 12px; }
+
+/* ── Dot indicators ─────────────────────────────────────────────────── */
 .dots {
   position: absolute;
-  bottom: 18px;
-  right: 28px;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
   display: flex;
-  gap: 8px;
-  z-index: 3;
+  gap: 6px;
 }
 
 .dot {
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.35);
-  border: 0;
-  padding: 0;
+  background: rgba(255,255,255,0.3);
+  border: none;
   cursor: pointer;
-  transition: all 0.25s ease;
+  padding: 0;
+  transition: background 0.25s, transform 0.25s;
 }
 
-.dot:hover {
-  background: rgba(255, 255, 255, 0.7);
+.dotActive {
+  background: var(--gold, #D4AF37);
+  transform: scale(1.35);
 }
 
-.activeDot {
-  width: 28px;
-  border-radius: 6px;
-  background: var(--gold, #d4af37);
-  box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
-}
-
-@media (max-width: 640px) {
-  .carousel {
-    min-height: 400px;
-  }
-  .navArrow {
-    display: none;
-  }
-  .actions {
-    gap: 8px;
-  }
-  .playButton,
-  .trailerButton,
-  .favButton {
-    font-size: 12px;
-    padding: 8px 14px;
-  }
+/* ── Responsive ─────────────────────────────────────────────────────── */
+@media (max-width: 700px) {
+  .hero { min-height: 420px; height: auto; min-height: 360px; }
+  .content { padding: 1.5rem; flex-direction: column; align-items: flex-start; gap: 1rem; }
+  .poster { width: 90px; }
+  .nav { display: none; }
 }

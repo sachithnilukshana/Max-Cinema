@@ -1,82 +1,109 @@
-import React, { useRef } from 'react'
+import React, { useRef, useState } from 'react'
 import MediaCard from './MediaCard.jsx'
 import styles from './CategoryRail.module.css'
 
+/**
+ * Netflix-style horizontal scrollable rail.
+ *
+ * Props:
+ *   title       – section heading (string)
+ *   subtitle    – optional sub-heading (string)
+ *   items       – array of normalised media items
+ *   onSelect    – callback(item) when a card is clicked
+ *   selectedId  – currently selected item id (highlights the card)
+ *   top10       – if true, shows #1–#10 rank badges on the first 10 cards
+ *   loading     – if true, renders skeleton cards instead of real content
+ *   skeletonCount – how many skeleton cards to render while loading (default 8)
+ */
 export default function CategoryRail({
   title,
   subtitle,
   items = [],
-  type = 'movie',
-  top10 = false,
   onSelect,
   selectedId,
+  top10 = false,
   loading = false,
+  skeletonCount = 8,
 }) {
-  const scrollRef = useRef(null)
+  const trackRef = useRef(null)
+  const [showLeft, setShowLeft] = useState(false)
+  const [showRight, setShowRight] = useState(true)
 
   function scroll(direction) {
-    if (!scrollRef.current) return
-    const offset = direction === 'left' ? -550 : 550
-    scrollRef.current.scrollBy({ left: offset, behavior: 'smooth' })
+    const track = trackRef.current
+    if (!track) return
+    const amount = track.clientWidth * 0.75
+    track.scrollBy({ left: direction === 'right' ? amount : -amount, behavior: 'smooth' })
   }
 
-  const displayItems = top10 ? items.slice(0, 10) : items
+  function handleScroll() {
+    const track = trackRef.current
+    if (!track) return
+    setShowLeft(track.scrollLeft > 10)
+    setShowRight(track.scrollLeft < track.scrollWidth - track.clientWidth - 10)
+  }
+
+  const hasContent = loading ? true : items.length > 0
+  if (!hasContent && !loading) return null
 
   return (
-    <section className={styles.railWrap} aria-label={title}>
-      <div className={styles.railHeader}>
-        <div>
-          <div className={styles.titleRow}>
-            {top10 && <span className={styles.top10Badge}>TOP 10</span>}
-            <h2 className={styles.title}>{title}</h2>
-          </div>
+    <section className={styles.rail} aria-label={title || 'Content rail'}>
+      {(title || subtitle) && (
+        <div className={styles.header}>
+          {title && <h2 className={styles.title}>{title}</h2>}
           {subtitle && <p className={styles.subtitle}>{subtitle}</p>}
         </div>
+      )}
 
-        <div className={styles.controls}>
+      <div className={styles.trackWrap}>
+        {/* Left chevron */}
+        {showLeft && (
           <button
             type="button"
-            className={styles.scrollBtn}
+            className={`${styles.chevron} ${styles.chevronLeft}`}
             onClick={() => scroll('left')}
-            aria-label={`Scroll ${title} left`}
+            aria-label="Scroll left"
           >
             ‹
           </button>
+        )}
+
+        {/* Scrollable track */}
+        <div
+          ref={trackRef}
+          className={styles.track}
+          onScroll={handleScroll}
+        >
+          {loading
+            ? Array.from({ length: skeletonCount }).map((_, i) => (
+                <div key={i} className={styles.skeleton} aria-hidden="true" />
+              ))
+            : items.map((item, i) => (
+                <div key={item.id ?? i} className={styles.cardWrap}>
+                  {top10 && i < 10 && (
+                    <span className={styles.rankBadge}>{i + 1}</span>
+                  )}
+                  <MediaCard
+                    item={item}
+                    type={item.media_type || 'movie'}
+                    onClick={() => onSelect?.(item)}
+                    selected={selectedId !== undefined && (item.id === selectedId || item.tmdbId === selectedId)}
+                  />
+                </div>
+              ))
+          }
+        </div>
+
+        {/* Right chevron */}
+        {showRight && items.length > 3 && (
           <button
             type="button"
-            className={styles.scrollBtn}
+            className={`${styles.chevron} ${styles.chevronRight}`}
             onClick={() => scroll('right')}
-            aria-label={`Scroll ${title} right`}
+            aria-label="Scroll right"
           >
             ›
           </button>
-        </div>
-      </div>
-
-      <div className={styles.railTrack} ref={scrollRef}>
-        {loading ? (
-          Array.from({ length: 7 }).map((_, i) => (
-            <div key={i} className={styles.skeletonCard}>
-              <div className={styles.skeletonPoster} />
-              <div className={styles.skeletonLine} />
-              <div className={styles.skeletonSub} />
-            </div>
-          ))
-        ) : (
-          displayItems.map((item, index) => (
-            <div
-              key={`${item.media_type || type}:${item.id}:${index}`}
-              className={styles.cardItem}
-            >
-              <MediaCard
-                item={item}
-                type={type}
-                rank={top10 ? index + 1 : undefined}
-                onClick={onSelect}
-                selected={item.id === selectedId}
-              />
-            </div>
-          ))
         )}
       </div>
     </section>

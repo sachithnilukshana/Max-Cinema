@@ -23,6 +23,14 @@ async function tmdbFetch(path) {
   }
 }
 
+/** Build a URL-encoded query string from a params object, omitting falsy values */
+function q(params = {}) {
+  const p = new URLSearchParams()
+  Object.entries(params).forEach(([k, v]) => { if (v !== undefined && v !== null && v !== '') p.set(k, v) })
+  const s = p.toString()
+  return s ? `?${s}` : ''
+}
+
 export function apiErrorMessage(error, title = 'Titles') {
   if (error?.status === 503 || /credentials are not configured/i.test(error?.message)) {
     return 'TMDB is not configured on this deployment. In Netlify → Project configuration → Environment variables, add TMDB_API_KEY, then redeploy.'
@@ -35,49 +43,85 @@ export function apiErrorMessage(error, title = 'Titles') {
 }
 
 export const api = {
+  // ── Trending ─────────────────────────────────────────────────────────
   trendingMovies: () => tmdbFetch('/trending/movie/week'),
-  trendingTV: () => tmdbFetch('/trending/tv/week'),
-  topRatedMovies: () => tmdbFetch('/movie/top_rated'),
-  popularTV: () => tmdbFetch('/tv/popular'),
-  topRatedTV: () => tmdbFetch('/tv/top_rated'),
-  koreanDramas: () => tmdbFetch('/discover/tv?sort_by=popularity.desc&with_original_language=ko'),
-  searchMovies: (q) => tmdbFetch(`/search/movie?query=${encodeURIComponent(q)}`),
-  searchTV: (q) => tmdbFetch(`/search/tv?query=${encodeURIComponent(q)}`),
-  discoverMovies: ({ language, genre, year, minRating, sortBy } = {}) => {
-    const params = new URLSearchParams({ sort_by: sortBy || 'popularity.desc' })
-    if (language) params.set('with_original_language', language)
-    if (genre && genre !== 'all') params.set('with_genres', genre)
-    if (year) params.set('primary_release_year', year)
-    if (minRating) {
-      params.set('vote_average.gte', minRating)
-      params.set('vote_count.gte', '100')
+  trendingTV:     () => tmdbFetch('/trending/tv/week'),
+
+  // ── Top Rated ────────────────────────────────────────────────────────
+  topRatedMovies: (page = 1) => tmdbFetch(`/movie/top_rated${q({ page })}`),
+  topRatedTV:     (page = 1) => tmdbFetch(`/tv/top_rated${q({ page })}`),
+
+  // ── Popular ──────────────────────────────────────────────────────────
+  popularMovies: (page = 1) => tmdbFetch(`/movie/popular${q({ page })}`),
+  popularTV:     (page = 1) => tmdbFetch(`/tv/popular${q({ page })}`),
+
+  // ── Search ───────────────────────────────────────────────────────────
+  searchMovies: (query) => tmdbFetch(`/search/movie${q({ query })}`),
+  searchTV:     (query) => tmdbFetch(`/search/tv${q({ query })}`),
+
+  // ── Discover (filtered browsing) ─────────────────────────────────────
+  discoverMovies: ({
+    language, genre, sortBy = 'popularity.desc', year,
+    minRating, page = 1, keywords,
+  } = {}) => {
+    const params = {
+      sort_by: sortBy,
+      page,
+      with_original_language: language || undefined,
+      with_genres: genre || undefined,
+      primary_release_year: year || undefined,
+      'vote_average.gte': minRating || undefined,
+      'vote_count.gte': minRating ? 100 : undefined,
+      with_keywords: keywords || undefined,
     }
-    return tmdbFetch(`/discover/movie?${params}`)
+    return tmdbFetch(`/discover/movie${q(params)}`)
   },
-  discoverTV: ({ language, genre, year, minRating, sortBy } = {}) => {
-    const params = new URLSearchParams({ sort_by: sortBy || 'popularity.desc' })
-    if (language) params.set('with_original_language', language)
-    if (genre && genre !== 'all') params.set('with_genres', genre)
-    if (year) params.set('first_air_date_year', year)
-    if (minRating) {
-      params.set('vote_average.gte', minRating)
-      params.set('vote_count.gte', '100')
+
+  discoverTV: ({
+    language, genre, sortBy = 'popularity.desc', year,
+    minRating, page = 1, keywords,
+  } = {}) => {
+    const params = {
+      sort_by: sortBy,
+      page,
+      with_original_language: language || undefined,
+      with_genres: genre || undefined,
+      first_air_date_year: year || undefined,
+      'vote_average.gte': minRating || undefined,
+      'vote_count.gte': minRating ? 100 : undefined,
+      with_keywords: keywords || undefined,
     }
-    return tmdbFetch(`/discover/tv?${params}`)
+    return tmdbFetch(`/discover/tv${q(params)}`)
   },
-  movieDetails: (id) => tmdbFetch(`/movie/${id}`),
-  tvDetails: (id) => tmdbFetch(`/tv/${id}`),
-  seasonDetails: (id, season) => tmdbFetch(`/tv/${id}/season/${season}`),
+
+  // ── Details ──────────────────────────────────────────────────────────
+  movieDetails: (id)         => tmdbFetch(`/movie/${id}`),
+  tvDetails:    (id)         => tmdbFetch(`/tv/${id}`),
+  seasonDetails:(id, season) => tmdbFetch(`/tv/${id}/season/${season}`),
+
+  // ── Videos / Trailers ────────────────────────────────────────────────
   movieVideos: (id) => tmdbFetch(`/movie/${id}/videos`),
-  tvVideos: (id) => tmdbFetch(`/tv/${id}/videos`),
+  tvVideos:    (id) => tmdbFetch(`/tv/${id}/videos`),
+
+  // ── Watch Providers ──────────────────────────────────────────────────
   movieProviders: (id) => tmdbFetch(`/movie/${id}/watch/providers`),
-  tvProviders: (id) => tmdbFetch(`/tv/${id}/watch/providers`),
+  tvProviders:    (id) => tmdbFetch(`/tv/${id}/watch/providers`),
+
+  // ── Credits ──────────────────────────────────────────────────────────
   movieCredits: (id) => tmdbFetch(`/movie/${id}/credits`),
-  tvCredits: (id) => tmdbFetch(`/tv/${id}/credits`),
+  tvCredits:    (id) => tmdbFetch(`/tv/${id}/credits`),
+
+  // ── Recommendations ──────────────────────────────────────────────────
   movieRecommendations: (id) => tmdbFetch(`/movie/${id}/recommendations`),
-  tvRecommendations: (id) => tmdbFetch(`/tv/${id}/recommendations`),
+  tvRecommendations:    (id) => tmdbFetch(`/tv/${id}/recommendations`),
+
+  // ── Person (Actor / Director) ─────────────────────────────────────────
   personDetails: (id) => tmdbFetch(`/person/${id}`),
   personCredits: (id) => tmdbFetch(`/person/${id}/combined_credits`),
+
+  // ── Convenience: Korean dramas (language=ko, discover/tv) ────────────
+  koreanDramas: (page = 1) =>
+    tmdbFetch(`/discover/tv${q({ with_original_language: 'ko', sort_by: 'popularity.desc', page })}`),
 }
 
 export function movieEmbedUrl(tmdbId) {

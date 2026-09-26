@@ -2,11 +2,12 @@
 export const CINESCOPE_API_BASE = import.meta.env.VITE_CINESCOPE_API_URL || 'https://cinescope-api-9ukz.onrender.com'
 
 /**
- * Perform a safe GET request to the CineScope backend with timeout and graceful fallback
+ * Perform a safe GET request to the CineScope backend with timeout and graceful fallback.
+ * Returns the `data` field of a successful JSON response, or null on any error.
  */
 async function cinescopeFetch(endpoint) {
   const controller = new AbortController()
-  const timer = setTimeout(() => controller.abort(), 8000)
+  const timer = setTimeout(() => controller.abort(), 10000)
   try {
     const res = await fetch(`${CINESCOPE_API_BASE}${endpoint}`, {
       signal: controller.signal,
@@ -14,21 +15,62 @@ async function cinescopeFetch(endpoint) {
     })
     if (!res.ok) return null
     const json = await res.json()
-    return json?.success ? json.data : null
+    // Backend wraps successful responses in { success: true, data: … }
+    // Some list endpoints return the array directly at root level
+    if (json?.success !== undefined) return json.success ? (json.data ?? null) : null
+    return json ?? null
   } catch (err) {
-    console.warn(`[CineScope API] Failed to fetch ${endpoint}:`, err.message)
+    console.warn(`[CineScope API] Failed to fetch ${endpoint}:`, err?.message || err)
     return null
   } finally {
     clearTimeout(timer)
   }
 }
 
+/** Build a URLSearchParams query string from a plain object, ignoring undefined/null values */
+function buildQuery(params = {}) {
+  const q = new URLSearchParams()
+  Object.entries(params).forEach(([k, v]) => {
+    if (v !== undefined && v !== null && v !== '') q.append(k, v)
+  })
+  const s = q.toString()
+  return s ? `?${s}` : ''
+}
+
+/** Detect the current device type for ad targeting */
+function detectDevice() {
+  if (typeof window === 'undefined') return 'ALL'
+  return window.innerWidth < 768 ? 'MOBILE' : 'DESKTOP'
+}
+
 export const cinescopeApi = {
+  // ── Homepage & Editorial ─────────────────────────────────────────────
   getHomepage: () => cinescopeFetch('/api/public/homepage'),
   getFeatured: () => cinescopeFetch('/api/public/featured'),
   getTrending: () => cinescopeFetch('/api/public/trending'),
+
+  // ── Movies ───────────────────────────────────────────────────────────
+  getMovies: (params) => cinescopeFetch(`/api/public/movies${buildQuery(params)}`),
+  getMovieById: (id) => id ? cinescopeFetch(`/api/public/movies/${id}`) : Promise.resolve(null),
+
+  // ── TV Shows ─────────────────────────────────────────────────────────
+  getTVShows: (params) => cinescopeFetch(`/api/public/tv-shows${buildQuery(params)}`),
+  getTVShowById: (id) => id ? cinescopeFetch(`/api/public/tv-shows/${id}`) : Promise.resolve(null),
+
+  // ── Collections ──────────────────────────────────────────────────────
   getCollections: () => cinescopeFetch('/api/public/collections'),
-  getAds: (placement = 'HOMEPAGE') => cinescopeFetch(`/api/public/ads?placement=${encodeURIComponent(placement)}`),
+  getCollectionBySlug: (slug) => slug ? cinescopeFetch(`/api/public/collections/${slug}`) : Promise.resolve(null),
+
+  // ── Genres ───────────────────────────────────────────────────────────
+  getGenres: () => cinescopeFetch('/api/public/genres'),
+
+  // ── AI Recommendations (503 in staging — returns null gracefully) ────
+  getRecommendations: (contentId) =>
+    contentId ? cinescopeFetch(`/api/public/recommendations/${contentId}`) : Promise.resolve(null),
+
+  // ── Ads (device-aware) ───────────────────────────────────────────────
+  getAds: (placement = 'HOMEPAGE', device) =>
+    cinescopeFetch(`/api/public/ads${buildQuery({ placement, device: device || detectDevice() })}`),
 }
 
 /**

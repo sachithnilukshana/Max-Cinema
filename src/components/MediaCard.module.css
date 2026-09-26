@@ -1,12 +1,28 @@
 .card {
-  position: relative;
   cursor: pointer;
   border-radius: 8px;
-  background: var(--bg-card, #141416);
-  border: 0.5px solid var(--border, rgba(255, 255, 255, 0.08));
-  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease, border-color 0.25s ease;
+  overflow: hidden;
+  background: var(--bg-card);
+  border: 0.5px solid var(--border);
+  transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
   animation: fadeIn 0.35s ease both;
-  user-select: none;
+}
+
+.cardOpen {
+  display: block;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font-family: var(--font);
+  padding: 0;
+  text-align: left;
+}
+
+.cardOpen:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: -3px;
 }
 
 @keyframes fadeIn {
@@ -15,62 +31,14 @@
 }
 
 .card:hover {
-  border-color: rgba(200, 169, 110, 0.5);
-  transform: translateY(-4px) scale(1.02);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.65);
-  z-index: 5;
+  border-color: rgba(200, 169, 110, 0.45);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
 }
 
 .card.selected {
-  border-color: var(--gold, #d4af37);
-  box-shadow: 0 0 0 1px rgba(200, 169, 110, 0.4);
-}
-
-/* Netflix-style Ranked Card Layout */
-.rankedCard {
-  display: flex;
-  align-items: flex-end;
-  background: transparent;
-  border: 0;
-  box-shadow: none;
-}
-
-.rankedCard:hover {
-  background: transparent;
-  border: 0;
-  box-shadow: none;
-}
-
-.rankContainer {
-  flex-shrink: 0;
-  width: 55px;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  z-index: 2;
-  margin-right: -18px;
-  margin-bottom: -6px;
-  pointer-events: none;
-}
-
-.rankNumber {
-  font-size: 110px;
-  font-weight: 900;
-  line-height: 0.75;
-  font-family: Impact, "Arial Black", sans-serif;
-  color: #0d0d10;
-  -webkit-text-stroke: 3.5px rgba(212, 175, 55, 0.85);
-  filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.85));
-}
-
-.cardInner {
-  flex: 1;
-  border-radius: 8px;
-  overflow: hidden;
-  background: var(--bg-card, #141416);
-  border: 0.5px solid var(--border, rgba(255, 255, 255, 0.08));
-  display: flex;
-  flex-direction: column;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 1px rgba(200,169,110,0.3);
 }
 
 .poster {
@@ -78,10 +46,42 @@
   width: 100%;
   aspect-ratio: 2 / 3;
   overflow: hidden;
-  background: #161618;
+  background: #161616;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.posterOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.78), rgba(0, 0, 0, 0.05) 65%);
+  color: #fff;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.posterOverlay span {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.38);
+  font-size: 13px;
+}
+
+.posterOverlay small {
+  position: absolute;
+  bottom: 9px;
+  left: 9px;
+  font-size: 10px;
+  letter-spacing: 0.08em;
 }
 
 .poster img {
@@ -92,187 +92,139 @@
   transition: transform 0.35s ease;
 }
 
+.pinnedBadge {
+  position: absolute;
+  top: 9px;
+  left: 9px;
+  padding: 4px 7px;
+  border: 1px solid rgba(200, 169, 110, 0.55);
+  border-radius: 999px;
+  background: rgba(12, 12, 12, 0.78);
+  color: var(--gold);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
 .card:hover .poster img {
   transform: scale(1.05);
 }
 
-.noPoster {
-  font-size: 28px;
-  font-weight: 700;
-  color: #444;
-  text-transform: uppercase;
-}
-
-/* 1-Click Favorite Button */
-.favoriteBtn {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: rgba(0, 0, 0, 0.65);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  color: #ccc;
-  font-size: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  z-index: 4;
-  transition: all 0.2s ease;
-}
-
-.favoriteBtn:hover {
-  background: rgba(0, 0, 0, 0.85);
-  color: var(--gold, #d4af37);
-  transform: scale(1.15);
-  border-color: var(--gold, #d4af37);
-}
-
-.isFavorite {
-  color: #ffd700;
-  border-color: rgba(255, 215, 0, 0.5);
-  background: rgba(20, 20, 24, 0.85);
-  text-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
-}
-
-/* Hover Card Preview Layer */
-.hoverPreview {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    to top,
-    rgba(10, 10, 12, 0.96) 0%,
-    rgba(10, 10, 12, 0.85) 55%,
-    rgba(10, 10, 12, 0.3) 100%
-  );
-  padding: 14px 12px;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.25s ease;
-  z-index: 3;
-}
-
-.card:hover .hoverPreview {
+.card:hover .posterOverlay,
+.cardOpen:focus-visible .posterOverlay {
   opacity: 1;
-  pointer-events: auto;
 }
 
-.hoverActions {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 8px;
+.noPoster {
+  font-size: 2rem;
+  color: var(--text-dim);
+  font-style: italic;
 }
 
-.hoverPlayBtn {
-  flex: 1;
-  background: var(--gold, #d4af37);
-  color: #000;
-  border: 0;
-  border-radius: 4px;
-  font-size: 11px;
-  font-weight: 700;
-  padding: 6px 8px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  transition: background 0.15s ease, transform 0.15s ease;
-}
-
-.hoverPlayBtn:hover {
-  background: #f5d36e;
-  transform: scale(1.03);
-}
-
-.hoverTrailerBtn {
-  background: rgba(255, 255, 255, 0.15);
-  color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  border-radius: 4px;
-  font-size: 11px;
-  font-weight: 600;
-  padding: 6px 8px;
-  cursor: pointer;
-  transition: background 0.15s ease;
-}
-
-.hoverTrailerBtn:hover {
-  background: rgba(255, 255, 255, 0.3);
-}
-
-.hoverOverview {
-  font-size: 11px;
-  line-height: 1.4;
-  color: #ccc;
-  margin: 0 0 8px;
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-}
-
-.hoverGenres {
-  display: flex;
-  gap: 4px;
-  flex-wrap: wrap;
-}
-
-.genrePill {
-  font-size: 9px;
-  background: rgba(255, 255, 255, 0.12);
-  color: #ddd;
-  border-radius: 3px;
-  padding: 2px 5px;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-/* Card Info Footer */
 .info {
-  padding: 10px 10px 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.infoTop {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 11px;
+  padding: 8px 10px 10px;
+  position: relative;
 }
 
 .rating {
-  color: var(--gold, #d4af37);
-  font-weight: 700;
-}
-
-.year {
-  color: var(--text-muted, #888);
+  float: right;
+  font-size: 10px;
+  color: var(--gold);
+  margin-top: 1px;
 }
 
 .title {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text, #fff);
+  font-size: 12px;
+  color: var(--text-muted);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  padding-right: 38px;
   line-height: 1.3;
 }
 
-.cardMeta {
+.year {
   font-size: 11px;
-  color: var(--text-muted, #777);
-  white-space: nowrap;
+  color: #444;
+  margin-top: 3px;
+}
+
+.cardMeta {
   overflow: hidden;
+  color: var(--text-dim);
+  font-size: 10px;
+  letter-spacing: 0.03em;
+  margin-top: 5px;
   text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (hover: none) {
+  .posterOverlay {
+    opacity: 1;
+  }
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.watchStatus,
+.remove {
+  border: 0.5px solid #303030;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-family: var(--font);
+  font-size: 10px;
+  line-height: 1;
+}
+
+.watchStatus {
+  padding: 4px 6px;
+  border-radius: 4px;
+}
+
+.watchStatus[aria-pressed="true"] {
+  border-color: rgba(200, 169, 110, 0.5);
+  color: var(--gold);
+}
+
+.remove {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  font-size: 15px;
+}
+
+.watchStatus:hover,
+.remove:hover,
+.watchStatus:focus-visible,
+.remove:focus-visible {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.addToList {
+  width: 100%;
+  margin-top: 8px;
+  border: 0.5px solid rgba(200, 169, 110, 0.42);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--gold);
+  cursor: pointer;
+  font-family: var(--font);
+  font-size: 10px;
+  line-height: 1;
+  padding: 5px 6px;
+}
+
+.addToList:hover,
+.addToList:focus-visible {
+  background: rgba(200, 169, 110, 0.12);
 }

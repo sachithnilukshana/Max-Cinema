@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { api, apiErrorMessage, movieEmbedUrl, formatRating, getYear } from '../lib/api.js'
+import { api, apiErrorMessage, movieEmbedUrl, formatRating, getYear, posterUrl } from '../lib/api.js'
 import { recordContinueWatching } from '../lib/profile.js'
-import { cinescopeApi, normalizeCinescopeItem, trackMovieView, trackSearch } from '../lib/cinescopeApi.js'
+import { cinescopeApi, normalizeCinescopeItem, trackMovieView, trackSearch, trackTrailerClick } from '../lib/cinescopeApi.js'
 import MediaGrid from '../components/MediaGrid.jsx'
 import Player from '../components/Player.jsx'
 import WatchOptions from '../components/WatchOptions.jsx'
@@ -10,11 +10,18 @@ import PersonalControls from '../components/PersonalControls.jsx'
 import ContinueWatching from '../components/ContinueWatching.jsx'
 import SearchSuggestions from '../components/SearchSuggestions.jsx'
 import CuratedCollections from '../components/CuratedCollections.jsx'
-import HeroCarousel from '../components/HeroCarousel.jsx'
-import CategoryRail from '../components/CategoryRail.jsx'
-import FilterBar from '../components/FilterBar.jsx'
 import CineScopeAd from '../components/CineScopeAd.jsx'
 import styles from './Movies.module.css'
+
+const MOODS = [
+  ['all', 'All moods'], ['35', 'Feel-good'], ['10749', 'Romance'], ['53', 'Thriller'],
+  ['27', 'Horror'], ['18', 'Drama'], ['28', 'Action'],
+]
+
+const LANGUAGES = [
+  ['', 'All languages'], ['ml', 'Malayalam'], ['ta', 'Tamil'], ['te', 'Telugu'],
+  ['hi', 'Hindi'], ['ko', 'Korean'], ['en', 'English'],
+]
 
 function persist(key, val) {
   try { sessionStorage.setItem(key, JSON.stringify(val)) } catch {}
@@ -29,33 +36,29 @@ export default function Movies({ profile, adminConfig }) {
 
   const [query, setQuery] = useState(savedQuery)
   const [results, setResults] = useState([])
-  const [trendingMovies, setTrendingMovies] = useState([])
-  const [topRated, setTopRated] = useState([])
-  const [latestMovies, setLatestMovies] = useState([])
-  const [koreanShows, setKoreanShows] = useState([])
   const [loading, setLoading] = useState(true)
   const [label, setLabel] = useState(savedQuery ? 'Results' : 'Trending Now')
   const [player, setPlayer] = useState(savedPlayer)
   const [error, setError] = useState('')
   const [notice, setNotice] = useState('')
+  const [mood, setMood] = useState('all')
+  const [language, setLanguage] = useState('')
+  const [adminFeatured, setAdminFeatured] = useState(null)
   const [homepageConfig, setHomepageConfig] = useState(null)
   const [apiFeatured, setApiFeatured] = useState([])
-
-  // Advanced Filters
-  const [filterYear, setFilterYear] = useState('')
-  const [filterRating, setFilterRating] = useState('')
-  const [filterSort, setFilterSort] = useState('popularity.desc')
-  const [filterGenre, setFilterGenre] = useState('')
-  const [isFiltering, setIsFiltering] = useState(false)
-
+  const [apiTrending, setApiTrending] = useState([])
   const playerAnchorRef = useRef(null)
 
   // Primary data fetch
   useEffect(() => {
+    // 1. Fetch CineScope dynamic homepage config
     cinescopeApi.getHomepage()
-      .then(config => { if (config) setHomepageConfig(config) })
+      .then(config => {
+        if (config) setHomepageConfig(config)
+      })
       .catch(() => {})
 
+    // 2. Fetch CineScope dynamic featured titles
     cinescopeApi.getFeatured()
       .then(data => {
         if (Array.isArray(data) && data.length > 0) {
@@ -64,56 +67,46 @@ export default function Movies({ profile, adminConfig }) {
       })
       .catch(() => {})
 
-    // Fetch Rails: Top Rated, Latest Releases (2025/2026), Korean Dramas
-    api.topRatedMovies()
-      .then(d => setTopRated(d.results || []))
-      .catch(() => {})
-
-    api.discoverMovies({ year: '2025', sortBy: 'popularity.desc' })
-      .then(d => setLatestMovies(d.results || []))
-      .catch(() => {})
-
-    api.koreanDramas()
-      .then(d => setKoreanShows(d.results || []))
-      .catch(() => {})
-
-    // Search or Trending
+    // 3. Search or Trending
     if (savedQuery) {
       api.searchMovies(savedQuery)
         .then(d => setResults(d.results || []))
-        .catch(err => setError(apiErrorMessage(err, 'Movies')))
+        .catch(error => setError(apiErrorMessage(error, 'Movies')))
         .finally(() => setLoading(false))
     } else {
+      // First try CineScope trending
       cinescopeApi.getTrending()
         .then(data => {
           if (Array.isArray(data) && data.length > 0) {
             const normalized = data.map(normalizeCinescopeItem).filter(Boolean)
-            setTrendingMovies(normalized)
+            setApiTrending(normalized)
             setResults(normalized)
             setLoading(false)
           } else {
+            // Fallback to TMDB trending
             return api.trendingMovies()
-              .then(d => {
-                const list = d.results || []
-                setTrendingMovies(list)
-                setResults(list)
-              })
-              .catch(err => setError(apiErrorMessage(err, 'Trending movies')))
+              .then(d => setResults(d.results || []))
+              .catch(error => setError(apiErrorMessage(error, 'Trending movies')))
               .finally(() => setLoading(false))
           }
         })
         .catch(() => {
+          // Fallback to TMDB trending
           api.trendingMovies()
-            .then(d => {
-              const list = d.results || []
-              setTrendingMovies(list)
-              setResults(list)
-            })
-            .catch(err => setError(apiErrorMessage(err, 'Trending movies')))
+            .then(d => setResults(d.results || []))
+            .catch(error => setError(apiErrorMessage(error, 'Trending movies')))
             .finally(() => setLoading(false))
         })
     }
   }, [savedQuery])
+
+  useEffect(() => {
+    if (!adminConfig?.featuredMovieId) {
+      setAdminFeatured(null)
+      return
+    }
+    api.movieDetails(adminConfig.featuredMovieId).then(setAdminFeatured).catch(() => setAdminFeatured(null))
+  }, [adminConfig?.featuredMovieId])
 
   useEffect(() => {
     if (!notice) return undefined
@@ -127,61 +120,44 @@ export default function Movies({ profile, adminConfig }) {
     if (!q) return
 
     trackSearch(q)
+
     setLoading(true)
     setError('')
     setNotice('')
     setLabel('Results')
     setResults([])
-    setIsFiltering(false)
     persist('mv_query', q)
-
     try {
       const d = await api.searchMovies(q)
       setResults(d.results || [])
-    } catch (err) {
-      setError(apiErrorMessage(err, 'Search results'))
+    } catch (error) {
+      setError(apiErrorMessage(error, 'Search results'))
     } finally {
       setLoading(false)
     }
   }
 
-  function handleFilterChange({ year = filterYear, minRating = filterRating, sortBy = filterSort, genre = filterGenre }) {
-    setFilterYear(year)
-    setFilterRating(minRating)
-    setFilterSort(sortBy)
-    setFilterGenre(genre)
-
-    const hasFilters = Boolean(year || minRating || genre || (sortBy && sortBy !== 'popularity.desc'))
-    if (!hasFilters) {
-      handleResetFilter()
-      return
-    }
-
-    setIsFiltering(true)
+  async function discover(event) {
+    event.preventDefault()
     setLoading(true)
     setError('')
-    setLabel('Filtered Movies')
-
-    api.discoverMovies({ year, minRating, sortBy, genre })
-      .then(d => setResults(d.results || []))
-      .catch(err => setError(apiErrorMessage(err, 'Filtered movies')))
-      .finally(() => setLoading(false))
-  }
-
-  function handleResetFilter() {
-    setFilterYear('')
-    setFilterRating('')
-    setFilterSort('popularity.desc')
-    setFilterGenre('')
-    setIsFiltering(false)
-    setLabel('Trending Now')
-    setResults(trendingMovies.length > 0 ? trendingMovies : results)
+    setNotice('')
+    setPlayer(null)
+    setLabel('Curated picks')
+    try {
+      const data = await api.discoverMovies({ language, genre: mood === 'all' ? '' : mood })
+      setResults(data.results || [])
+    } catch (error) {
+      setError(apiErrorMessage(error, 'Curated picks'))
+    } finally {
+      setLoading(false)
+    }
   }
 
   function select(item) {
     trackMovieView(item)
 
-    const mediaType = item.media_type || (item.name ? 'tv' : 'movie')
+    const mediaType = item.media_type || 'movie'
     const libraryItem = { ...item, media_type: mediaType }
     const p = {
       src: movieEmbedUrl(item.tmdbId || item.id),
@@ -207,11 +183,33 @@ export default function Movies({ profile, adminConfig }) {
   }
 
   function selectSuggestion(item) {
-    setQuery(item.title || item.name || '')
+    setQuery(item.title || '')
     select(item)
   }
 
-  const carouselItems = apiFeatured.length > 0 ? apiFeatured : (trendingMovies.length > 0 ? trendingMovies : results)
+  // Hero calculation with graceful fallbacks
+  const heroCandidate = adminFeatured || (apiFeatured.length > 0 ? apiFeatured[0] : null) || results[0]
+  const heroMovie = homepageConfig?.heroMovie ? normalizeCinescopeItem(homepageConfig.heroMovie) : null
+  const heroFeatured = heroMovie || heroCandidate
+
+  const heroEnabled = homepageConfig ? homepageConfig.heroEnabled !== false : true
+  const showHero = heroEnabled && label === 'Trending Now' && Boolean(heroFeatured || homepageConfig?.heroTitle)
+
+  const heroTitle = homepageConfig?.heroTitle || heroFeatured?.title || 'Featured Film'
+  const heroDescription = homepageConfig?.heroDescription || heroFeatured?.overview || 'A standout pick from this week’s movie conversation.'
+  const heroCtaText = homepageConfig?.ctaText || 'Explore title'
+
+  let heroBackdrop = homepageConfig?.heroBackgroundImage || heroFeatured?.backdrop_path
+  if (heroBackdrop && !heroBackdrop.startsWith('http://') && !heroBackdrop.startsWith('https://')) {
+    heroBackdrop = `https://image.tmdb.org/t/p/w1280${heroBackdrop}`
+  }
+
+  function handleHeroAction() {
+    if (heroFeatured) {
+      trackTrailerClick(heroFeatured)
+      select(heroFeatured)
+    }
+  }
 
   return (
     <div>
@@ -226,24 +224,39 @@ export default function Movies({ profile, adminConfig }) {
       </form>
       <SearchSuggestions query={query} type="movie" onSelect={selectSuggestion} />
 
-      {/* Advanced Filter and Sorting Bar */}
-      <FilterBar
-        year={filterYear}
-        onYearChange={year => handleFilterChange({ year })}
-        minRating={filterRating}
-        onRatingChange={minRating => handleFilterChange({ minRating })}
-        sortBy={filterSort}
-        onSortChange={sortBy => handleFilterChange({ sortBy })}
-        genre={filterGenre}
-        onGenreChange={genre => handleFilterChange({ genre })}
-        onReset={handleResetFilter}
-      />
+      <form className={styles.discoveryControls} onSubmit={discover}>
+        <label>
+          Mood
+          <select value={mood} onChange={event => setMood(event.target.value)}>
+            {MOODS.map(([value, text]) => <option key={value} value={value}>{text}</option>)}
+          </select>
+        </label>
+        <label>
+          Language
+          <select value={language} onChange={event => setLanguage(event.target.value)}>
+            {LANGUAGES.map(([value, text]) => <option key={value} value={value}>{text}</option>)}
+          </select>
+        </label>
+        <button type="submit">Find picks</button>
+        <span>Audio and subtitle availability depends on the official provider.</span>
+      </form>
 
       {adminConfig?.announcement && <p className={styles.announcement}>{adminConfig.announcement}</p>}
 
-      {/* Hero Banner Carousel (Shown on default non-search view) */}
-      {!query && !isFiltering && carouselItems.length > 0 && (
-        <HeroCarousel items={carouselItems} onSelect={select} />
+      {showHero && (
+        <section
+          className={styles.hero}
+          style={heroBackdrop ? { backgroundImage: `url(${heroBackdrop})` } : undefined}
+        >
+          <div className={styles.heroContent}>
+            <p className={styles.heroEyebrow}>{homepageConfig?.heroTitle ? 'CineScope Spotlight' : 'Featured this week'}</p>
+            <h1>{heroTitle}</h1>
+            <p>{heroDescription}</p>
+            <button type="button" className={styles.heroButton} onClick={handleHeroAction}>
+              {heroCtaText}
+            </button>
+          </div>
+        </section>
       )}
 
       {/* CineScope Dynamic Advertisement */}
@@ -263,66 +276,26 @@ export default function Movies({ profile, adminConfig }) {
       {notice && <p className={styles.notice} role="status">{notice}</p>}
       {error && <p className={styles.error} role="alert">{error}</p>}
 
-      {/* Category Rails (Netflix-Style Horizontal Scroll) */}
-      {!query && !isFiltering && (
-        <>
-          {/* Rail 1: Top 10 Trending Now with stylized badges */}
-          <CategoryRail
-            title="Trending Now"
-            subtitle="The 10 most popular movies streaming this week"
-            items={trendingMovies.length > 0 ? trendingMovies : results}
-            top10={true}
+      {/* CineScope Admin Featured Section (when configured) */}
+      {apiFeatured.length > 0 && !savedQuery && (
+        <div className={styles.featuredSection}>
+          <p className={styles.sectionLabel}>Featured Selections</p>
+          <MediaGrid
+            items={apiFeatured}
+            type="movie"
             onSelect={select}
             selectedId={player?.selectedId}
-            loading={loading && trendingMovies.length === 0}
           />
-
-          {/* Rail 2: Top Rated Movies */}
-          {topRated.length > 0 && (
-            <CategoryRail
-              title="Top Rated Movies (★ 8.0+)"
-              subtitle="Critically acclaimed masterpieces of all time"
-              items={topRated}
-              onSelect={select}
-              selectedId={player?.selectedId}
-            />
-          )}
-
-          {/* Rail 3: Latest Releases (2025/2026) */}
-          {latestMovies.length > 0 && (
-            <CategoryRail
-              title="Latest Releases"
-              subtitle="New films and fresh cinema debuts"
-              items={latestMovies}
-              onSelect={select}
-              selectedId={player?.selectedId}
-            />
-          )}
-
-          {/* Rail 4: Korean Dramas & Asian Cinema */}
-          {koreanShows.length > 0 && (
-            <CategoryRail
-              title="Korean Dramas &amp; Asian Hits"
-              subtitle="Phenomenal Korean dramas and Asian series"
-              items={koreanShows}
-              type="tv"
-              onSelect={select}
-              selectedId={player?.selectedId}
-            />
-          )}
-
-          {/* CineScope Curated Collections Section */}
-          <CuratedCollections
-            onSelectTitle={select}
-            selectedId={player?.selectedId}
-          />
-        </>
+        </div>
       )}
 
-      {/* Grid: Always shown for Search or Filtering, or as Explore All at the bottom */}
-      <p className={styles.sectionLabel}>
-        {query || isFiltering ? label : 'Explore All Movies'}
-      </p>
+      {/* CineScope Curated Collections Section */}
+      <CuratedCollections
+        onSelectTitle={select}
+        selectedId={player?.selectedId}
+      />
+
+      <p className={styles.sectionLabel}>{label}</p>
       <MediaGrid
         items={results}
         type="movie"
@@ -332,9 +305,19 @@ export default function Movies({ profile, adminConfig }) {
         emptyAction={() => {
           setQuery('')
           persist('mv_query', null)
-          handleResetFilter()
+          setLabel('Trending Now')
+          setLoading(true)
+          if (apiTrending.length > 0) {
+            setResults(apiTrending)
+            setLoading(false)
+          } else {
+            api.trendingMovies()
+              .then(data => setResults(data.results || []))
+              .catch(error => setError(apiErrorMessage(error, 'Trending movies')))
+              .finally(() => setLoading(false))
+          }
         }}
-        emptyActionLabel="Browse all movies"
+        emptyActionLabel="Browse movies"
       />
     </div>
   )

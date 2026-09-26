@@ -30,25 +30,6 @@ export default function App() {
   const [commandQuery, setCommandQuery] = useState('')
   const [path, setPath] = useState(readPath)
   const [privacyNotice, setPrivacyNotice] = useState('')
-  const [installPrompt, setInstallPrompt] = useState(null)
-
-  useEffect(() => {
-    const handleBeforeInstall = (e) => {
-      e.preventDefault()
-      setInstallPrompt(e)
-    }
-    window.addEventListener('beforeinstallprompt', handleBeforeInstall)
-    return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstall)
-  }, [])
-
-  async function handleInstallApp() {
-    if (!installPrompt) return
-    installPrompt.prompt()
-    const { outcome } = await installPrompt.userChoice
-    if (outcome === 'accepted') {
-      setInstallPrompt(null)
-    }
-  }
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme
@@ -162,16 +143,6 @@ export default function App() {
           </button>
         </nav>
         <div className={styles.headerRight}>
-          {installPrompt && (
-            <button
-              type="button"
-              className={styles.installBtn}
-              onClick={handleInstallApp}
-              title="Install Max Cinema on your device"
-            >
-              📲 Install App
-            </button>
-          )}
           <button
             type="button"
             className={styles.searchTrigger}

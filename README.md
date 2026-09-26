@@ -44,7 +44,8 @@ This package contains comprehensive documentation for the **Max Cinema** project
 - 📁 File navigation guide
 - 🔧 20+ common coding tasks with examples
 - 🔐 Authentication setup
-- 🐛 Debugging tips
+- 🐛 Debu
+gging tips
 - 📊 Performance optimization
 - 🎨 Customization examples
 - 💾 Backup and export
@@ -54,7 +55,6 @@ This package contains comprehensive documentation for the **Max Cinema** project
 - "Show me code"
 - "Where do I find...?"
 - You need quick answers
-
 ---
 
 ### 3. **MAX_CINEMA_GUIDE.md** 📖 MOST COMPREHENSIVE

@@ -3,47 +3,54 @@ import { cinescopeApi } from '../lib/cinescopeApi.js'
 import AdUnit from './AdUnit.jsx'
 import styles from './CineScopeAd.module.css'
 
+/** Returns 'MOBILE' for viewports < 768 px, otherwise 'DESKTOP' */
+function getDevice() {
+  if (typeof window === 'undefined') return 'ALL'
+  return window.innerWidth < 768 ? 'MOBILE' : 'DESKTOP'
+}
+
 export default function CineScopeAd({ placement = 'HOMEPAGE', slot, className = '' }) {
   const [ad, setAd] = useState(null)
   const [loaded, setLoaded] = useState(false)
   const containerRef = useRef(null)
+  const device = getDevice()
 
+  // Fetch the best ad for this placement + device on mount / when placement changes
   useEffect(() => {
     let active = true
-    cinescopeApi.getAds(placement)
+    setAd(null)
+    setLoaded(false)
+
+    cinescopeApi.getAds(placement, device)
       .then(ads => {
         if (!active) return
         if (Array.isArray(ads) && ads.length > 0) {
-          // Sort by priority descending and filter enabled
-          const activeAds = ads
+          const best = ads
             .filter(a => a.enabled !== false)
-            .sort((a, b) => (b.priority || 0) - (a.priority || 0))
-          if (activeAds.length > 0) {
-            setAd(activeAds[0])
-          }
+            .sort((a, b) => (b.priority || 0) - (a.priority || 0))[0]
+          if (best) setAd(best)
         }
       })
       .catch(() => {})
-      .finally(() => {
-        if (active) setLoaded(true)
-      })
+      .finally(() => { if (active) setLoaded(true) })
+
     return () => { active = false }
-  }, [placement])
+  }, [placement]) // device is stable per render — no need in deps
 
+  // Inject raw adCode (supports third-party script tags)
   useEffect(() => {
-    if (!ad || !ad.adCode || !containerRef.current) return
-
+    if (!ad?.adCode || !containerRef.current) return
     const container = containerRef.current
     container.innerHTML = ''
-
-    // If adCode has scripts, extract and run them so dynamic ads / ad networks execute properly
     const range = document.createRange()
     range.selectNode(container)
     const fragment = range.createContextualFragment(ad.adCode)
     container.appendChild(fragment)
   }, [ad])
 
-  if (ad && ad.adCode) {
+  if (!loaded) return null // don't flash an empty slot while loading
+
+  if (ad?.adCode) {
     return (
       <aside className={`${styles.wrap} ${className}`} aria-label={ad.name || 'Advertisement'}>
         <span className={styles.label}>Advertisement</span>
@@ -52,11 +59,10 @@ export default function CineScopeAd({ placement = 'HOMEPAGE', slot, className = 
     )
   }
 
-  // Fallback to Google AdSense slot if provided and no dynamic ad was returned
+  // Fallback to Google AdSense slot if provided and no backend ad was returned
   if (slot) {
     return <AdUnit slot={slot} className={className} />
   }
 
   return null
 }
-

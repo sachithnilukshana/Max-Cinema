@@ -1,13 +1,16 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import { cinescopeApi, normalizeCinescopeItem } from '../lib/cinescopeApi.js'
-import MediaGrid from './MediaGrid.jsx'
+import CategoryRail from './CategoryRail.jsx'
 import styles from './CuratedCollections.module.css'
 
 export default function CuratedCollections({ onSelectTitle, selectedId }) {
   const [collections, setCollections] = useState([])
-  const [activeCollectionId, setActiveCollectionId] = useState(null)
-  const [loading, setLoading] = useState(true)
+  const [activeId, setActiveId] = useState(null)
+  const [itemsMap, setItemsMap] = useState({}) // slug -> normalised items array
+  const [loadingMeta, setLoadingMeta] = useState(true)
+  const [loadingItems, setLoadingItems] = useState(false)
 
+  // Load collection list on mount
   useEffect(() => {
     let active = true
     cinescopeApi.getCollections()
@@ -15,24 +18,75 @@ export default function CuratedCollections({ onSelectTitle, selectedId }) {
         if (!active) return
         if (Array.isArray(data) && data.length > 0) {
           setCollections(data)
-          setActiveCollectionId(data[0].id)
+          setActiveId(data[0].id)
         }
       })
       .catch(() => {})
-      .finally(() => {
-        if (active) setLoading(false)
-      })
+      .finally(() => { if (active) setLoadingMeta(false) })
     return () => { active = false }
   }, [])
 
-  if (loading || !collections.length) {
-    return null
-  }
+  // Fetch items for the active collection (lazy, cached in itemsMap)
+  const fetchCollectionItems = useCallback((collection) => {
+    if (!collection) return
+    const slug = collection.slug || collection.id
+    // Return from cache if already loaded
+    if (itemsMap[slug] !== undefined) return
 
-  const activeCollection = collections.find(c => c.id === activeCollectionId) || collections[0]
-  const normalizedItems = (activeCollection?.items || [])
-    .map(normalizeCinescopeItem)
-    .filter(Boolean)
+    setLoadingItems(true)
+    let active = true
+
+    const loadSlug = async () => {
+      let items = null
+
+      // Try by slug first, fall back to using the cached `items` array already in the list response
+      if (collection.slug) {
+        const detail = await cinescopeApi.getCollectionBySlug(collection.slug)
+        if (detail && Array.isArray(detail.items)) {
+          items = detail.items
+        }
+      }
+
+      // Fallback: collection list already carries items array in some backend versions
+      if (!items && Array.isArray(collection.items)) {
+        items = collection.items
+      }
+
+      if (!active) return
+
+      const normalised = (items || [])
+        .map(item => {
+          // items may be { contentType, movie, tvShow } wrappers or flat movie/tv objects
+          const raw = item.movie || item.tvShow || item
+          return normalizeCinescopeItem({ ...raw, contentType: item.contentType || 'MOVIE' })
+        })
+        .filter(Boolean)
+
+      setItemsMap(prev => ({ ...prev, [slug]: normalised }))
+      setLoadingItems(false)
+    }
+
+    loadSlug().catch(() => {
+      if (active) {
+        setItemsMap(prev => ({ ...prev, [slug]: [] }))
+        setLoadingItems(false)
+      }
+    })
+
+    return () => { active = false }
+  }, [itemsMap])
+
+  // Trigger item fetch whenever active collection changes
+  useEffect(() => {
+    const col = collections.find(c => c.id === activeId)
+    fetchCollectionItems(col)
+  }, [activeId, collections]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  if (loadingMeta || !collections.length) return null
+
+  const activeCollection = collections.find(c => c.id === activeId) || collections[0]
+  const activeSlug = activeCollection?.slug || activeCollection?.id
+  const items = itemsMap[activeSlug]
 
   return (
     <section className={styles.section} aria-label="Curated Collections">
@@ -43,23 +97,26 @@ export default function CuratedCollections({ onSelectTitle, selectedId }) {
         </div>
       </div>
 
+      {/* Collection tabs */}
       <div className={styles.collectionTabs}>
         {collections.map(col => {
-          const isActive = col.id === activeCollection?.id
+          const isActive = col.id === activeId
+          const slug = col.slug || col.id
+          const count = itemsMap[slug]?.length ?? col._count?.items ?? col.itemCount ?? null
           return (
             <button
               key={col.id}
               type="button"
               className={`${styles.tabBtn} ${isActive ? styles.activeTab : ''}`}
-              onClick={() => setActiveCollectionId(col.id)}
+              onClick={() => setActiveId(col.id)}
             >
               {col.coverImage && (
                 <img src={col.coverImage} alt="" className={styles.tabThumb} loading="lazy" />
               )}
               <div className={styles.tabText}>
                 <span className={styles.tabTitle}>{col.name}</span>
-                {col.items?.length > 0 && (
-                  <span className={styles.tabCount}>{col.items.length} titles</span>
+                {count !== null && count > 0 && (
+                  <span className={styles.tabCount}>{count} titles</span>
                 )}
               </div>
             </button>
@@ -67,15 +124,24 @@ export default function CuratedCollections({ onSelectTitle, selectedId }) {
         })}
       </div>
 
+      {/* Active collection content */}
       {activeCollection && (
         <div className={styles.collectionInfo}>
           {activeCollection.description && (
             <p className={styles.description}>{activeCollection.description}</p>
           )}
-          {normalizedItems.length > 0 ? (
-            <MediaGrid
-              items={normalizedItems}
-              type="movie"
+
+          {loadingItems || items === undefined ? (
+            // Skeleton shimmer while loading
+            <div className={styles.skeletonRow}>
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className={styles.skeletonCard} aria-hidden="true" />
+              ))}
+            </div>
+          ) : items.length > 0 ? (
+            <CategoryRail
+              title=""
+              items={items}
               onSelect={onSelectTitle}
               selectedId={selectedId}
             />
@@ -87,4 +153,3 @@ export default function CuratedCollections({ onSelectTitle, selectedId }) {
     </section>
   )
 }
-
