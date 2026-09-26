@@ -37,13 +37,33 @@ export function apiErrorMessage(error, title = 'Titles') {
 export const api = {
   trendingMovies: () => tmdbFetch('/trending/movie/week'),
   trendingTV: () => tmdbFetch('/trending/tv/week'),
+  topRatedMovies: () => tmdbFetch('/movie/top_rated'),
+  popularTV: () => tmdbFetch('/tv/popular'),
+  topRatedTV: () => tmdbFetch('/tv/top_rated'),
+  koreanDramas: () => tmdbFetch('/discover/tv?sort_by=popularity.desc&with_original_language=ko'),
   searchMovies: (q) => tmdbFetch(`/search/movie?query=${encodeURIComponent(q)}`),
   searchTV: (q) => tmdbFetch(`/search/tv?query=${encodeURIComponent(q)}`),
-  discoverMovies: ({ language, genre }) => {
-    const params = new URLSearchParams({ sort_by: 'popularity.desc' })
+  discoverMovies: ({ language, genre, year, minRating, sortBy } = {}) => {
+    const params = new URLSearchParams({ sort_by: sortBy || 'popularity.desc' })
     if (language) params.set('with_original_language', language)
-    if (genre) params.set('with_genres', genre)
+    if (genre && genre !== 'all') params.set('with_genres', genre)
+    if (year) params.set('primary_release_year', year)
+    if (minRating) {
+      params.set('vote_average.gte', minRating)
+      params.set('vote_count.gte', '100')
+    }
     return tmdbFetch(`/discover/movie?${params}`)
+  },
+  discoverTV: ({ language, genre, year, minRating, sortBy } = {}) => {
+    const params = new URLSearchParams({ sort_by: sortBy || 'popularity.desc' })
+    if (language) params.set('with_original_language', language)
+    if (genre && genre !== 'all') params.set('with_genres', genre)
+    if (year) params.set('first_air_date_year', year)
+    if (minRating) {
+      params.set('vote_average.gte', minRating)
+      params.set('vote_count.gte', '100')
+    }
+    return tmdbFetch(`/discover/tv?${params}`)
   },
   movieDetails: (id) => tmdbFetch(`/movie/${id}`),
   tvDetails: (id) => tmdbFetch(`/tv/${id}`),
@@ -56,6 +76,8 @@ export const api = {
   tvCredits: (id) => tmdbFetch(`/tv/${id}/credits`),
   movieRecommendations: (id) => tmdbFetch(`/movie/${id}/recommendations`),
   tvRecommendations: (id) => tmdbFetch(`/tv/${id}/recommendations`),
+  personDetails: (id) => tmdbFetch(`/person/${id}`),
+  personCredits: (id) => tmdbFetch(`/person/${id}/combined_credits`),
 }
 
 export function movieEmbedUrl(tmdbId) {

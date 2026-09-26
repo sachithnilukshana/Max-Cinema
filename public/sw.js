@@ -1,31 +1,72 @@
-const CACHE_NAME = 'Max Cinema-shell-v3'
-const APP_SHELL = ['/', '/index.html', '/manifest.webmanifest', '/favicon.ico', '/max-cinema-logo.png']
+// Service Worker for Max Cinema PWA
+const CACHE_NAME = 'max-cinema-v1'
+const STATIC_ASSETS = [
+  '/',
+  '/index.html',
+  '/manifest.webmanifest',
+  '/max-cinema-logo.png',
+  '/favicon.ico',
+]
 
-self.addEventListener('install', event => {
-  event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(APP_SHELL)))
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.addAll(STATIC_ASSETS).catch(() => {})
+    })
+  )
   self.skipWaiting()
 })
 
-self.addEventListener('activate', event => {
-  event.waitUntil(caches.keys().then(keys => Promise.all(keys
-    .filter(key => key !== CACHE_NAME)
-    .map(key => caches.delete(key)))))
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then((keys) => {
+      return Promise.all(
+        keys.map((key) => {
+          if (key !== CACHE_NAME) {
+            return caches.delete(key)
+          }
+        })
+      )
+    })
+  )
   self.clients.claim()
 })
 
-self.addEventListener('fetch', event => {
-  const request = event.request
-  const url = new URL(request.url)
-  if (request.method !== 'GET' || url.origin !== self.location.origin || url.pathname.startsWith('/api/')) return
+self.addEventListener('fetch', (event) => {
+  // Only handle GET requests and skip API or streaming iframe embeds
+  if (event.request.method !== 'GET') return
+  const url = new URL(event.request.url)
 
-  if (request.mode === 'navigate') {
-    event.respondWith(fetch(request).catch(() => caches.match('/index.html')))
+  if (url.pathname.startsWith('/api/') || url.hostname.includes('youtube') || url.hostname.includes('tmdb')) {
     return
   }
 
-  event.respondWith(caches.match(request).then(cached => cached || fetch(request).then(response => {
-    const copy = response.clone()
-    caches.open(CACHE_NAME).then(cache => cache.put(request, copy))
-    return response
-  })))
+  event.respondWith(
+    caches.match(event.request).then((cachedResponse) => {
+      if (cachedResponse) {
+        // Fetch fresh in background
+        fetch(event.request).then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200) {
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, networkResponse))
+          }
+        }).catch(() => {})
+        return cachedResponse
+      }
+
+      return fetch(event.request).then((networkResponse) => {
+        if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
+          return networkResponse
+        }
+        const responseToCache = networkResponse.clone()
+        caches.open(CACHE_NAME).then((cache) => {
+          cache.put(event.request, responseToCache)
+        })
+        return networkResponse
+      }).catch(() => {
+        if (event.request.mode === 'navigate') {
+          return caches.match('/index.html')
+        }
+      })
+    })
+  )
 })

@@ -1,13 +1,28 @@
 const ALLOWED_PATHS = [
   /^\/trending\/(movie|tv)\/week$/,
   /^\/search\/(movie|tv)$/,
-  /^\/discover\/movie$/,
+  /^\/discover\/(movie|tv)$/,
+  /^\/(movie|tv)\/(top_rated|popular)$/,
   /^\/(movie|tv)\/\d+$/,
   /^\/tv\/\d+\/season\/\d+$/,
   /^\/(movie|tv)\/\d+\/(videos|watch\/providers|credits|recommendations)$/,
+  /^\/person\/\d+$/,
+  /^\/person\/\d+\/(combined_credits|movie_credits|tv_credits)$/,
 ]
 
-const ALLOWED_PARAMS = new Set(['query', 'sort_by', 'with_original_language', 'with_genres'])
+const ALLOWED_PARAMS = new Set([
+  'query',
+  'sort_by',
+  'with_original_language',
+  'with_genres',
+  'page',
+  'vote_average.gte',
+  'vote_count.gte',
+  'primary_release_year',
+  'first_air_date_year',
+  'without_genres',
+  'with_keywords',
+])
 
 function readSecret(name) {
   let value = (process.env[name] || '').trim()

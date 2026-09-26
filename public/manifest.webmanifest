@@ -1,12 +1,28 @@
 {
+  "id": "/",
   "name": "Max Cinema",
   "short_name": "Max Cinema",
-  "description": "Discover, save, and track what to watch next with Max Cinema.",
+  "description": "Stream movies, binge TV series, and track your favorites with Max Cinema.",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#0a0a0a",
-  "theme_color": "#0a0a0a",
+  "orientation": "any",
+  "background_color": "#0a0a0c",
+  "theme_color": "#0a0a0c",
+  "categories": ["entertainment", "movies", "video"],
   "icons": [
+    {
+      "src": "/max-cinema-logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/max-cinema-logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
     {
       "src": "/max-cinema-logo.png",
       "sizes": "1280x1280",

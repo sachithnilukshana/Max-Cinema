@@ -94,6 +94,25 @@
   gap: 10px;
 }
 
+.installBtn {
+  background: rgba(200, 169, 110, 0.15);
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.installBtn:hover {
+  background: var(--gold);
+  color: #000;
+  transform: translateY(-1px);
+}
+
 .searchTrigger {
   display: flex;
   align-items: center;
@@ -330,6 +349,18 @@
   margin-top: 0.45rem;
   color: var(--text-dim);
   font-size: 11px;
+}
+
+.footerAdWrap {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.footerAd {
+  width: min(980px, 100%);
+  max-width: 980px;
 }
 
 .footerLink {

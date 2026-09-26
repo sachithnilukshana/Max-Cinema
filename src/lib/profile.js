@@ -38,6 +38,7 @@ function defaultLibrary() {
     continueWatching: [],
     episodeProgress: {},
     favorites: [],
+    favoriteItems: [],
     notes: {},
     ratings: {},
     reports: [],
@@ -56,6 +57,7 @@ function normalizeLibrary(saved) {
     continueWatching: Array.isArray(saved.continueWatching) ? saved.continueWatching.filter(item => item && typeof item === 'object' && Number.isFinite(Number(item.id))) : [],
     episodeProgress: saved.episodeProgress && typeof saved.episodeProgress === 'object' && !Array.isArray(saved.episodeProgress) ? saved.episodeProgress : {},
     favorites: Array.isArray(saved.favorites) ? saved.favorites.filter(item => typeof item === 'string') : [],
+    favoriteItems: Array.isArray(saved.favoriteItems) ? saved.favoriteItems.filter(item => item && typeof item === 'object' && Number.isFinite(Number(item.id))) : [],
     notes: saved.notes && typeof saved.notes === 'object' && !Array.isArray(saved.notes) ? saved.notes : {},
     ratings: saved.ratings && typeof saved.ratings === 'object' && !Array.isArray(saved.ratings) ? saved.ratings : {},
     reports: Array.isArray(saved.reports) ? saved.reports.filter(item => item && typeof item === 'object') : [],
@@ -203,11 +205,29 @@ export function clearContinueWatching(profileId, mediaType = null) {
 export function toggleFavorite(profileId, item) {
   return updateLibrary(profileId, library => {
     const key = titleKey(item)
-    const favorites = library.favorites.includes(key)
+    const isFav = (library.favorites || []).includes(key)
+    const favorites = isFav
       ? library.favorites.filter(value => value !== key)
-      : [...library.favorites, key]
-    return { ...library, favorites }
+      : [...(library.favorites || []), key]
+    const currentItems = library.favoriteItems || []
+    const favoriteItems = isFav
+      ? currentItems.filter(fav => titleKey(fav) !== key)
+      : [
+          {
+            ...item,
+            media_type: item.media_type || (item.name ? 'tv' : 'movie'),
+            addedAt: new Date().toISOString(),
+          },
+          ...currentItems.filter(fav => titleKey(fav) !== key),
+        ]
+    return { ...library, favorites, favoriteItems }
   })
+}
+
+export function isFavorite(profileId, item) {
+  if (!item) return false
+  const library = loadLibrary(profileId)
+  return (library.favorites || []).includes(titleKey(item))
 }
 
 export function saveTitleReview(profileId, item, { rating, note }) {

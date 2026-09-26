@@ -81,6 +81,16 @@
   color: #0a0a0a;
 }
 
+.favFilterBtn {
+  border-color: rgba(200, 169, 110, 0.4);
+  color: var(--gold);
+}
+
+.ratingSpan {
+  color: var(--gold);
+  font-weight: 600;
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { api, formatRating, getYear, posterUrl } from '../lib/api.js'
 import { trackMovieView, trackTVView, trackTrailerClick } from '../lib/cinescopeApi.js'
 import WatchOptions from './WatchOptions.jsx'
+import PersonModal from './PersonModal.jsx'
 import styles from './TitleDetails.module.css'
 
 function runtimeLabel(details, mediaType) {
@@ -19,6 +20,7 @@ export default function TitleDetails({ id, mediaType, onSelect }) {
   const [trailer, setTrailer] = useState(null)
   const [trailerOpen, setTrailerOpen] = useState(false)
   const [fullPageOpen, setFullPageOpen] = useState(false)
+  const [selectedPerson, setSelectedPerson] = useState(null)
 
   useEffect(() => {
     if (!trailerOpen && !fullPageOpen) return undefined
@@ -104,12 +106,20 @@ export default function TitleDetails({ id, mediaType, onSelect }) {
           <h4>Cast</h4>
           <div className={styles.cast}>
             {credits.map(person => (
-              <div key={person.credit_id || person.id} className={styles.person}>
-                {person.profile_path
-                  ? <img src={posterUrl(person.profile_path)} alt="" loading="lazy" />
-                  : <div className={styles.personFallback} aria-hidden="true">{person.name?.slice(0, 1)}</div>}
-                <span>{person.name}</span>
-              </div>
+              <button
+                key={person.credit_id || person.id}
+                type="button"
+                className={styles.personBtn}
+                onClick={() => setSelectedPerson({ id: person.id, name: person.name })}
+                title={`Explore ${person.name}'s filmography`}
+              >
+                <div className={styles.person}>
+                  {person.profile_path
+                    ? <img src={posterUrl(person.profile_path)} alt="" loading="lazy" />
+                    : <div className={styles.personFallback} aria-hidden="true">{person.name?.slice(0, 1)}</div>}
+                  <span>{person.name}</span>
+                </div>
+              </button>
             ))}
           </div>
         </div>
@@ -172,11 +182,43 @@ export default function TitleDetails({ id, mediaType, onSelect }) {
             </div>
             <div className={styles.fullBody}>
               <WatchOptions id={id} mediaType={mediaType} />
-              {!!credits.length && <div className={styles.block}><h4>Cast</h4><div className={styles.cast}>{credits.map(person => <div key={person.credit_id || person.id} className={styles.person}>{person.profile_path ? <img src={posterUrl(person.profile_path)} alt="" loading="lazy" /> : <div className={styles.personFallback}>{person.name?.slice(0, 1)}</div>}<span>{person.name}</span></div>)}</div></div>}
+              {!!credits.length && (
+                <div className={styles.block}>
+                  <h4>Cast</h4>
+                  <div className={styles.cast}>
+                    {credits.map(person => (
+                      <button
+                        key={person.credit_id || person.id}
+                        type="button"
+                        className={styles.personBtn}
+                        onClick={() => setSelectedPerson({ id: person.id, name: person.name })}
+                        title={`Explore ${person.name}'s filmography`}
+                      >
+                        <div className={styles.person}>
+                          {person.profile_path ? <img src={posterUrl(person.profile_path)} alt="" loading="lazy" /> : <div className={styles.personFallback}>{person.name?.slice(0, 1)}</div>}
+                          <span>{person.name}</span>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
               {!!recommendations.length && <div className={styles.block}><h4>Related titles</h4><div className={styles.recommendations}>{recommendations.map(item => { const name = mediaType === 'tv' ? item.name : item.title; return <button key={item.id} type="button" className={styles.recommendation} onClick={() => { setFullPageOpen(false); onSelect?.(item) }}>{item.poster_path && <img src={posterUrl(item.poster_path)} alt="" loading="lazy" />}<span title={name}>{name}</span></button> })}</div></div>}
             </div>
           </section>
         </div>
+      )}
+      {selectedPerson && (
+        <PersonModal
+          personId={selectedPerson.id}
+          personName={selectedPerson.name}
+          onClose={() => setSelectedPerson(null)}
+          onSelectTitle={(item) => {
+            setSelectedPerson(null)
+            setFullPageOpen(false)
+            onSelect?.(item)
+          }}
+        />
       )}
     </section>
   )
