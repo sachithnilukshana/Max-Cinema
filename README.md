@@ -8,9 +8,10 @@
 
   [![React](https://img.shields.io/badge/React-18.3-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://reactjs.org/)
   [![Vite](https://img.shields.io/badge/Vite-8.3-646C9F?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
+  [![Vercel](https://img.shields.io/badge/Vercel-Deployed-black?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com/)
+  [![Netlify](https://img.shields.io/badge/Netlify-Deployed-00C7B7?style=for-the-badge&logo=netlify&logoColor=white)](https://www.netlify.com/)
   [![Node](https://img.shields.io/badge/Node-%3E%3D20.19-339933?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
   [![PWA](https://img.shields.io/badge/PWA-Ready-5A0FC8?style=for-the-badge&logo=pwa&logoColor=white)](https://developer.mozilla.org/docs/Web/Progressive_web_apps)
-  [![Netlify](https://img.shields.io/badge/Netlify-Deployed-00C7B7?style=for-the-badge&logo=netlify&logoColor=white)](https://www.netlify.com/)
   [![License](https://img.shields.io/badge/License-MIT-D4AF37?style=for-the-badge)](LICENSE)
 
   <br />
@@ -58,12 +59,12 @@
 
 | Layer | Technology |
 |---|---|
-| **Frontend Library** | [React 18](https://reactjs.org/) (Hooks, Context, Modals) |
+| **Frontend Library** | [React 18](https://reactjs.org/) (Hooks, Modals, State) |
 | **Build & Dev Tool** | [Vite 8](https://vitejs.dev/) with Fast Refresh & Rolldown engine |
 | **Styling** | Vanilla CSS Modules with custom theme variables |
 | **Authentication** | [Firebase Auth v12](https://firebase.google.com/docs/auth) (Google & Email sign-in ready) |
 | **Database & Analytics** | Supabase JS client & CineScope Analytics integration |
-| **API Proxy & Backend** | Netlify Functions (`netlify/functions/`) & Node.js (`server/index.mjs`) |
+| **Serverless Backend** | Vercel Serverless Functions (`api/`) & Netlify Functions (`netlify/functions/`) |
 | **Media Metadata** | [The Movie Database (TMDB) API v3](https://developer.themoviedb.org/docs) |
 | **PWA & Offline** | Service Worker (`public/sw.js`) + Web App Manifest |
 
@@ -73,11 +74,16 @@
 
 ```
 Max-Cinema/
+├── api/                        # Vercel Serverless API proxies
+│   ├── health.js               # Health check endpoint (/api/health)
+│   ├── tmdb.js                 # Secure TMDB API proxy (/api/tmdb)
+│   └── play/
+│       └── [...path].js        # Licensed embed proxy (/api/play/*)
 ├── netlify/
 │   └── functions/              # Netlify Serverless API proxies
-│       ├── health.mjs          # Healthcheck endpoint
+│       ├── health.mjs          # Health check endpoint
 │       ├── play.mjs            # Licensed embed proxy
-│       └── tmdb.mjs            # Secure TMDB API proxy with whitelist validation
+│       └── tmdb.mjs            # TMDB API proxy
 ├── public/                     # Static assets, branding, and PWA manifest
 │   ├── ads.txt                 # Google AdSense publisher validation
 │   ├── favicon.ico             # App icon
@@ -123,6 +129,7 @@ Max-Cinema/
 │   └── schema.sql              # Supabase database schema for backend features
 ├── .env.example                # Sample environment configuration template
 ├── netlify.toml                # Netlify build configuration, headers & routing
+├── vercel.json                 # Vercel deployment preset, rewrites & headers
 ├── package.json                # Project dependencies and npm scripts
 └── vite.config.js              # Vite bundler configuration
 ```
@@ -134,7 +141,7 @@ Max-Cinema/
 ### 1. Prerequisites
 - **Node.js**: `v20.19.0` or higher
 - **npm**: `v10.0.0` or higher
-- (Optional) A free [TMDB API Key](https://www.themoviedb.org/settings/api)
+- A free [TMDB API Key](https://www.themoviedb.org/settings/api)
 
 ### 2. Clone the Repository
 ```bash
@@ -188,17 +195,29 @@ npm run dev
 
 ## 🚢 Production Deployment
 
-### Deploying to Netlify (Recommended)
-This repository includes a pre-configured `netlify.toml` with serverless function routing, SPA fallback, and security headers:
+### Deploying to Vercel (Recommended)
+This repository is 100% pre-configured for Vercel with zero extra setup needed:
 
 1. Push your repository to GitHub.
-2. Link your repository in [Netlify](https://app.netlify.com/).
-3. Add your environment variables in Netlify:
-   - `TMDB_API_KEY` = `your_tmdb_api_key`
-4. Netlify will automatically run `npm run build` and publish the `dist` directory with `netlify/functions` deployed.
+2. Go to [Vercel Dashboard](https://vercel.com/new) and click **"Add New Project"**.
+3. Import `sachithnilukshana/Max-Cinema`.
+4. Vercel automatically detects the **Vite** framework preset from `vercel.json`.
+5. Under **Environment Variables**, add:
+   - `TMDB_API_KEY` = `your_tmdb_api_key_here`
+   - *(Optional)* `EMBED_BASE` and `EMBED_API_KEY`
+6. Click **Deploy**!
+   - Static assets (`dist/`) are served via Vercel's global Edge CDN.
+   - API routes (`/api/tmdb`, `/api/health`, `/api/play/*`) are deployed automatically as Vercel Serverless Functions in `api/`.
+   - All SPA routes are rewritten to `/index.html` seamlessly.
+
+### Deploying to Netlify
+1. Push your repository to GitHub.
+2. Import repository in [Netlify](https://app.netlify.com/).
+3. In **Site Settings → Environment Variables**, add `TMDB_API_KEY`.
+4. Deploy! `netlify.toml` handles the build and serverless function routing automatically.
 
 ### Deploying with Standalone Node.js
-You can also run Max Cinema on any Node.js container or cloud platform (Render, Railway, DigitalOcean, VPS):
+You can also run Max Cinema on any Node.js container or cloud platform (Render, Railway, VPS):
 ```bash
 # Build the production bundle
 npm run build
@@ -206,7 +225,6 @@ npm run build
 # Start the Node HTTP server
 npm start
 ```
-The server will bind to `PORT` (default `8787`) or `HOST` defined in your environment and serve both static assets and API proxy endpoints securely.
 
 ---
 
