@@ -180,14 +180,13 @@ export default function App() {
       <footer className={styles.footer}>
         <p className={styles.footerText}>
           &copy; {new Date().getFullYear()} All rights reserved{' '}
-          <a
-            href="https://www.codespecters.com/"
-            target="_blank"
-            rel="noopener noreferrer"
+          <button
+            type="button"
+            onClick={goHome}
             className={styles.footerLink}
           >
-            Code Specter
-          </a>
+            Max Cinema
+          </button>
           {' '}| Digital Entertainment Democratized
         </p>
         <p className={styles.footerLinks}>

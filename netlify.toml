@@ -10,12 +10,12 @@
   directory = "netlify/functions"
 
 [[redirects]]
-  from = "/privacy-policy"
-  to = "/index.html"
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
   status = 200
 
 [[redirects]]
-  from = "/terms"
+  from = "/*"
   to = "/index.html"
   status = 200
 

@@ -348,6 +348,11 @@
   color: var(--gold);
   text-decoration: none;
   transition: opacity 0.2s;
+  background: transparent;
+  border: 0;
+  font: inherit;
+  cursor: pointer;
+  padding: 0;
 }
 
 .footerLink:hover {

@@ -1,456 +1,227 @@
-# Max Cinema - Complete Documentation Package
+<div align="center">
 
-## 📚 Documentation Index
+  <img src="public/max-cinema-logo.png" alt="Max Cinema Logo" width="120" style="border-radius: 20px; box-shadow: 0 8px 24px rgba(0,0,0,0.5);" />
 
-This package contains comprehensive documentation for the **Max Cinema** project - a production-ready React movie discovery and watchlist management application.
+  # MAX CINEMA
 
-### Quick Navigation
+  **A Luxury, High-Performance Cinematic Streaming & Discovery Web Experience**
 
-**Start here:**
-1. 👋 This file (README)
-2. 🚀 [QUICK_REFERENCE.md](./QUICK_REFERENCE.md) - Fast answers (5-minute reads)
-3. 📖 [MAX_CINEMA_GUIDE.md](./MAX_CINEMA_GUIDE.md) - Complete guide (everything you need)
+  [![React](https://img.shields.io/badge/React-18.3-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://reactjs.org/)
+  [![Vite](https://img.shields.io/badge/Vite-8.3-646C9F?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
+  [![Node](https://img.shields.io/badge/Node-%3E%3D20.19-339933?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
+  [![PWA](https://img.shields.io/badge/PWA-Ready-5A0FC8?style=for-the-badge&logo=pwa&logoColor=white)](https://developer.mozilla.org/docs/Web/Progressive_web_apps)
+  [![Netlify](https://img.shields.io/badge/Netlify-Deployed-00C7B7?style=for-the-badge&logo=netlify&logoColor=white)](https://www.netlify.com/)
+  [![License](https://img.shields.io/badge/License-MIT-D4AF37?style=for-the-badge)](LICENSE)
 
-**Deep dives:**
-- 🏗️ [COMPONENT_ARCHITECTURE.md](./COMPONENT_ARCHITECTURE.md) - Technical architecture
-- 📊 [PROJECT_SUMMARY.md](./PROJECT_SUMMARY.md) - Statistics and roadmap
-- 🎨 [ARCHITECTURE_VISUAL.md](./ARCHITECTURE_VISUAL.md) - Visual diagrams
+  <br />
 
----
+  <p align="center">
+    <b>Max Cinema</b> delivers a luxury digital entertainment experience democratized for all cinephiles. Discover trending movies, binge television series, inspect cast and crew filmographies, maintain an automatic watch history, and stream with a cinema-grade responsive player.
+  </p>
 
-## 📄 Document Descriptions
-
-### 1. **README.md** (This File)
-**Purpose**: Index and overview of all documentation  
-**Read time**: 5-10 minutes  
-**For**: Getting oriented, finding what you need
-
-**What's covered**:
-- List of all documents
-- Quick start checklist
-- When to read each document
-- Support resources
+</div>
 
 ---
 
-### 2. **QUICK_REFERENCE.md** ⭐ START HERE
-**Purpose**: Quick answers and code snippets  
-**Read time**: 5-30 minutes  
-**For**: Developers who want answers NOW  
-**Best for**: Lookup reference, common tasks
+## ✨ Features
 
-**What's covered**:
-- 🚀 Quick start (5 minutes to running locally)
-- 📁 File navigation guide
-- 🔧 20+ common coding tasks with examples
-- 🔐 Authentication setup
-- 🐛 Debu
-gging tips
-- 📊 Performance optimization
-- 🎨 Customization examples
-- 💾 Backup and export
+- **🎬 Comprehensive Entertainment Catalog**  
+  Browse thousands of movies and TV series powered by TMDB and CineScope curated endpoints. Live trending charts, top rated releases, and popular picks updated in real time.
 
-**Use this when**:
-- "How do I...?"
-- "Show me code"
-- "Where do I find...?"
-- You need quick answers
----
+- **🍿 Seamless Streaming & Player Controls**  
+  Built-in cinematic video playback with responsive iframe handling, full-screen toggle, multi-season/episode selectors, and next-episode shortcuts.
 
-### 3. **MAX_CINEMA_GUIDE.md** 📖 MOST COMPREHENSIVE
-**Purpose**: Complete reference for everything  
-**Read time**: 1-2 hours (can skim sections)  
-**For**: Deep understanding of the project  
-**Best for**: Full learning, troubleshooting, deployment
+- **🔍 Global Command Palette (`Ctrl+K` or `/`)**  
+  Instant keyboard-first search and navigation across all movies, TV shows, and watchlists with live suggestions and debounced queries.
 
-**What's covered**:
-- 🏗️ Project architecture (with diagrams)
-- 📁 Code structure breakdown
-- 🔄 Data flow explanations
-- ⚙️ Local development setup (step-by-step)
-- 🚀 3 deployment options (Netlify, Self-hosted, Docker)
-- ✨ Adding new features (5+ examples)
-- 🐛 10+ common issues with solutions
-- 🔐 Security best practices
-- 🌐 Environment configuration reference
+- **⏱️ Local Watch History & Continue Watching**  
+  Automatically saves playback progress and recent titles locally. Features time-ago timestamps, quick-resume buttons, and privacy-respecting one-click history clearing.
 
-**Use this when**:
-- Setting up locally
-- Deploying to production
-- Understanding how things work
-- Troubleshooting
-- Adding major features
-- Learning the full system
+- **🎭 Cast & Crew Filmography Explorer**  
+  Interactive actor and director modal profiles detailing biographical overviews, dates of birth, combined credits, and quick links to titles they starred in.
+
+- **🎯 Granular Multi-Filter Bar**  
+  Filter effortlessly by genre, mood (*Feel-good, Romance, Thriller, Horror, Action, Drama*), original language (*English, Malayalam, Tamil, Telugu, Hindi, Korean*), release year, and minimum rating.
+
+- **💎 Luxury Cinematic Design System**  
+  Styled with EB Garamond typography, obsidian gold accents, silky smooth modal transitions, and dynamic dark / light themes persisted in local storage.
+
+- **📱 Progressive Web App (PWA)**  
+  Web app manifest, offline service worker caching, and home-screen installability on mobile (iOS/Android) and desktop (Chrome/Edge/macOS).
+
+- **🛡️ Production-Grade Security & Privacy**  
+  Serverless proxy shielding API keys from client inspection, strict Content Security Policy (CSP), nosniff headers, and cookie/privacy preference management.
 
 ---
 
-### 4. **COMPONENT_ARCHITECTURE.md** 🏗️ FOR DEVELOPERS
-**Purpose**: Technical deep dive into component design  
-**Read time**: 45-60 minutes  
-**For**: Developers building on/extending the project  
-**Best for**: Architecture understanding, component design patterns
+## 🛠️ Tech Stack
 
-**What's covered**:
-- 🌳 Component hierarchy diagram
-- 📊 App-level state structure
-- 🎯 Profile data structure
-- 📝 Detailed component descriptions (12+ components)
-- 📈 Data flow diagrams (ASCII art)
-- 🔄 Event system documentation
-- ⚡ Performance considerations
-- 🎨 Component dependencies
-
-**Use this when**:
-- Understanding component relationships
-- Modifying component state
-- Adding new components
-- Optimizing performance
-- Understanding data flow
-- Learning design patterns
+| Layer | Technology |
+|---|---|
+| **Frontend Library** | [React 18](https://reactjs.org/) (Hooks, Context, Modals) |
+| **Build & Dev Tool** | [Vite 8](https://vitejs.dev/) with Fast Refresh & Rolldown engine |
+| **Styling** | Vanilla CSS Modules with custom theme variables |
+| **Authentication** | [Firebase Auth v12](https://firebase.google.com/docs/auth) (Google & Email sign-in ready) |
+| **Database & Analytics** | Supabase JS client & CineScope Analytics integration |
+| **API Proxy & Backend** | Netlify Functions (`netlify/functions/`) & Node.js (`server/index.mjs`) |
+| **Media Metadata** | [The Movie Database (TMDB) API v3](https://developer.themoviedb.org/docs) |
+| **PWA & Offline** | Service Worker (`public/sw.js`) + Web App Manifest |
 
 ---
 
-### 5. **PROJECT_SUMMARY.md** 📊 EXECUTIVE OVERVIEW
-**Purpose**: Statistics, roadmap, and project assessment  
-**Read time**: 20-30 minutes  
-**For**: Project evaluation, understanding scope  
-**Best for**: Overview, statistics, feature list, roadmap
-
-**What's covered**:
-- 📈 Code statistics (5,000+ LOC breakdown)
-- ✨ Feature list (what's built, what's planned)
-- 🛠️ Technology stack details
-- 📱 Platform support matrix
-- 🎯 Feature roadmap (3 phases)
-- 📊 Performance metrics
-- 🔐 Security features checklist
-- 📋 System requirements
-- 🎓 Learning path for developers
-- 💡 Customization ideas
-- 🎉 Project complexity assessment
-
-**Use this when**:
-- Evaluating the project
-- Understanding capabilities
-- Planning customizations
-- Assessing complexity
-- Understanding roadmap
-- Checking requirements
-
----
-
-### 6. **ARCHITECTURE_VISUAL.md** 🎨 DIAGRAMS & FLOWCHARTS
-**Purpose**: Visual representations of the system  
-**Read time**: 15-25 minutes  
-**For**: Visual learners, system design overview  
-**Best for**: Understanding architecture at a glance
-
-**What's covered**:
-- 🏛️ Full system architecture diagram (ASCII)
-- 📂 File structure tree
-- 🌳 Component dependency tree
-- 📈 Data flow diagrams
-- 🚀 Deployment architecture options (2)
-- 💾 State management visualization
-- 🔄 API call flow diagram
-- 📊 Component size distribution
-- 🔒 Security layers matrix
-- 🛠️ Technology stack visualization
-- 🚦 Development workflow
-- 🎯 Quick decision tree
-
-**Use this when**:
-- Visual overview needed
-- Presenting to team
-- Understanding connections
-- Remembering structure
-- Quick reference
-
----
-
-## 🎯 Recommended Reading Path
-
-### For Quick Setup (30 minutes)
-1. Read this README
-2. Read QUICK_REFERENCE.md → "Quick Start" section
-3. Run locally: `npm install && npm run dev`
-4. Explore the UI
-
-### For Complete Understanding (4-6 hours)
-1. README.md (this file) - 5 min
-2. QUICK_REFERENCE.md → "🚀 Quick Start" - 15 min
-3. MAX_CINEMA_GUIDE.md → "Project Architecture" - 30 min
-4. ARCHITECTURE_VISUAL.md → All sections - 20 min
-5. COMPONENT_ARCHITECTURE.md → Component details - 60 min
-6. PROJECT_SUMMARY.md → All sections - 30 min
-7. Hands-on: Make your first code change - 30 min
-8. Hands-on: Deploy to Netlify - 30 min
-
-### For Deployment (1-2 hours)
-1. QUICK_REFERENCE.md → "🚀 Deployment Checklist" - 15 min
-2. MAX_CINEMA_GUIDE.md → "Production Deployment" section - 30 min
-3. Follow step-by-step instructions
-4. Test at deployed URL
-
-### For Adding Features (2-4 hours)
-1. QUICK_REFERENCE.md → "🔧 Common Tasks" - 30 min
-2. MAX_CINEMA_GUIDE.md → "Adding New Features" - 60 min
-3. COMPONENT_ARCHITECTURE.md → Component structure - 45 min
-4. Review existing components - 30 min
-5. Build your feature
-
-### For Fixing Bugs (1-2 hours)
-1. MAX_CINEMA_GUIDE.md → "Common Issues & Fixes" - 30 min
-2. QUICK_REFERENCE.md → "🐛 Debugging Tips" - 15 min
-3. COMPONENT_ARCHITECTURE.md → Data flow - 30 min
-4. Investigate and fix
-
----
-
-## 🚀 Quick Start Checklist
-
-### Day 1: Get Running Locally
-- [ ] Read QUICK_REFERENCE.md → "🚀 Quick Start"
-- [ ] Run `npm install`
-- [ ] Create `.env` with TMDB_API_KEY
-- [ ] Run `npm run api` (Terminal 1)
-- [ ] Run `npm run dev` (Terminal 2)
-- [ ] Visit http://localhost:5173
-- [ ] Search for a movie and test watchlist
-- [ ] **Result**: App running locally ✅
-
-### Day 2: Understand Code
-- [ ] Read MAX_CINEMA_GUIDE.md → "Code Structure"
-- [ ] Open src/App.jsx and understand it
-- [ ] Review pages/ folder structure
-- [ ] Check components/ folder
-- [ ] Study lib/api.js and lib/profile.js
-- [ ] Read COMPONENT_ARCHITECTURE.md → "Component Details"
-- [ ] **Result**: Understanding how app works ✅
-
-### Day 3: Make Changes
-- [ ] Read QUICK_REFERENCE.md → "🔧 Common Tasks"
-- [ ] Add a simple UI element
-- [ ] Modify CSS styling
-- [ ] Test changes in browser
-- [ ] Commit to git
-- [ ] **Result**: Made first code change ✅
-
-### Day 4: Prepare Deployment
-- [ ] Read MAX_CINEMA_GUIDE.md → "Production Deployment"
-- [ ] Run `npm run build` locally
-- [ ] Create GitHub repository
-- [ ] Push code to GitHub (ensure .env in .gitignore!)
-- [ ] Create Netlify account
-- [ ] **Result**: Code ready to deploy ✅
-
-### Day 5: Deploy
-- [ ] Connect GitHub to Netlify
-- [ ] Add TMDB_API_KEY to Netlify env vars
-- [ ] Netlify auto-deploys
-- [ ] Test `/api/health` endpoint
-- [ ] Verify movies load
-- [ ] **Result**: App live on internet 🎉
-
----
-
-## 📍 Document Cross-References
-
-### If you want to...
-
-| Goal | Read This | Section |
-|------|-----------|---------|
-| Get running in 5 min | QUICK_REFERENCE.md | 🚀 Quick Start |
-| Set up environment | MAX_CINEMA_GUIDE.md | Environment Configuration |
-| Deploy to Netlify | MAX_CINEMA_GUIDE.md | Netlify Deployment |
-| Deploy self-hosted | MAX_CINEMA_GUIDE.md | Self-Hosted Deployment |
-| Understand architecture | ARCHITECTURE_VISUAL.md | System Architecture |
-| Understand components | COMPONENT_ARCHITECTURE.md | Component Details |
-| Find code examples | QUICK_REFERENCE.md | 🔧 Common Tasks |
-| Fix a bug | MAX_CINEMA_GUIDE.md | Common Issues & Fixes |
-| Add a feature | MAX_CINEMA_GUIDE.md | Adding New Features |
-| Optimize performance | QUICK_REFERENCE.md | Performance Optimization |
-| See the roadmap | PROJECT_SUMMARY.md | Feature Roadmap |
-| Check capabilities | PROJECT_SUMMARY.md | Core Features |
-| Understand data flow | COMPONENT_ARCHITECTURE.md | Data Flow Diagrams |
-| See API integration | ARCHITECTURE_VISUAL.md | API Call Flow |
-| Learn project stats | PROJECT_SUMMARY.md | Project Statistics |
-
----
-
-## 🎓 Learning Resources
-
-### In This Package
-- 📚 6 comprehensive markdown documents
-- 🎨 30+ ASCII diagrams and flowcharts
-- 💻 50+ code examples
-- ✅ Troubleshooting guide for 10+ issues
-- 🚀 Multiple deployment guides
-- 📊 Complete architecture documentation
-
-### External Resources
-- **TMDB API Docs**: https://developer.themoviedb.org/docs
-- **React Docs**: https://react.dev
-- **Vite Docs**: https://vitejs.dev
-- **Firebase Docs**: https://firebase.google.com/docs
-- **Netlify Docs**: https://docs.netlify.com
-- **Node.js Docs**: https://nodejs.org/en/docs/
-- **MDN Web Docs**: https://developer.mozilla.org
-
----
-
-## 💾 File Manifest
+## 📁 Repository Structure
 
 ```
-Documentation Package Contents
-├── README.md                          (This file - Start here!)
-├── QUICK_REFERENCE.md                 (Quick answers & code examples)
-├── MAX_CINEMA_GUIDE.md                (Complete reference guide)
-├── COMPONENT_ARCHITECTURE.md          (Technical architecture)
-├── PROJECT_SUMMARY.md                 (Statistics & roadmap)
-└── ARCHITECTURE_VISUAL.md             (Diagrams & flowcharts)
-
-Total: 6 markdown files
-Pages: 150+ pages of content
-Words: 50,000+ words
-Diagrams: 30+ ASCII diagrams
-Code Examples: 50+ examples
+Max-Cinema/
+├── netlify/
+│   └── functions/              # Netlify Serverless API proxies
+│       ├── health.mjs          # Healthcheck endpoint
+│       ├── play.mjs            # Licensed embed proxy
+│       └── tmdb.mjs            # Secure TMDB API proxy with whitelist validation
+├── public/                     # Static assets, branding, and PWA manifest
+│   ├── ads.txt                 # Google AdSense publisher validation
+│   ├── favicon.ico             # App icon
+│   ├── manifest.webmanifest    # PWA install specification
+│   ├── max-cinema-logo.png     # Brand insignia
+│   ├── robots.txt              # Search engine crawler configuration
+│   ├── sitemap.xml             # XML sitemap
+│   └── sw.js                   # Service worker for offline caching
+├── server/
+│   └── index.mjs               # Standalone production Node.js HTTP server & API proxy
+├── src/
+│   ├── components/             # Reusable UI components
+│   │   ├── CategoryRail.jsx    # Horizontal scrolling genre rails
+│   │   ├── CineScopeAd.jsx     # Dynamic ad slot integration
+│   │   ├── ContinueWatching.jsx# Resume playback shelf
+│   │   ├── CuratedCollections.jsx # Hand-picked playlists & collections
+│   │   ├── FilterBar.jsx       # Mood, language, genre, and year filter controls
+│   │   ├── HeroCarousel.jsx    # Featured title hero banner with autoplay preview
+│   │   ├── MediaCard.jsx       # Media poster cards with badges & quick actions
+│   │   ├── MediaGrid.jsx       # Responsive grid layout for movie lists
+│   │   ├── PersonModal.jsx     # Cast & crew biography and credit details
+│   │   ├── Player.jsx          # Cinema playback overlay with fullscreen toggle
+│   │   ├── SearchSuggestions.jsx # Autocomplete dropdown
+│   │   ├── SeasonPicker.jsx    # Episode/Season selector for TV series
+│   │   ├── TitleDetails.jsx    # Expanded details modal (cast, trailers, recs)
+│   │   └── TrailerModal.jsx    # YouTube trailer lightbox player
+│   ├── lib/                    # Core libraries & utilities
+│   │   ├── api.js              # TMDB client & embed link helpers
+│   │   ├── cinescopeApi.js     # Analytics and backend integration
+│   │   ├── firebase.js         # Firebase Authentication client
+│   │   ├── profile.js          # Local user preferences, library, and watch history
+│   │   └── supabase.js         # Supabase client connector
+│   ├── pages/                  # Page views
+│   │   ├── Movies.jsx          # Movie exploration and discovery page
+│   │   ├── TV.jsx              # TV series exploration page
+│   │   ├── WatchHistory.jsx    # User watch history and playback log
+│   │   ├── PrivacyPolicy.jsx   # Interactive privacy policy
+│   │   └── Terms.jsx           # Terms of service page
+│   ├── App.jsx                 # Main application root with tab & route state
+│   ├── index.css               # Global typography, resets, and CSS custom properties
+│   └── main.jsx                # React DOM entrypoint
+├── supabase/
+│   └── schema.sql              # Supabase database schema for backend features
+├── .env.example                # Sample environment configuration template
+├── netlify.toml                # Netlify build configuration, headers & routing
+├── package.json                # Project dependencies and npm scripts
+└── vite.config.js              # Vite bundler configuration
 ```
 
 ---
 
-## 🎯 Which Document Should I Read?
+## 🚀 Getting Started
 
-### "I have 5 minutes"
-→ Read: **QUICK_REFERENCE.md** → "🚀 Quick Start" section
+### 1. Prerequisites
+- **Node.js**: `v20.19.0` or higher
+- **npm**: `v10.0.0` or higher
+- (Optional) A free [TMDB API Key](https://www.themoviedb.org/settings/api)
 
-### "I want to get running locally"
-→ Read: **QUICK_REFERENCE.md** → "🚀 Quick Start"  
-→ Then: **MAX_CINEMA_GUIDE.md** → "Local Development Setup"
+### 2. Clone the Repository
+```bash
+git clone https://github.com/sachithnilukshana/Max-Cinema.git
+cd Max-Cinema
+```
 
-### "I want to deploy"
-→ Read: **MAX_CINEMA_GUIDE.md** → "Production Deployment"  
-→ Or: **QUICK_REFERENCE.md** → "🚀 Deployment Checklist"
+### 3. Install Dependencies
+```bash
+npm install
+```
 
-### "I want to understand the code"
-→ Read: **MAX_CINEMA_GUIDE.md** → "Code Structure"  
-→ Then: **COMPONENT_ARCHITECTURE.md** → "Component Details"
+### 4. Configure Environment Variables
+Copy `.env.example` to `.env`:
+```bash
+cp .env.example .env
+```
+Open `.env` and provide your credentials:
+```ini
+# TMDB API Key (v3) or Read Access Token
+TMDB_API_KEY=your_tmdb_api_key_here
 
-### "I want to add features"
-→ Read: **MAX_CINEMA_GUIDE.md** → "Adding New Features"  
-→ Then: **QUICK_REFERENCE.md** → "🔧 Common Tasks"
+# (Optional) Licensed embed playback base URL & key
+EMBED_BASE=https://your-licensed-provider.example
+EMBED_API_KEY=your_provider_key
 
-### "I need to fix a bug"
-→ Read: **MAX_CINEMA_GUIDE.md** → "Common Issues & Fixes"  
-→ Or: **QUICK_REFERENCE.md** → "🐛 Debugging Tips"
+# Supabase (Optional)
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_PUBLISHABLE_KEY=your_supabase_publishable_key
+```
 
-### "I want an overview"
-→ Read: **PROJECT_SUMMARY.md** → All sections  
-→ Then: **ARCHITECTURE_VISUAL.md** → All sections
+### 5. Run Locally
 
-### "I want everything"
-→ Read in order:
-1. README.md (this)
-2. QUICK_REFERENCE.md
-3. MAX_CINEMA_GUIDE.md
-4. ARCHITECTURE_VISUAL.md
-5. COMPONENT_ARCHITECTURE.md
-6. PROJECT_SUMMARY.md
+**Option A: Vite Development Server**
+```bash
+npm run dev
+```
+Open [http://localhost:5173](http://localhost:5173) in your browser.
 
----
-
-## ✅ Getting Help
-
-### Within This Package
-1. Search for your issue in **MAX_CINEMA_GUIDE.md** → "Common Issues & Fixes"
-2. Look up code examples in **QUICK_REFERENCE.md** → "🔧 Common Tasks"
-3. Check architecture details in **COMPONENT_ARCHITECTURE.md**
-4. Review deployment guides in **MAX_CINEMA_GUIDE.md** → "Production Deployment"
-
-### External Help
-- **TMDB API Issues**: https://www.themoviedb.org/talk/categories/12151
-- **React Questions**: https://stackoverflow.com/questions/tagged/reactjs
-- **Deployment Issues**: Check Netlify support or your server provider
-- **Firebase Issues**: https://firebase.google.com/support
-- **General Dev Help**: https://stackoverflow.com, GitHub Issues
-
----
-
-## 🎉 You're All Set!
-
-You now have everything you need to:
-- ✅ Understand the Max Cinema project
-- ✅ Set up local development
-- ✅ Add new features
-- ✅ Deploy to production
-- ✅ Troubleshoot issues
-- ✅ Optimize performance
-- ✅ Customize the application
-
-### Next Steps
-
-**Pick one:**
-
-1. **Get it running** (15 min)
-   - Read QUICK_REFERENCE.md → "🚀 Quick Start"
-   - Follow 5-minute setup
-
-2. **Deploy it** (1-2 hours)
-   - Read MAX_CINEMA_GUIDE.md → "Production Deployment"
-   - Follow Netlify deployment guide
-
-3. **Customize it** (2-4 hours)
-   - Read QUICK_REFERENCE.md → "🔧 Common Tasks"
-   - Pick a feature to add and follow example
-
-4. **Learn it** (4-6 hours)
-   - Follow "For Complete Understanding" path above
-   - Read all documents in recommended order
+**Option B: Full Stack Local Development with Node Server**
+In one terminal, start the backend proxy:
+```bash
+npm run api
+```
+In a second terminal, start Vite:
+```bash
+npm run dev
+```
 
 ---
 
-## 📞 Support
+## 🚢 Production Deployment
 
-**Need more help?**
-- Review all cross-referenced sections
-- Check the troubleshooting guides
-- Consult the code examples
-- Explore external resources
-- Join developer communities
+### Deploying to Netlify (Recommended)
+This repository includes a pre-configured `netlify.toml` with serverless function routing, SPA fallback, and security headers:
 
-**Want to contribute?**
-- Fork the repository
-- Make improvements
-- Submit pull requests
-- Share your customizations
+1. Push your repository to GitHub.
+2. Link your repository in [Netlify](https://app.netlify.com/).
+3. Add your environment variables in Netlify:
+   - `TMDB_API_KEY` = `your_tmdb_api_key`
+4. Netlify will automatically run `npm run build` and publish the `dist` directory with `netlify/functions` deployed.
 
-**Have questions?**
-- Post on GitHub Issues
-- Join community discussions
-- Check Stack Overflow
-- Review TMDB documentation
+### Deploying with Standalone Node.js
+You can also run Max Cinema on any Node.js container or cloud platform (Render, Railway, DigitalOcean, VPS):
+```bash
+# Build the production bundle
+npm run build
 
----
-
-**Happy coding! 🚀**
-
-*For the latest updates, visit the project repository.*
+# Start the Node HTTP server
+npm start
+```
+The server will bind to `PORT` (default `8787`) or `HOST` defined in your environment and serve both static assets and API proxy endpoints securely.
 
 ---
 
-## Document Statistics
+## ⌨️ Keyboard Shortcuts
 
-| Document | Lines | Words | Sections | Topics |
-|----------|-------|-------|----------|--------|
-| README.md | 350 | 3,500 | 10 | Index, navigation, checklist |
-| QUICK_REFERENCE.md | 800 | 8,000 | 15 | Quick tasks, examples, tips |
-| MAX_CINEMA_GUIDE.md | 2,500 | 25,000 | 20 | Complete guide, setup, deploy |
-| COMPONENT_ARCHITECTURE.md | 1,200 | 12,000 | 12 | Architecture, components, flow |
-| PROJECT_SUMMARY.md | 1,500 | 15,000 | 15 | Stats, roadmap, capabilities |
-| ARCHITECTURE_VISUAL.md | 800 | 8,000 | 12 | Diagrams, visuals, trees |
-| **TOTAL** | **7,150** | **71,500** | **84** | **Complete coverage** |
+| Shortcut | Action |
+|---|---|
+| <kbd>Ctrl</kbd> + <kbd>K</kbd> or <kbd>/</kbd> | Open Global Command Palette / Search |
+| <kbd>Esc</kbd> | Close Search Palette, Modals, or Player |
+| <kbd>Space</kbd> / Click | Play / Pause media |
 
 ---
 
-Last updated: September 17, 2026
-For: Max Cinema v1.0.0
+## 📄 License & Credits
+
+- Movie & TV metadata provided by [The Movie Database (TMDB)](https://www.themoviedb.org/). This product uses the TMDB API but is not endorsed or certified by TMDB.
+- Distributed under the **MIT License**. See `LICENSE` for details.
+- Maintained by [Sachith Nilukshana](https://github.com/sachithnilukshana).

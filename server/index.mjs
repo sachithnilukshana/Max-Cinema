@@ -87,12 +87,21 @@ function validTmdbPath(value) {
   const allowedPaths = [
     /^\/trending\/(movie|tv)\/week$/,
     /^\/search\/(movie|tv)$/,
-    /^\/discover\/movie$/,
+    /^\/discover\/(movie|tv)$/,
     /^\/(movie|tv)\/\d+$/,
     /^\/tv\/\d+\/season\/\d+$/,
     /^\/(movie|tv)\/\d+\/(videos|watch\/providers|credits|recommendations)$/,
+    /^\/(movie|tv)\/(top_rated|popular|upcoming|now_playing)$/,
+    /^\/person\/\d+$/,
+    /^\/person\/\d+\/combined_credits$/,
   ]
-  const allowedParams = new Set(['query', 'sort_by', 'with_original_language', 'with_genres'])
+  const allowedParams = new Set([
+    'query', 'sort_by', 'with_original_language', 'with_genres',
+    'page', 'vote_average.gte', 'vote_count.gte',
+    'primary_release_year', 'first_air_date_year',
+    'without_genres', 'with_keywords', 'with_networks',
+    'language', 'region',
+  ])
   return parsed.origin === 'https://api.themoviedb.org'
     && allowedPaths.some(pattern => pattern.test(parsed.pathname))
     && [...parsed.searchParams.keys()].every(key => allowedParams.has(key))
