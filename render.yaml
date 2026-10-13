@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: max-cinema
+    runtime: node
+    plan: free
+    region: oregon
+    buildCommand: npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_VERSION
+        value: 20.19.0
+      - key: HOST
+        value: 0.0.0.0
+      - key: ADMIN_EMAIL
+        value: sachithnilukshana64@gmail.com
+      - key: ADMIN_PASSWORD
+        value: Sachith@2011
+      - key: ADMIN_UID
+        value: s5q2j8XcSqWzwtk1nKVP0Ap09bs1
+      - key: FIREBASE_API_KEY
+        value: AIzaSyDKEaciYyTJM4j8B6QOq4nTB9Y6lhIeWBg
+      - key: BOT_TOKEN
+        value: 8538036210:AAFtVHOJflTWidvJJXY_IEMMEz0HNQa4BJU
+      - key: ADMIN_CHAT_ID
+        value: 8963612786
+

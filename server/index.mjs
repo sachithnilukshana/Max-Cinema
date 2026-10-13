@@ -2,11 +2,25 @@ import { createReadStream, existsSync, statSync } from 'node:fs'
 import { createServer } from 'node:http'
 import { extname, isAbsolute, join, relative, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import telegramHandler from '../api/telegram.js'
+import checkPremiumHandler from '../api/check-premium.js'
+import virtualCardPayHandler from '../api/virtual-card-pay.js'
+import reportHandler from '../api/report.js'
+import recordReferralHandler from '../api/record-referral.js'
+import payhereNotifyHandler from '../api/payhere-notify.js'
 
 const rootDir = fileURLToPath(new URL('..', import.meta.url))
+
+// Load local .env if present
+try {
+  if (existsSync(join(rootDir, '.env')) && typeof process.loadEnvFile === 'function') {
+    process.loadEnvFile(join(rootDir, '.env'))
+  }
+} catch {}
+
 const distDir = join(rootDir, 'dist')
 const port = Number(process.env.PORT || 8787)
-const host = process.env.HOST || '127.0.0.1'
+const host = process.env.HOST || '0.0.0.0'
 function readSecret(name) {
   let value = (process.env[name] || '').trim()
   if (value.startsWith(`${name}=`)) value = value.slice(name.length + 1).trim()
@@ -215,19 +229,80 @@ function serveApp(pathname, response) {
   createReadStream(target).pipe(response)
 }
 
-const server = createServer((request, response) => {
-  if (request.method !== 'GET') {
-    send(response, 405, 'Method not allowed.')
+async function runHandler(handler, request, response, requestUrl) {
+  response.setHeader('Access-Control-Allow-Origin', '*')
+  response.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE')
+  response.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+
+  if (request.method === 'OPTIONS') {
+    response.writeHead(200)
+    response.end()
     return
   }
 
-  const requestUrl = new URL(request.url, 'http://localhost')
+  request.query = Object.fromEntries(requestUrl.searchParams.entries())
+  let bodyData = ''
+  for await (const chunk of request) {
+    bodyData += chunk
+  }
+  try {
+    request.body = bodyData ? JSON.parse(bodyData) : {}
+  } catch {
+    request.body = bodyData
+  }
+
+  response.status = (code) => {
+    response.statusCode = code
+    return response
+  }
+  response.json = (data) => {
+    response.setHeader('Content-Type', 'application/json; charset=utf-8')
+    response.end(JSON.stringify(data))
+  }
+  response.send = (data) => {
+    response.end(data)
+  }
+
+  try {
+    await handler(request, response)
+  } catch (err) {
+    console.error('API handler error:', err)
+    if (!response.writableEnded) {
+      response.writeHead(500, { 'Content-Type': 'application/json' })
+      response.end(JSON.stringify({ error: err.message }))
+    }
+  }
+}
+
+const server = createServer((request, response) => {
+  const requestUrl = new URL(request.url, `http://${request.headers.host || 'localhost'}`)
+
   if (requestUrl.pathname === '/api/health') {
     send(response, 200, JSON.stringify({ ok: true }), { 'Content-Type': 'application/json; charset=utf-8' })
   } else if (requestUrl.pathname === '/api/tmdb') {
+    if (request.method !== 'GET') {
+      send(response, 405, 'Method not allowed.')
+      return
+    }
     proxyTmdb(requestUrl, request, response)
   } else if (requestUrl.pathname.startsWith('/api/play/')) {
+    if (request.method !== 'GET') {
+      send(response, 405, 'Method not allowed.')
+      return
+    }
     playEmbed(requestUrl.pathname, response)
+  } else if (requestUrl.pathname === '/api/telegram') {
+    runHandler(telegramHandler, request, response, requestUrl)
+  } else if (requestUrl.pathname === '/api/check-premium') {
+    runHandler(checkPremiumHandler, request, response, requestUrl)
+  } else if (requestUrl.pathname === '/api/virtual-card-pay') {
+    runHandler(virtualCardPayHandler, request, response, requestUrl)
+  } else if (requestUrl.pathname === '/api/report') {
+    runHandler(reportHandler, request, response, requestUrl)
+  } else if (requestUrl.pathname === '/api/record-referral') {
+    runHandler(recordReferralHandler, request, response, requestUrl)
+  } else if (requestUrl.pathname === '/api/payhere-notify') {
+    runHandler(payhereNotifyHandler, request, response, requestUrl)
   } else if (requestUrl.pathname.startsWith('/api/')) {
     send(response, 404, 'API endpoint not found.')
   } else {

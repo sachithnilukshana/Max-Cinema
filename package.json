@@ -7,10 +7,10 @@
   },
   "scripts": {
     "dev": "vite",
-    "api": "node --env-file=.env server/index.mjs",
+    "api": "node server/index.mjs",
     "build": "vite build",
     "preview": "vite preview",
-    "start": "node --env-file=.env server/index.mjs"
+    "start": "node server/index.mjs"
   },
   "dependencies": {
     "@supabase/server": "^1.6.1",
