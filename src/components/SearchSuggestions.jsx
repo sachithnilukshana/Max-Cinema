@@ -72,7 +72,7 @@ export default function SearchSuggestions({ query, type, onSelect }) {
             const date = type === 'tv' ? item.first_air_date : item.release_date
             return (
               <button key={item.id} type="button" role="option" aria-selected={activeIndex === index} className={activeIndex === index ? styles.active : ''} onMouseDown={event => event.preventDefault()} onClick={() => choose(item)}>
-                {item.poster_path ? <img src={posterUrl(item.poster_path)} alt="" /> : <span className={styles.posterFallback}>✦</span>}
+                {item.poster_path ? <img src={posterUrl(item.poster_path)} alt="" decoding="async" draggable="false" /> : <span className={styles.posterFallback}>✦</span>}
                 <span><b>{title}</b><small>{getYear(date) || 'Coming soon'} · {type === 'tv' ? 'TV series' : 'Movie'}</small></span>
               </button>
             )

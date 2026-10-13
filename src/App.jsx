@@ -31,7 +31,7 @@ function readPath() { return window.location.pathname.replace(/\/+$/, '') || '/'
 export default function App() {
   const [tab, setTab] = useState(() => {
     const saved = readSession('cs_tab')
-    return ['movies', 'tv', 'history', 'watchlist', 'stats', 'party', 'payment'].includes(saved) ? saved : 'movies'
+    return ['movies', 'tv', 'history', 'watchlist', 'stats', 'payment'].includes(saved) ? saved : 'movies'
   })
   const [homeKey, setHomeKey] = useState(0)
   const [profile, setProfile] = useState(getActiveProfile)
@@ -98,7 +98,6 @@ export default function App() {
     if (deepLink) {
       if (deepLink.type === 'watchlist') setTab('watchlist')
       else if (deepLink.type === 'stats') setTab('stats')
-      else if (deepLink.type === 'party') setTab('party')
       else if (deepLink.type === 'movie') setTab('movies')
       else if (deepLink.type === 'tv') setTab('tv')
     }
@@ -196,12 +195,6 @@ export default function App() {
               ❤️ Watchlist
             </button>
             <button
-              className={`${styles.tab} ${tab === 'party' && !isLoginPage && !isPaymentPage ? styles.active : ''}`}
-              onClick={() => goTab('party')}
-            >
-              🍿 Watch Party
-            </button>
-            <button
               className={`${styles.tab} ${tab === 'history' && !isLoginPage && !isPaymentPage ? styles.active : ''}`}
               onClick={() => goTab('history')}
             >
@@ -284,7 +277,28 @@ export default function App() {
           ) : tab === 'stats' ? (
             <Stats profile={profile} user={user} />
           ) : tab === 'party' ? (
-            <WatchParty profile={profile} user={user} onBack={goHome} />
+            <div style={{ textAlign: 'center', padding: '5rem 1.5rem', maxWidth: '540px', margin: '0 auto' }}>
+              <div style={{ fontSize: '3.5rem', marginBottom: '1rem' }}>🍿</div>
+              <h2 style={{ color: 'var(--gold)', fontFamily: 'var(--font-heading)', marginBottom: '0.8rem' }}>Watch Party Temporarily Paused</h2>
+              <p style={{ color: 'var(--text-muted)', marginBottom: '1.8rem', lineHeight: 1.6 }}>
+                Watch Party is temporarily undergoing scheduled maintenance and performance upgrades. We'll be back shortly!
+              </p>
+              <button
+                type="button"
+                onClick={goHome}
+                style={{
+                  background: 'var(--gold)',
+                  color: '#000',
+                  fontWeight: 600,
+                  border: 'none',
+                  borderRadius: '6px',
+                  padding: '10px 22px',
+                  cursor: 'pointer'
+                }}
+              >
+                Back to Movies
+              </button>
+            </div>
           ) : (
             <>
               {tab === 'movies' && <Movies key={homeKey} profile={profile} />}
@@ -315,10 +329,6 @@ export default function App() {
               Upgrade VIP 👑
             </a>
             <span aria-hidden="true">·</span>
-            <a href="/party" onClick={event => { event.preventDefault(); goTab('party') }}>
-              Watch Party 🍿
-            </a>
-            <span aria-hidden="true">·</span>
             <a href="/privacy-policy" onClick={event => { event.preventDefault(); navigate('/privacy-policy') }}>Privacy Policy</a>
             <span aria-hidden="true">·</span>
             <a href="/terms" onClick={event => { event.preventDefault(); navigate('/terms') }}>Terms of Use</a>
@@ -336,7 +346,6 @@ export default function App() {
           <button className={tab === 'movies' && !isLoginPage && !isPaymentPage ? styles.mobileActive : ''} onClick={() => goTab('movies')}>⌂<span>Movies</span></button>
           <button className={tab === 'tv' && !isLoginPage && !isPaymentPage ? styles.mobileActive : ''} onClick={() => goTab('tv')}>▣<span>TV</span></button>
           <button className={tab === 'watchlist' && !isLoginPage && !isPaymentPage ? styles.mobileActive : ''} onClick={() => goTab('watchlist')}>❤️<span>Saved</span></button>
-          <button className={tab === 'party' && !isLoginPage && !isPaymentPage ? styles.mobileActive : ''} onClick={() => goTab('party')}>🍿<span>Party</span></button>
           <button className={tab === 'history' && !isLoginPage && !isPaymentPage ? styles.mobileActive : ''} onClick={() => goTab('history')}>⏱<span>History</span></button>
           <button className={tab === 'stats' && !isLoginPage && !isPaymentPage ? styles.mobileActive : ''} onClick={() => goTab('stats')}>📊<span>Stats</span></button>
           <button className={isPaymentPage || tab === 'payment' ? styles.mobileActive : ''} onClick={() => navigate('/payment')}>👑<span>VIP</span></button>
@@ -352,7 +361,6 @@ export default function App() {
                 <button type="button" onClick={() => { goTab('movies'); setCommandOpen(false) }}>Browse Movies</button>
                 <button type="button" onClick={() => { goTab('tv'); setCommandOpen(false) }}>Browse TV</button>
                 <button type="button" onClick={() => { goTab('watchlist'); setCommandOpen(false) }}>Watchlist</button>
-                <button type="button" onClick={() => { goTab('party'); setCommandOpen(false) }}>Watch Party</button>
                 <button type="button" onClick={() => { goTab('history'); setCommandOpen(false) }}>Open History</button>
                 <button type="button" onClick={() => { goTab('stats'); setCommandOpen(false) }}>My Stats</button>
               </div>

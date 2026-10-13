@@ -6,6 +6,12 @@
   padding: 0;
 }
 
+img {
+  user-select: none;
+  -webkit-user-drag: none;
+  -webkit-user-select: none;
+}
+
 :root {
   /* ── CineScope Brand Palette ── */
   --bg: #070707;

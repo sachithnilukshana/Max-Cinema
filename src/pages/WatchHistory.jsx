@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { loadLibrary, removeFromContinueWatching, clearContinueWatching } from '../lib/profile.js'
-import { posterUrl, formatRating, getYear, movieEmbedUrl, tvEmbedUrl } from '../lib/api.js'
+import { posterUrl, posterSrcSet, formatRating, getYear, movieEmbedUrl, tvEmbedUrl } from '../lib/api.js'
 import { usePremium } from '../lib/PremiumContext.jsx'
 import Player from '../components/Player.jsx'
 import styles from './WatchHistory.module.css'
@@ -151,7 +151,16 @@ export default function WatchHistory({ profile, onBrowse }) {
               <article key={`${item.media_type || 'title'}:${item.id}:${item.season || ''}:${item.episode || ''}`} className={styles.card}>
                 <div className={styles.posterWrap} onClick={() => handlePlay(item)}>
                   {poster ? (
-                    <img src={poster} alt="" loading="lazy" className={styles.poster} />
+                    <img
+                      src={poster}
+                      srcSet={posterSrcSet(item.poster_path)}
+                      sizes="(max-width: 600px) 140px, 185px"
+                      alt=""
+                      loading="lazy"
+                      decoding="async"
+                      draggable="false"
+                      className={styles.poster}
+                    />
                   ) : (
                     <div className={styles.noPoster}>{title.slice(0, 2)}</div>
                   )}

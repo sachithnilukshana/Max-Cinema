@@ -95,7 +95,7 @@ export default function HeroCarousel({ items = [], onPlay, onTrailer, onSelect }
       {/* Backdrop */}
       <div className={styles.backdrop}>
         {backdrop
-          ? <img src={backdrop} alt="" className={styles.backdropImg} loading="eager" />
+          ? <img src={backdrop} alt="" className={styles.backdropImg} loading="eager" decoding="async" draggable="false" />
           : <div className={styles.backdropFallback} />
         }
         <div className={styles.backdropGrad} />
@@ -104,7 +104,7 @@ export default function HeroCarousel({ items = [], onPlay, onTrailer, onSelect }
       {/* Content */}
       <div className={styles.content}>
         {poster && (
-          <img src={poster} alt="" className={styles.poster} loading="eager" />
+          <img src={poster} alt="" className={styles.poster} loading="eager" decoding="async" draggable="false" />
         )}
 
         <div className={styles.meta}>

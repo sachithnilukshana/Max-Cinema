@@ -1,3 +1,4 @@
+export const IMG_BASE_SM = 'https://image.tmdb.org/t/p/w185'
 export const IMG_BASE = 'https://image.tmdb.org/t/p/w342'
 export const IMG_BASE_LG = 'https://image.tmdb.org/t/p/w780'
 
@@ -183,6 +184,17 @@ export function posterUrl(path, large = false) {
   if (!path) return null
   if (typeof path === 'string' && (path.startsWith('http://') || path.startsWith('https://'))) return path
   return (large ? IMG_BASE_LG : IMG_BASE) + path
+}
+
+export function posterThumbnailUrl(path) {
+  if (!path) return null
+  if (typeof path === 'string' && (path.startsWith('http://') || path.startsWith('https://'))) return path
+  return IMG_BASE_SM + path
+}
+
+export function posterSrcSet(path) {
+  if (!path || typeof path !== 'string' || path.startsWith('http://') || path.startsWith('https://')) return undefined
+  return `${IMG_BASE_SM}${path} 185w, ${IMG_BASE}${path} 342w, ${IMG_BASE_LG}${path} 780w`
 }
 
 export function formatRating(rating) {

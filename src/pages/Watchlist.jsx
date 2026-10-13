@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react'
 import { getWatchlist, removeFromWatchlist } from '../lib/watchlist.js'
-import { posterUrl, formatRating, getYear } from '../lib/api.js'
+import { posterUrl, posterSrcSet, formatRating, getYear } from '../lib/api.js'
 import styles from './Watchlist.module.css'
 
 // ── Sorting helpers ───────────────────────────────────────────────────────────
@@ -159,7 +159,16 @@ function WatchlistCard({ item, onSelect, onRemove }) {
       >
         <div className={styles.posterWrap}>
           {poster ? (
-            <img src={poster} alt="" loading="lazy" className={styles.poster} />
+            <img
+              src={poster}
+              srcSet={posterSrcSet(item.poster_path)}
+              sizes="(max-width: 600px) 140px, 185px"
+              alt=""
+              loading="lazy"
+              decoding="async"
+              draggable="false"
+              className={styles.poster}
+            />
           ) : (
             <div className={styles.noPoster} aria-hidden="true">
               {title.slice(0, 2)}

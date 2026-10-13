@@ -79,10 +79,17 @@
   width: 100%;
   aspect-ratio: 2 / 3;
   overflow: hidden;
-  background: #161616;
+  background: linear-gradient(110deg, #121214 8%, #1f1f23 18%, #121214 33%);
+  background-size: 200% 100%;
+  animation: posterShimmer 1.8s ease-in-out infinite;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+@keyframes posterShimmer {
+  0% { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
 }
 
 .posterOverlay {
@@ -96,6 +103,7 @@
   color: #fff;
   opacity: 0;
   transition: opacity 0.2s ease;
+  z-index: 2;
 }
 
 .posterOverlay span {
@@ -117,11 +125,32 @@
   letter-spacing: 0.08em;
 }
 
+.posterImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  opacity: 0;
+  transition: opacity 0.3s ease, transform 0.35s ease;
+  user-select: none;
+  -webkit-user-drag: none;
+  -webkit-user-select: none;
+  pointer-events: none;
+}
+
+.posterImg.loaded {
+  opacity: 1;
+}
+
 .poster img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
+  user-select: none;
+  -webkit-user-drag: none;
+  -webkit-user-select: none;
+  pointer-events: none;
   transition: transform 0.35s ease;
 }
 

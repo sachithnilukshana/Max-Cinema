@@ -257,7 +257,7 @@ function RecentItem({ item }) {
     <div className={styles.recentCard}>
       <div className={styles.recentPosterWrap}>
         {poster ? (
-          <img src={poster} alt="" loading="lazy" className={styles.recentPoster} />
+          <img src={poster} alt="" loading="lazy" decoding="async" draggable="false" className={styles.recentPoster} />
         ) : (
           <div className={styles.recentNoPoster} aria-hidden="true">
             {title.slice(0, 2)}

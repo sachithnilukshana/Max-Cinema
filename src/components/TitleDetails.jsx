@@ -119,7 +119,7 @@ export default function TitleDetails({ id, mediaType, onSelect }) {
             {credits.map(person => (
               <div key={person.credit_id || person.id} className={styles.person}>
                 {person.profile_path
-                  ? <img src={posterUrl(person.profile_path)} alt="" loading="lazy" />
+                  ? <img src={posterUrl(person.profile_path)} alt="" loading="lazy" decoding="async" draggable="false" />
                   : <div className={styles.personFallback} aria-hidden="true">{person.name?.slice(0, 1)}</div>}
                 <span>{person.name}</span>
               </div>
@@ -136,7 +136,7 @@ export default function TitleDetails({ id, mediaType, onSelect }) {
               const name = mediaType === 'tv' ? item.name : item.title
               return (
                 <button key={item.id} type="button" className={styles.recommendation} onClick={() => onSelect?.(item)}>
-                  {item.poster_path && <img src={posterUrl(item.poster_path)} alt="" loading="lazy" />}
+                  {item.poster_path && <img src={posterUrl(item.poster_path)} alt="" loading="lazy" decoding="async" draggable="false" />}
                   <span title={name}>{name}</span>
                 </button>
               )
@@ -185,8 +185,8 @@ export default function TitleDetails({ id, mediaType, onSelect }) {
             </div>
             <div className={styles.fullBody}>
               <WatchOptions id={id} mediaType={mediaType} />
-              {!!credits.length && <div className={styles.block}><h4>Cast</h4><div className={styles.cast}>{credits.map(person => <div key={person.credit_id || person.id} className={styles.person}>{person.profile_path ? <img src={posterUrl(person.profile_path)} alt="" loading="lazy" /> : <div className={styles.personFallback}>{person.name?.slice(0, 1)}</div>}<span>{person.name}</span></div>)}</div></div>}
-              {!!recommendations.length && <div className={styles.block}><h4>Related titles</h4><div className={styles.recommendations}>{recommendations.map(item => { const name = mediaType === 'tv' ? item.name : item.title; return <button key={item.id} type="button" className={styles.recommendation} onClick={() => { setFullPageOpen(false); onSelect?.(item) }}>{item.poster_path && <img src={posterUrl(item.poster_path)} alt="" loading="lazy" />}<span title={name}>{name}</span></button> })}</div></div>}
+              {!!credits.length && <div className={styles.block}><h4>Cast</h4><div className={styles.cast}>{credits.map(person => <div key={person.credit_id || person.id} className={styles.person}>{person.profile_path ? <img src={posterUrl(person.profile_path)} alt="" loading="lazy" decoding="async" draggable="false" /> : <div className={styles.personFallback}>{person.name?.slice(0, 1)}</div>}<span>{person.name}</span></div>)}</div></div>}
+              {!!recommendations.length && <div className={styles.block}><h4>Related titles</h4><div className={styles.recommendations}>{recommendations.map(item => { const name = mediaType === 'tv' ? item.name : item.title; return <button key={item.id} type="button" className={styles.recommendation} onClick={() => { setFullPageOpen(false); onSelect?.(item) }}>{item.poster_path && <img src={posterUrl(item.poster_path)} alt="" loading="lazy" decoding="async" draggable="false" />}<span title={name}>{name}</span></button> })}</div></div>}
             </div>
           </section>
         </div>

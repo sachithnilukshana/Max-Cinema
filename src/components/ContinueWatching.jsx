@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { loadLibrary, removeFromContinueWatching, clearContinueWatching } from '../lib/profile.js'
-import { posterUrl } from '../lib/api.js'
+import { posterUrl, posterSrcSet } from '../lib/api.js'
 import styles from './ContinueWatching.module.css'
 
 export default function ContinueWatching({ profile, onSelect, mediaType }) {
@@ -55,7 +55,15 @@ export default function ContinueWatching({ profile, onSelect, mediaType }) {
             >
               <div className={styles.posterBox}>
                 {item.poster_path ? (
-                  <img src={posterUrl(item.poster_path)} alt="" loading="lazy" />
+                  <img
+                    src={posterUrl(item.poster_path)}
+                    srcSet={posterSrcSet(item.poster_path)}
+                    sizes="120px"
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                    draggable="false"
+                  />
                 ) : (
                   <div className={styles.noPoster}>{title.slice(0, 2)}</div>
                 )}

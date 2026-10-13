@@ -1,32 +1,6 @@
-import React, { useState, useRef, useCallback } from 'react'
-import { posterUrl, formatRating, getYear } from '../lib/api.js'
+import React, { useState } from 'react'
+import { posterUrl, posterSrcSet, formatRating, getYear } from '../lib/api.js'
 import styles from './MediaCard.module.css'
-
-// Extract dominant color from image via canvas (dynamic poster background)
-function useColorExtract(posterSrc) {
-  const [color, setColor] = useState(null)
-  const extractRef = useRef(false)
-
-  const onLoad = useCallback(e => {
-    if (extractRef.current || !posterSrc) return
-    extractRef.current = true
-    try {
-      const img = e.currentTarget
-      const canvas = document.createElement('canvas')
-      canvas.width = 4
-      canvas.height = 6
-      const ctx = canvas.getContext('2d')
-      ctx.drawImage(img, 0, 0, 4, 6)
-      const data = ctx.getImageData(0, 0, 4, 6).data
-      let r = 0, g = 0, b = 0
-      for (let i = 0; i < data.length; i += 4) { r += data[i]; g += data[i+1]; b += data[i+2] }
-      const n = data.length / 4
-      setColor(`rgba(${Math.round(r/n * 0.55)},${Math.round(g/n * 0.55)},${Math.round(b/n * 0.55)},0.45)`)
-    } catch {}
-  }, [posterSrc])
-
-  return { color, onLoad }
-}
 
 // Watchlist storage helper
 function getWatchlistKey(uid) { return `cs_watchlist_${uid || 'guest'}` }
@@ -54,9 +28,10 @@ export default function MediaCard({ item, type = 'movie', onClick, selected, uid
   const year      = getYear(date)
   const rating    = formatRating(item.vote_average)
   const poster    = posterUrl(item.poster_path)
+  const srcSet    = posterSrcSet(item.poster_path)
 
   const [inWL, setInWL] = useState(() => isWL(uid, item.id))
-  const { color, onLoad } = useColorExtract(poster)
+  const [loaded, setLoaded] = useState(false)
 
   function handleWatchlist(e) {
     e.stopPropagation()
@@ -67,7 +42,6 @@ export default function MediaCard({ item, type = 'movie', onClick, selected, uid
   return (
     <article
       className={`${styles.card} ${selected ? styles.selected : ''}`}
-      style={color ? { '--card-accent': color } : undefined}
     >
       {/* ── Watchlist ❤️ button (floats in top-right of poster) ── */}
       <button
@@ -88,9 +62,21 @@ export default function MediaCard({ item, type = 'movie', onClick, selected, uid
         onClick={() => onClick(item)}
         aria-label={`Watch ${title}`}
       >
-        <div className={styles.poster} style={color ? { background: color } : undefined}>
+        <div className={styles.poster}>
           {poster
-            ? <img src={poster} alt="" loading="lazy" crossOrigin="anonymous" onLoad={onLoad} />
+            ? (
+              <img
+                src={poster}
+                srcSet={srcSet}
+                sizes="(max-width: 600px) 140px, 185px"
+                alt=""
+                loading="lazy"
+                decoding="async"
+                draggable="false"
+                onLoad={() => setLoaded(true)}
+                className={`${styles.posterImg} ${loaded ? styles.loaded : ''}`}
+              />
+            )
             : <div className={styles.noPoster} aria-hidden="true">{title?.slice(0, 2)}</div>}
           <div className={styles.posterOverlay} aria-hidden="true">
             <span>▶</span>
