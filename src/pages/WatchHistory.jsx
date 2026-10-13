@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { loadLibrary, removeFromContinueWatching, clearContinueWatching } from '../lib/profile.js'
 import { posterUrl, formatRating, getYear, movieEmbedUrl, tvEmbedUrl } from '../lib/api.js'
+import { usePremium } from '../lib/PremiumContext.jsx'
 import Player from '../components/Player.jsx'
 import styles from './WatchHistory.module.css'
 
@@ -25,6 +26,7 @@ export default function WatchHistory({ profile, onBrowse }) {
   const [history, setHistory] = useState([])
   const [filter, setFilter] = useState('all') // 'all' | 'movie' | 'tv'
   const [player, setPlayer] = useState(null)
+  const { isPremium } = usePremium()
 
   function loadHistory() {
     const lib = loadLibrary(profile.id)
@@ -41,8 +43,8 @@ export default function WatchHistory({ profile, onBrowse }) {
     const isTV = item.media_type === 'tv' || Boolean(item.season)
     const title = item.title || item.name
     const src = isTV
-      ? tvEmbedUrl(item.id, item.season || 1, item.episode || 1)
-      : movieEmbedUrl(item.tmdbId || item.id)
+      ? tvEmbedUrl(item.id, item.season || 1, item.episode || 1, isPremium)
+      : movieEmbedUrl(item.tmdbId || item.id, isPremium)
 
     setPlayer({
       src,

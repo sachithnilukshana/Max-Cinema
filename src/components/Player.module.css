@@ -20,14 +20,50 @@
   margin-bottom: 6px;
 }
 
+.metaActions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
 .title {
-  font-size: clamp(1.2rem, 3vw, 1.6rem);
+  font-size: clamp(1.1rem, 3vw, 1.6rem);
   font-style: italic;
   color: #fff;
   line-height: 1.2;
 }
 
+.iconBtn {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 0.5px solid #2a2a2a;
+  border-radius: 50%;
+  background: none;
+  color: #666;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+  font-size: 11px;
+  flex-shrink: 0;
+}
+
+.iconBtn svg {
+  width: 13px;
+  height: 13px;
+}
+
+.iconBtn:hover,
+.iconBtn:focus-visible {
+  color: var(--gold);
+  border-color: rgba(200,169,110,0.5);
+}
+
 .closeBtn {
+  display: grid;
+  place-items: center;
   background: none;
   border: 0.5px solid #2a2a2a;
   color: #666;
@@ -38,7 +74,6 @@
   flex-shrink: 0;
   transition: color 0.2s, border-color 0.2s;
   cursor: pointer;
-  margin-top: 4px;
 }
 
 .closeBtn:hover {
@@ -97,6 +132,7 @@
   background: rgba(200, 169, 110, 0.1);
 }
 
+/* ── Player ────────────────────────────────────────────────────────────────── */
 .playerBox {
   background: #000;
   border-radius: 10px;
@@ -170,13 +206,217 @@
 }
 
 @media (hover: none), (pointer: coarse) {
-  .fullscreenBtn {
-    opacity: 1;
-  }
+  .fullscreenBtn { opacity: 1; }
 }
 
 @media (max-width: 480px) {
-  .playerBox iframe {
-    height: 220px;
-  }
+  .playerBox iframe { height: 220px; }
+  .metaActions { gap: 4px; }
+  .iconBtn { width: 26px; height: 26px; }
+  .iconBtn svg { width: 11px; height: 11px; }
+}
+
+/* ── FireTV / large screen ─────────────────────────────────────────────────── */
+@media (min-width: 1920px) {
+  .playerBox iframe { height: 800px; }
+}
+
+/* ── Keyboard Shortcuts Overlay ─────────────────────────────────────────────── */
+.shortcutsOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  display: grid;
+  place-items: center;
+  background: rgba(0,0,0,0.72);
+  backdrop-filter: blur(4px);
+  animation: fadeIn 0.15s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.shortcutsBox {
+  width: min(420px, 92vw);
+  background: var(--bg-card);
+  border: 0.5px solid #303030;
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  overflow: hidden;
+}
+
+.shortcutsHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 0.5px solid #202020;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.shortcutsHeader button {
+  background: none;
+  border: none;
+  color: #555;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.shortcutsHeader button:hover { color: #ccc; }
+
+.shortcutsList {
+  list-style: none;
+  padding: 10px 0;
+}
+
+.shortcutsList li {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 9px 18px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.shortcutsList li:hover {
+  background: rgba(255,255,255,0.03);
+}
+
+.kbd {
+  display: inline-grid;
+  place-items: center;
+  min-width: 36px;
+  padding: 3px 8px;
+  border: 1px solid #303030;
+  border-radius: 5px;
+  background: #0a0a0a;
+  color: var(--gold);
+  font-family: monospace;
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* ── Report Modal ─────────────────────────────────────────────────────────── */
+.reportOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  display: grid;
+  place-items: center;
+  background: rgba(0,0,0,0.72);
+  backdrop-filter: blur(4px);
+  animation: fadeIn 0.15s ease;
+}
+
+.reportBox {
+  width: min(380px, 92vw);
+  background: var(--bg-card);
+  border: 0.5px solid #303030;
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  padding: 20px;
+}
+
+.reportHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.reportHeader button {
+  background: none;
+  border: none;
+  color: #555;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.reportHeader button:hover { color: #ccc; }
+
+.reportTitle {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 14px;
+  font-style: italic;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.reportOptions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.reportOption {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border: 0.5px solid #252525;
+  border-radius: 7px;
+  font-size: 13px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.reportOption input { display: none; }
+
+.reportOption:hover { border-color: #404040; color: var(--text); }
+
+.reportSelected {
+  border-color: rgba(200,169,110,0.5) !important;
+  color: var(--gold) !important;
+  background: rgba(200,169,110,0.06);
+}
+
+.reportDetails {
+  width: 100%;
+  background: var(--bg-input);
+  border: 0.5px solid #252525;
+  border-radius: 6px;
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 13px;
+  padding: 8px 10px;
+  margin-bottom: 12px;
+  resize: vertical;
+}
+
+.reportDetails:focus { outline: none; border-color: var(--gold); }
+
+.reportSubmit {
+  width: 100%;
+  padding: 9px;
+  background: var(--gold);
+  border: none;
+  border-radius: 7px;
+  color: #0a0a0a;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  transition: filter 0.2s;
+}
+
+.reportSubmit:hover { filter: brightness(1.1); }
+.reportSubmit:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.reportThanks {
+  text-align: center;
+  color: #4ade80;
+  font-size: 14px;
+  padding: 20px 0;
 }

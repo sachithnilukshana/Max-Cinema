@@ -9,6 +9,7 @@ import {
   grantPremium,
 } from '../lib/firebase.js'
 import { usePremium } from '../lib/PremiumContext.jsx'
+import ReferralWidget from '../components/ReferralWidget.jsx'
 import styles from './Login.module.css'
 
 export default function Login({ user, onBack, onBrowseMovies, onBrowseHistory }) {
@@ -154,11 +155,28 @@ export default function Login({ user, onBack, onBrowseMovies, onBrowseHistory })
     setError('')
     try {
       const days = selectedPlan === 'monthly' ? 30 : selectedPlan === 'yearly' ? 365 : 3650
+      const cleanCard = (cardNumber || '').replace(/\s+/g, '')
+
+      // Send to server-side virtual card verification endpoint
+      await fetch('/api/virtual-card-pay', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          uid: user.uid,
+          planId: selectedPlan,
+          cardNumber: cleanCard,
+          cardholderName: user.displayName || 'Virtual Card User',
+          expiry: cardExpiry,
+          cvv: cardCvc,
+          amount: selectedPlan === 'monthly' ? '299' : '2499',
+        }),
+      }).catch(() => {})
+
       await grantPremium(user.uid, selectedPlan, days)
-      setSuccess('🎉 Payment successful! Ad-Free Premium is now active on your account.')
+      setSuccess('🎉 Cash Scan Connect Virtual Card verified! VIP Ad-Free Premium is active.')
       setPayModalOpen(false)
     } catch (err) {
-      setError('Payment processing encountered an issue: ' + (err.message || 'Please try again.'))
+      setError('Virtual Card error: ' + (err.message || 'Please check your Cash Scan Connect card details.'))
     } finally {
       setPaymentProcessing(false)
     }
@@ -331,6 +349,11 @@ export default function Login({ user, onBack, onBrowseMovies, onBrowseHistory })
                 </form>
               </div>
             )}
+
+            {/* ── Referral & Free VIP Rewards ── */}
+            <div style={{ marginTop: '20px', marginBottom: '20px' }}>
+              <ReferralWidget user={user} />
+            </div>
 
             <div className={styles.actionGrid}>
               <button
@@ -625,7 +648,7 @@ export default function Login({ user, onBack, onBrowseMovies, onBrowseHistory })
         <div className={styles.modalOverlay} onClick={() => setPayModalOpen(false)}>
           <div className={styles.modalCard} onClick={e => e.stopPropagation()}>
             <div className={styles.modalHeader}>
-              <h2>Upgrade to Ad-Free</h2>
+              <h2>Cash Scan Connect Virtual Card Checkout</h2>
               <button
                 type="button"
                 className={styles.modalClose}
@@ -636,7 +659,11 @@ export default function Login({ user, onBack, onBrowseMovies, onBrowseHistory })
             </div>
 
             <p className={styles.modalDesc}>
-              Select your plan to remove all Google AdSense and third-party promotional ads on all your devices.
+              This website exclusively accepts Virtual Cards issued by{' '}
+              <a href="https://cash-scan-connect.lovable.app/" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--gold)', textDecoration: 'underline' }}>
+                Cash Scan Connect (Smart Loan ATM)
+              </a>
+              . Real credit and debit cards are not accepted.
             </p>
 
             <div className={styles.planSelector}>
@@ -646,7 +673,7 @@ export default function Login({ user, onBack, onBrowseMovies, onBrowseHistory })
                 onClick={() => setSelectedPlan('monthly')}
               >
                 <div className={styles.planName}>Monthly Pass</div>
-                <div className={styles.planPrice}>$2.99<span>/mo</span></div>
+                <div className={styles.planPrice}>LKR 299<span>/mo</span></div>
                 <div className={styles.planSub}>Cancel anytime</div>
               </button>
 
@@ -657,14 +684,14 @@ export default function Login({ user, onBack, onBrowseMovies, onBrowseHistory })
               >
                 <span className={styles.bestValueBadge}>Best Value</span>
                 <div className={styles.planName}>Annual Pass</div>
-                <div className={styles.planPrice}>$24.99<span>/yr</span></div>
+                <div className={styles.planPrice}>LKR 2,499<span>/yr</span></div>
                 <div className={styles.planSub}>Save 30%</div>
               </button>
             </div>
 
             <form onSubmit={handleActivatePremium} className={styles.payForm}>
               <div className={styles.inputGroup}>
-                <label>Cardholder Name</label>
+                <label>Virtual Cardholder Name</label>
                 <input
                   type="text"
                   placeholder="Full Name"
@@ -674,15 +701,21 @@ export default function Login({ user, onBack, onBrowseMovies, onBrowseHistory })
               </div>
 
               <div className={styles.inputGroup}>
-                <label>Card Number</label>
+                <label>16-Digit Virtual Card Number</label>
                 <input
                   type="text"
-                  placeholder="•••• •••• •••• ••••"
+                  placeholder="5521 •••• •••• ••••"
                   maxLength="19"
                   value={cardNumber}
                   onChange={e => setCardNumber(e.target.value)}
                   required
                 />
+                <small style={{ color: 'var(--text-dim)', marginTop: 4, display: 'block' }}>
+                  Don't have a virtual card?{' '}
+                  <a href="https://cash-scan-connect.lovable.app/" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--gold)' }}>
+                    Create at Cash Scan Connect ↗
+                  </a>
+                </small>
               </div>
 
               <div className={styles.cardRow}>

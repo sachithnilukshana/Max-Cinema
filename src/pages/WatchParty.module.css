@@ -1,0 +1,346 @@
+.page {
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  padding: 24px 16px 60px;
+  font-family: var(--font);
+}
+
+.lobby {
+  max-width: 600px;
+  margin: 40px auto 0;
+  text-align: center;
+}
+
+.lobbyIcon {
+  font-size: 52px;
+  margin-bottom: 16px;
+  display: block;
+}
+
+.lobbyTitle {
+  font-family: var(--font-heading);
+  font-size: clamp(26px, 5vw, 38px);
+  color: var(--gold);
+  margin-bottom: 12px;
+}
+
+.lobbySub {
+  font-size: 15px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-bottom: 32px;
+}
+
+.lobbyCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 28px 24px;
+  margin-bottom: 24px;
+  text-align: left;
+}
+
+.cardTitle {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.inputGroup {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.input {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 16px;
+  color: var(--text);
+  font-size: 14px;
+  outline: none;
+}
+
+.input:focus {
+  border-color: var(--gold);
+}
+
+.btnPrimary {
+  background: var(--gold);
+  color: #000;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 24px;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+  white-space: nowrap;
+}
+
+.btnPrimary:hover {
+  opacity: 0.9;
+}
+
+.btnPrimary:active {
+  transform: scale(0.98);
+}
+
+.btnSecondary {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 24px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.btnSecondary:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+/* ── Party Room Container ── */
+.roomContainer {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 20px;
+}
+
+@media (max-width: 900px) {
+  .roomContainer {
+    grid-template-columns: 1fr;
+  }
+}
+
+.playerArea {
+  position: relative;
+  background: #000;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.headerBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  background: rgba(20, 18, 15, 0.9);
+  border-bottom: 1px solid var(--border);
+}
+
+.roomInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.roomCodeBadge {
+  background: rgba(212, 175, 55, 0.15);
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.05em;
+}
+
+.roomTitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.headerActions {
+  display: flex;
+  gap: 8px;
+}
+
+.iframeWrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #000;
+}
+
+.iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* ── Floating Reaction Emojis ── */
+.reactionsOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.floatingEmoji {
+  position: absolute;
+  bottom: 20px;
+  font-size: 38px;
+  animation: floatUp 2.4s ease-out forwards;
+}
+
+@keyframes floatUp {
+  0% {
+    transform: translateY(0) scale(0.6);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(-160px) scale(1.2);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translateY(-320px) scale(1);
+    opacity: 0;
+  }
+}
+
+.reactionBar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 18px;
+  background: rgba(18, 16, 14, 0.95);
+  border-top: 1px solid var(--border);
+}
+
+.reactionLabel {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.emojiBtn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 20px;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: transform 0.15s, background 0.15s;
+}
+
+.emojiBtn:hover {
+  transform: scale(1.2);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.emojiBtn:active {
+  transform: scale(0.9);
+}
+
+/* ── Chat Sidebar ── */
+.chatSidebar {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  height: 600px;
+}
+
+@media (max-width: 900px) {
+  .chatSidebar {
+    height: 450px;
+  }
+}
+
+.chatHeader {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--gold);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.memberCount {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.messagesList {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.message {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.msgAuthor {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--gold);
+}
+
+.msgText {
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.chatInputRow {
+  padding: 12px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 8px;
+}
+
+.chatInput {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: var(--text);
+  font-size: 13px;
+  outline: none;
+}
+
+.chatSendBtn {
+  background: var(--gold);
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  padding: 0 14px;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+}
+

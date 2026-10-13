@@ -1,0 +1,433 @@
+/* ── Watchlist Page ────────────────────────────────────────────────────────── */
+
+.wrap {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 4rem;
+}
+
+/* ── Header ─────────────────────────────────────────────────────────────────── */
+
+.header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.pageTitle {
+  margin: 0 0 0.4rem;
+  font-family: 'EB Garamond', serif;
+  font-size: 2.2rem;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.subtitle {
+  margin: 0;
+  color: var(--text-dim);
+  font-size: 0.95rem;
+}
+
+/* ── Controls row (tabs + sort) ─────────────────────────────────────────────── */
+
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+  flex-wrap: wrap;
+}
+
+.tabs {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 1.1rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  min-height: 44px;
+}
+
+.tab:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.tab:hover {
+  border-color: var(--gold);
+  color: var(--text);
+}
+
+.activeTab {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: #0a0a0a;
+}
+
+.badge {
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 10px;
+  padding: 0.05em 0.45em;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.activeTab .badge {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+/* ── Sort ───────────────────────────────────────────────────────────────────── */
+
+.sortWrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.sortLabel {
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+.sortSelect {
+  padding: 0.45rem 0.75rem;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 0.85rem;
+  cursor: pointer;
+  min-height: 44px;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23888'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.65rem center;
+  padding-right: 2rem;
+}
+
+.sortSelect:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+/* ── Grid ───────────────────────────────────────────────────────────────────── */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 1rem;
+}
+
+@media (min-width: 480px) {
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+    gap: 1.15rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    gap: 1.25rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(185px, 1fr));
+    gap: 1.4rem;
+  }
+}
+
+/* ── Card ───────────────────────────────────────────────────────────────────── */
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:focus-within {
+  border-color: rgba(200, 169, 110, 0.5);
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(200, 169, 110, 0.5);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.posterBtn {
+  display: block;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  width: 100%;
+}
+
+.posterWrap {
+  position: relative;
+  aspect-ratio: 2 / 3;
+  width: 100%;
+  background: #141414;
+  overflow: hidden;
+}
+
+.poster {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.card:hover .poster {
+  transform: scale(1.04);
+}
+
+.noPoster {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-dim);
+  background: #181818;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.card:hover .overlay,
+.posterBtn:focus-visible .overlay {
+  opacity: 1;
+}
+
+.playIcon {
+  width: 44px;
+  height: 44px;
+  background: var(--gold);
+  color: #0a0a0a;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  padding-left: 3px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+/* ── Badges ─────────────────────────────────────────────────────────────────── */
+
+.ratingBadge {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  background: rgba(10, 10, 10, 0.82);
+  border: 1px solid var(--border);
+  color: var(--gold);
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  pointer-events: none;
+}
+
+.typeBadge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: rgba(10, 10, 10, 0.75);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+/* ── Remove (heart) button ──────────────────────────────────────────────────── */
+
+.removeBtn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  background: rgba(10, 10, 10, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 50%;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s ease, transform 0.2s ease, background 0.2s ease;
+  z-index: 3;
+  line-height: 1;
+}
+
+.card:hover .removeBtn,
+.card:focus-within .removeBtn {
+  opacity: 1;
+}
+
+.removeBtn:hover {
+  background: rgba(220, 53, 69, 0.85);
+  border-color: transparent;
+  transform: scale(1.12);
+}
+
+.removeBtn:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+  opacity: 1;
+}
+
+/* ── Card info ──────────────────────────────────────────────────────────────── */
+
+.info {
+  padding: 0.65rem 0.75rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.cardTitle {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cardMeta {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.76rem;
+  color: var(--text-dim);
+}
+
+/* ── Empty state ────────────────────────────────────────────────────────────── */
+
+.empty {
+  text-align: center;
+  padding: 4rem 1.5rem;
+  background: var(--bg-card);
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  margin-top: 1rem;
+}
+
+.emptyIcon {
+  font-size: 3rem;
+  display: inline-block;
+  margin-bottom: 1rem;
+}
+
+.empty h2 {
+  font-family: 'EB Garamond', serif;
+  font-size: 1.8rem;
+  margin: 0 0 0.5rem;
+  color: var(--text);
+}
+
+.empty p {
+  color: var(--text-dim);
+  max-width: 440px;
+  margin: 0 auto 1.5rem;
+  line-height: 1.5;
+  font-size: 0.95rem;
+}
+
+.browseBtn {
+  background: var(--gold);
+  color: #0a0a0a;
+  border: none;
+  padding: 0.75rem 1.6rem;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  min-height: 44px;
+}
+
+.browseBtn:hover {
+  opacity: 0.88;
+  transform: translateY(-2px);
+}
+
+.browseBtn:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+}
+
+/* ── Responsive adjustments ─────────────────────────────────────────────────── */
+
+@media (max-width: 480px) {
+  .pageTitle {
+    font-size: 1.7rem;
+  }
+  .controls {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .sortWrap {
+    width: 100%;
+  }
+  .sortSelect {
+    flex: 1;
+    width: 100%;
+  }
+}
+
+@media (min-width: 1200px) {
+  .wrap {
+    padding: 2rem 2rem 5rem;
+  }
+}

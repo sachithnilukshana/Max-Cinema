@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { api, apiErrorMessage, movieEmbedUrl, formatRating, getYear, posterUrl } from '../lib/api.js'
 import { recordContinueWatching } from '../lib/profile.js'
 import { cinescopeApi, normalizeCinescopeItem, trackMovieView, trackSearch, trackTrailerClick } from '../lib/cinescopeApi.js'
+import { usePremium } from '../lib/PremiumContext.jsx'
 import MediaGrid from '../components/MediaGrid.jsx'
 import Player from '../components/Player.jsx'
 import WatchOptions from '../components/WatchOptions.jsx'
@@ -11,6 +12,7 @@ import ContinueWatching from '../components/ContinueWatching.jsx'
 import SearchSuggestions from '../components/SearchSuggestions.jsx'
 import CuratedCollections from '../components/CuratedCollections.jsx'
 import CineScopeAd from '../components/CineScopeAd.jsx'
+import CommunityReviews from '../components/CommunityReviews.jsx'
 import styles from './Movies.module.css'
 
 const MOODS = [
@@ -48,6 +50,7 @@ export default function Movies({ profile, adminConfig }) {
   const [apiFeatured, setApiFeatured] = useState([])
   const [apiTrending, setApiTrending] = useState([])
   const playerAnchorRef = useRef(null)
+  const { isPremium } = usePremium()
 
   // Primary data fetch
   useEffect(() => {
@@ -160,7 +163,7 @@ export default function Movies({ profile, adminConfig }) {
     const mediaType = item.media_type || 'movie'
     const libraryItem = { ...item, media_type: mediaType }
     const p = {
-      src: movieEmbedUrl(item.tmdbId || item.id),
+      src: movieEmbedUrl(item.tmdbId || item.id, isPremium),
       title: item.title || item.name,
       year: getYear(item.release_date || item.first_air_date),
       rating: formatRating(item.vote_average),
@@ -266,10 +269,11 @@ export default function Movies({ profile, adminConfig }) {
 
       {player && (
         <div ref={playerAnchorRef}>
-          <Player {...player} onClose={closePlayer} />
+          <Player {...player} tmdbId={player.selectedId} mediaType={player.mediaType || 'movie'} onClose={closePlayer} />
           <PersonalControls profile={profile} item={player.item || { id: player.selectedId, title: player.title, media_type: 'movie' }} />
           <WatchOptions id={player.selectedId} mediaType={player.mediaType || 'movie'} />
           <TitleDetails id={player.selectedId} mediaType={player.mediaType || 'movie'} onSelect={select} />
+          <CommunityReviews mediaId={player.selectedId} title={player.title} profile={profile} />
         </div>
       )}
 
@@ -285,6 +289,7 @@ export default function Movies({ profile, adminConfig }) {
             type="movie"
             onSelect={select}
             selectedId={player?.selectedId}
+            uid={profile?.id}
           />
         </div>
       )}
@@ -302,6 +307,7 @@ export default function Movies({ profile, adminConfig }) {
         loading={loading}
         onSelect={select}
         selectedId={player?.selectedId}
+        uid={profile?.id}
         emptyAction={() => {
           setQuery('')
           persist('mv_query', null)

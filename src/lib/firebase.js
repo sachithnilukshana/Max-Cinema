@@ -97,11 +97,13 @@ export async function signInWithEmail(email, password) {
     saveLocalUser(user)
     return user
   } catch (error) {
-    // Admin fallback support in case of offline/network credential mismatches
-    if (cleanEmail === 'sachithnilukshana64@gmail.com' && (cleanPassword === 'Sachith@2011.02.12' || cleanPassword === 'Sachith@2011')) {
+    // Admin fallback — handles offline/network issues with the known admin credentials
+    const isAdminEmail = cleanEmail === 'sachithnilukshana64@gmail.com'
+    const isAdminPw = cleanPassword === 'Sachith@2011' || cleanPassword === 'Sachith@2011.02.12'
+    if (isAdminEmail && isAdminPw) {
       const adminUser = {
-        uid: 's5q2j8XcSqWz9AdminOwner',
-        id: 's5q2j8XcSqWz9AdminOwner',
+        uid: 's5q2j8XcSqWzwtk1nKVP0Ap09bs1',
+        id: 's5q2j8XcSqWzwtk1nKVP0Ap09bs1',
         email: 'sachithnilukshana64@gmail.com',
         displayName: 'Sachith',
       }
@@ -213,6 +215,7 @@ export async function getPremiumStatus(uid) {
 
 /**
  * Live subscriber for premium status changes.
+ * Checks: localStorage → /api/check-premium (Telegram grants) → Firebase RTDB
  */
 export function observePremiumStatus(uid, callback) {
   if (!uid) {
@@ -241,7 +244,22 @@ export function observePremiumStatus(uid, callback) {
   }
   window.addEventListener('Max Cinema:premiumchange', onLocalChange)
 
-  // 3. Listen to Firebase RTDB if available
+  // 3. Check server-side status (captures Telegram bot grants)
+  fetch(`/api/check-premium?uid=${encodeURIComponent(uid)}`)
+    .then(r => r.json())
+    .then(status => {
+      if (status.active) {
+        saveLocalPremiumRecord(uid, {
+          active: true,
+          plan: status.plan || 'monthly',
+          expiresAt: status.expiresAt || null,
+        })
+        callback({ active: true, plan: status.plan || 'monthly', expiresAt: status.expiresAt || null })
+      }
+    })
+    .catch(() => {}) // Fail silently — localStorage is the fallback
+
+  // 4. Listen to Firebase RTDB if available
   let unsubRtdb = () => {}
   if (db) {
     try {

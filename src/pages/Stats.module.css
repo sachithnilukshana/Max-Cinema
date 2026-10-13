@@ -1,0 +1,318 @@
+/* ── Stats Page ─────────────────────────────────────────────────────────────── */
+
+.wrap {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 5rem;
+}
+
+/* ── Header ─────────────────────────────────────────────────────────────────── */
+
+.header {
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.pageTitle {
+  margin: 0 0 0.4rem;
+  font-family: 'EB Garamond', serif;
+  font-size: 2.2rem;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.subtitle {
+  margin: 0;
+  color: var(--text-dim);
+  font-size: 0.95rem;
+}
+
+/* ── Stats grid ─────────────────────────────────────────────────────────────── */
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+}
+
+@media (min-width: 480px) {
+  .statsGrid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.15rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .statsGrid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .statsGrid {
+    grid-template-columns: repeat(6, 1fr);
+    gap: 1.1rem;
+  }
+}
+
+/* ── Stat card ──────────────────────────────────────────────────────────────── */
+
+.statCard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 1.4rem 1rem 1.2rem;
+  border-radius: 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  gap: 0.35rem;
+}
+
+.statCard:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+}
+
+/* Gradient top-bar accent per colour */
+.statCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  border-radius: 14px 14px 0 0;
+}
+
+.accent_gold::before   { background: linear-gradient(90deg, #c8a96e, #e8c98e); }
+.accent_blue::before   { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+.accent_purple::before { background: linear-gradient(90deg, #8b5cf6, #a78bfa); }
+.accent_green::before  { background: linear-gradient(90deg, #10b981, #34d399); }
+.accent_orange::before { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+.accent_red::before    { background: linear-gradient(90deg, #ef4444, #f87171); }
+
+/* Inner glow */
+.accent_gold   { box-shadow: inset 0 0 40px rgba(200, 169, 110, 0.06); }
+.accent_blue   { box-shadow: inset 0 0 40px rgba(59, 130, 246, 0.07); }
+.accent_purple { box-shadow: inset 0 0 40px rgba(139, 92, 246, 0.07); }
+.accent_green  { box-shadow: inset 0 0 40px rgba(16, 185, 129, 0.07); }
+.accent_orange { box-shadow: inset 0 0 40px rgba(245, 158, 11, 0.07); }
+.accent_red    { box-shadow: inset 0 0 40px rgba(239, 68, 68, 0.07); }
+
+.statIcon {
+  font-size: 1.6rem;
+  line-height: 1;
+  margin-bottom: 0.1rem;
+}
+
+.statValue {
+  font-family: 'EB Garamond', serif;
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: var(--gold);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.statValueText {
+  font-size: 1.4rem;
+  letter-spacing: 0;
+}
+
+.statLabel {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-top: 0.1rem;
+}
+
+/* ── Recently Active section ────────────────────────────────────────────────── */
+
+.recentSection {
+  margin-top: 1rem;
+}
+
+.sectionTitle {
+  font-family: 'EB Garamond', serif;
+  font-size: 1.55rem;
+  font-weight: 500;
+  color: var(--text);
+  margin: 0 0 1.1rem;
+}
+
+.recentGrid {
+  display: flex;
+  gap: 0.85rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+.recentGrid::-webkit-scrollbar {
+  height: 4px;
+}
+
+.recentGrid::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.recentGrid::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 2px;
+}
+
+/* ── Recent card ────────────────────────────────────────────────────────────── */
+
+.recentCard {
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 130px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+@media (min-width: 480px) {
+  .recentCard {
+    flex: 0 0 145px;
+  }
+}
+
+@media (min-width: 768px) {
+  .recentCard {
+    flex: 0 0 160px;
+  }
+}
+
+.recentCard:hover {
+  transform: translateY(-2px);
+  border-color: rgba(200, 169, 110, 0.4);
+}
+
+.recentPosterWrap {
+  position: relative;
+  aspect-ratio: 2 / 3;
+  background: #141414;
+  overflow: hidden;
+}
+
+.recentPoster {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.recentCard:hover .recentPoster {
+  transform: scale(1.04);
+}
+
+.recentNoPoster {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text-dim);
+  background: #181818;
+}
+
+.recentTypeBadge {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  background: rgba(10, 10, 10, 0.8);
+  border: 1px solid var(--border);
+  color: var(--gold);
+  padding: 0.1rem 0.38rem;
+  border-radius: 4px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+.recentInfo {
+  padding: 0.6rem 0.7rem 0.7rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.recentTitle {
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.recentEp {
+  font-size: 0.72rem;
+  color: var(--gold);
+  font-weight: 600;
+}
+
+.recentTime {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+}
+
+/* ── Empty hint ─────────────────────────────────────────────────────────────── */
+
+.emptyHint {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  background: var(--bg-card);
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  margin-top: 1rem;
+}
+
+.emptyIcon {
+  font-size: 3rem;
+  display: inline-block;
+  margin-bottom: 1rem;
+}
+
+.emptyHint p {
+  color: var(--text-dim);
+  font-size: 1rem;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ── Wide / TV screen ───────────────────────────────────────────────────────── */
+
+@media (min-width: 1200px) {
+  .wrap {
+    padding: 2rem 2rem 6rem;
+  }
+  .statCard {
+    padding: 1.8rem 1rem 1.5rem;
+  }
+  .statValue {
+    font-size: 2.8rem;
+  }
+  .statValueText {
+    font-size: 1.6rem;
+  }
+}

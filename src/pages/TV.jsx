@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { api, apiErrorMessage, tvEmbedUrl, formatRating, getYear } from '../lib/api.js'
 import { loadLibrary, markEpisodeWatched, recordContinueWatching, setEpisodeWatched } from '../lib/profile.js'
 import { trackSearch, trackTVView } from '../lib/cinescopeApi.js'
+import { usePremium } from '../lib/PremiumContext.jsx'
 import MediaGrid from '../components/MediaGrid.jsx'
 import Player from '../components/Player.jsx'
 import SeasonPicker from '../components/SeasonPicker.jsx'
@@ -10,6 +11,7 @@ import TitleDetails from '../components/TitleDetails.jsx'
 import PersonalControls from '../components/PersonalControls.jsx'
 import ContinueWatching from '../components/ContinueWatching.jsx'
 import SearchSuggestions from '../components/SearchSuggestions.jsx'
+import CommunityReviews from '../components/CommunityReviews.jsx'
 import styles from './TV.module.css'
 
 function persist(key, val) { try { sessionStorage.setItem(key, JSON.stringify(val)) } catch {} }
@@ -27,6 +29,7 @@ export default function TV({ profile }) {
   const [episodeProgress, setEpisodeProgress] = useState(() => loadLibrary(profile.id).episodeProgress)
   const playerAnchorRef = useRef(null)
   const didRestore = useRef(false)
+  const { isPremium } = usePremium()
 
   // Load trending or restore last search
   useEffect(() => {
@@ -103,7 +106,7 @@ export default function TV({ profile }) {
 
   function playerFor(show, season, episode) {
     return {
-      src: tvEmbedUrl(show.id, season, episode),
+      src: tvEmbedUrl(show.id, season, episode, isPremium),
       title: show.name,
       year: getYear(show.first_air_date),
       rating: formatRating(show.vote_average),
@@ -180,10 +183,11 @@ export default function TV({ profile }) {
 
       {player && (
         <div ref={playerAnchorRef}>
-          <Player {...player} onClose={() => { setPlayer(null); persist('tv_player', null) }} onNextEpisode={nextEpisode} />
+          <Player {...player} tmdbId={player.selectedId} mediaType={player.mediaType || 'tv'} onClose={() => { setPlayer(null); persist('tv_player', null) }} onNextEpisode={nextEpisode} />
           <PersonalControls profile={profile} item={player.item || { id: player.selectedId, name: player.title, media_type: 'tv' }} />
           <WatchOptions id={player.selectedId} mediaType={player.mediaType || 'tv'} />
           <TitleDetails id={player.selectedId} mediaType={player.mediaType || 'tv'} onSelect={selectShow} />
+          <CommunityReviews mediaId={player.selectedId} title={player.title} profile={profile} />
         </div>
       )}
 
@@ -205,6 +209,7 @@ export default function TV({ profile }) {
         loading={loading}
         onSelect={selectShow}
         selectedId={selected?.id}
+        uid={profile?.id}
       />
     </div>
   )

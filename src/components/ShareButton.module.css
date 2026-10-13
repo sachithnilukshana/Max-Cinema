@@ -1,0 +1,75 @@
+.shareBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  min-height: 36px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-card);
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+  font-family: var(--font);
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.18s, border-color 0.18s, background 0.18s;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.shareBtn:hover,
+.shareBtn:focus-visible {
+  color: var(--gold);
+  border-color: var(--gold);
+  background: color-mix(in srgb, var(--gold) 8%, var(--bg-card));
+  outline: none;
+}
+
+.shareBtn:active {
+  transform: scale(0.96);
+}
+
+.shareBtn.copied {
+  color: #4ade80;
+  border-color: #4ade80;
+  background: color-mix(in srgb, #4ade80 8%, var(--bg-card));
+}
+
+.icon {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+}
+
+.label {
+  line-height: 1;
+}
+
+/* Touch-friendly on mobile */
+@media (max-width: 480px) {
+  .shareBtn {
+    min-height: 44px;
+    padding: 8px 14px;
+    font-size: 0.875rem;
+  }
+
+  .icon {
+    width: 17px;
+    height: 17px;
+  }
+}
+
+/* FireTV — remove hover, keep focus-visible */
+@media (min-width: 1920px) {
+  .shareBtn:hover {
+    color: var(--text-muted);
+    border-color: var(--border);
+    background: var(--bg-card);
+  }
+
+  .shareBtn:focus-visible {
+    color: var(--gold);
+    border-color: var(--gold);
+    background: color-mix(in srgb, var(--gold) 8%, var(--bg-card));
+  }
+}

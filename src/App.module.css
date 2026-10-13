@@ -524,14 +524,16 @@
     right: 0;
     bottom: 0;
     left: 0;
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
     border-top: 0.5px solid #2a2a2a;
     background: color-mix(in srgb, var(--bg) 93%, transparent);
     backdrop-filter: blur(16px);
   }
 
   .mobileNav button {
+    flex: 1;
     display: grid;
     justify-items: center;
     gap: 1px;
@@ -541,11 +543,15 @@
     cursor: pointer;
     font-family: var(--font);
     font-size: 16px;
-    padding: 8px 2px;
+    padding: 8px 1px;
+    min-width: 0;
   }
 
   .mobileNav span {
-    font-size: 10px;
+    font-size: 9px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .mobileNav button.mobileActive {
@@ -553,6 +559,6 @@
   }
 
   .footer {
-    margin-bottom: 57px;
+    margin-bottom: 64px;
   }
 }

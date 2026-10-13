@@ -125,39 +125,58 @@ export const api = {
 }
 
 const EMBED_BASE = 'https://embedmaster.link'
-export const ADMIN_PLAYER_ID = 'v2acgdm2adzyn2pr4d'
-export const CUSTOMER_PLAYER_ID = 'v23rgjijhbwlarnpf1'
-export const ADMIN_EMAIL = 'sachithnilukshana64@gmail.com'
+
+// Premium player (Admin + Premium subscribers) — cleaner UX, no extra ads
+export const PREMIUM_PLAYER_ID = 'v23rgjijhbwlarnpf1'
+
+// Free player (non-premium users)
+export const FREE_PLAYER_ID = 'v2acgdm2adzyn2pr4d'
+
+// Legacy aliases kept for compatibility
+export const ADMIN_PLAYER_ID   = PREMIUM_PLAYER_ID
+export const CUSTOMER_PLAYER_ID = FREE_PLAYER_ID
+
+export const ADMIN_EMAIL      = 'sachithnilukshana64@gmail.com'
 export const ADMIN_UID_PREFIX = 's5q2j8XcSqWz'
 
 export function isAdminUser(user) {
   if (!user) return false
   const emailMatch = user.email && user.email.toLowerCase() === ADMIN_EMAIL
-  const uidMatch = user.uid && user.uid.startsWith(ADMIN_UID_PREFIX)
+  const uidMatch   = user.uid   && user.uid.startsWith(ADMIN_UID_PREFIX)
   return Boolean(emailMatch || uidMatch)
 }
 
-export function getActivePlayerId() {
+/**
+ * Pick the right player ID based on premium status.
+ * isPremium=true → PREMIUM_PLAYER_ID (v23rgjijhbwlarnpf1)
+ * isPremium=false → FREE_PLAYER_ID   (v2acgdm2adzyn2pr4d)
+ * Admin users always get premium player regardless of isPremium flag.
+ */
+export function getActivePlayerId(isPremium = false) {
   try {
     const raw = localStorage.getItem('cs_firebase_user')
     if (raw) {
       const u = JSON.parse(raw)
-      if (isAdminUser(u)) {
-        return ADMIN_PLAYER_ID
-      }
+      if (isAdminUser(u)) return PREMIUM_PLAYER_ID
     }
   } catch {}
-  return CUSTOMER_PLAYER_ID
+  return isPremium ? PREMIUM_PLAYER_ID : FREE_PLAYER_ID
 }
 
-export function movieEmbedUrl(tmdbId, customPlayerId = null) {
-  const pid = customPlayerId || getActivePlayerId()
-  return `${EMBED_BASE}/movie/${tmdbId}?playerid=${pid}`
+/**
+ * Movie embed URL — format: https://embedmaster.link/{playerId}/movie/{id}
+ */
+export function movieEmbedUrl(tmdbId, isPremium = false, customPlayerId = null) {
+  const pid = customPlayerId || getActivePlayerId(isPremium)
+  return `${EMBED_BASE}/${pid}/movie/${tmdbId}`
 }
 
-export function tvEmbedUrl(tmdbId, season, episode, customPlayerId = null) {
-  const pid = customPlayerId || getActivePlayerId()
-  return `${EMBED_BASE}/tv/${tmdbId}/${season}/${episode}?playerid=${pid}`
+/**
+ * TV embed URL — format: https://embedmaster.link/{playerId}/tv/{id}/{season}/{episode}
+ */
+export function tvEmbedUrl(tmdbId, season, episode, isPremium = false, customPlayerId = null) {
+  const pid = customPlayerId || getActivePlayerId(isPremium)
+  return `${EMBED_BASE}/${pid}/tv/${tmdbId}/${season}/${episode}`
 }
 
 export function posterUrl(path, large = false) {
