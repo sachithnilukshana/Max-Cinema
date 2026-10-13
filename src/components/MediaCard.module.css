@@ -1,4 +1,5 @@
 .card {
+  position: relative;
   cursor: pointer;
   border-radius: 8px;
   overflow: hidden;
@@ -6,6 +7,38 @@
   border: 0.5px solid var(--border);
   transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
   animation: fadeIn 0.35s ease both;
+}
+
+.heartBtn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 10;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(10, 10, 10, 0.65);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  transition: transform 0.2s, background 0.2s, border-color 0.2s;
+}
+
+.heartBtn:hover {
+  transform: scale(1.18);
+  background: rgba(10, 10, 10, 0.9);
+  border-color: var(--gold);
+}
+
+.heartActive {
+  background: rgba(212, 175, 55, 0.25);
+  border-color: var(--gold);
 }
 
 .cardOpen {
