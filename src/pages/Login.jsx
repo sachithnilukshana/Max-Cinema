@@ -174,7 +174,9 @@ export default function Login({ user, onBack, onBrowseMovies, onBrowseHistory })
             <p className={styles.subtitle}>{user.email}</p>
             <div className={styles.badgeRow}>
               <span className={styles.vipBadge}>
-                {user.email?.toLowerCase() === 'sachithnilukshana64@gmail.com' ? '👑 Admin' : '★ Max Cinema Member'}
+                {user.email?.toLowerCase() === 'sachithnilukshana64@gmail.com' || user.uid?.startsWith('s5q2j8XcSqWz')
+                  ? '👑 Admin & Owner'
+                  : '★ Max Cinema Member'}
               </span>
               <span className={isPremium ? styles.premiumBadge : styles.statusBadge}>
                 {isPremium ? '✨ Ad-Free Active' : 'Free Tier (Ads)'}
@@ -182,9 +184,33 @@ export default function Login({ user, onBack, onBrowseMovies, onBrowseHistory })
             </div>
 
             <div className={styles.profileMeta}>
-              <div className={styles.metaItem}>
+              <div className={styles.metaItemFull}>
                 <span className={styles.metaLabel}>User ID</span>
-                <span className={styles.metaValue}>{user.uid ? user.uid.slice(0, 12) + '…' : 'member'}</span>
+                <div className={styles.uidWrapper}>
+                  <code className={styles.uidValue}>{user.uid || 'member'}</code>
+                  {user.uid && (
+                    <button
+                      type="button"
+                      className={styles.copyBtn}
+                      onClick={() => {
+                        navigator.clipboard?.writeText?.(user.uid)
+                        setSuccess('Copied User ID to clipboard!')
+                        setTimeout(() => setSuccess(''), 2500)
+                      }}
+                      title="Copy full User ID"
+                    >
+                      📋 Copy
+                    </button>
+                  )}
+                </div>
+              </div>
+              <div className={styles.metaItem}>
+                <span className={styles.metaLabel}>Player Profile</span>
+                <span className={styles.metaValue}>
+                  {user.email?.toLowerCase() === 'sachithnilukshana64@gmail.com' || user.uid?.startsWith('s5q2j8XcSqWz')
+                    ? 'Admin (v2acgdm…)'
+                    : 'Customer (v23rgj…)'}
+                </span>
               </div>
               <div className={styles.metaItem}>
                 <span className={styles.metaLabel}>Ads Status</span>

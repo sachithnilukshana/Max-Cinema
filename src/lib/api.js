@@ -127,13 +127,22 @@ export const api = {
 const EMBED_BASE = 'https://embedmaster.link'
 export const ADMIN_PLAYER_ID = 'v2acgdm2adzyn2pr4d'
 export const CUSTOMER_PLAYER_ID = 'v23rgjijhbwlarnpf1'
+export const ADMIN_EMAIL = 'sachithnilukshana64@gmail.com'
+export const ADMIN_UID_PREFIX = 's5q2j8XcSqWz'
+
+export function isAdminUser(user) {
+  if (!user) return false
+  const emailMatch = user.email && user.email.toLowerCase() === ADMIN_EMAIL
+  const uidMatch = user.uid && user.uid.startsWith(ADMIN_UID_PREFIX)
+  return Boolean(emailMatch || uidMatch)
+}
 
 export function getActivePlayerId() {
   try {
     const raw = localStorage.getItem('cs_firebase_user')
     if (raw) {
       const u = JSON.parse(raw)
-      if (u?.email && u.email.toLowerCase() === 'sachithnilukshana64@gmail.com') {
+      if (isAdminUser(u)) {
         return ADMIN_PLAYER_ID
       }
     }

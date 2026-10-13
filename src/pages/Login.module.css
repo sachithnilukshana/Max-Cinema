@@ -390,16 +390,61 @@
   background: var(--bg-input, #0d0d0d);
   border: 1px solid var(--border, #2a2a2a);
   border-radius: 10px;
-  padding: 12px 16px;
+  padding: 14px 16px;
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 10px;
   margin-bottom: 1.25rem;
+}
+
+.metaItemFull {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+}
+
+.uidWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border, #222);
+}
+
+.uidValue {
+  font-family: monospace;
+  font-size: 11px;
+  color: var(--gold, #f5c518);
+  word-break: break-all;
+}
+
+.copyBtn {
+  background: rgba(245, 197, 24, 0.15);
+  border: 1px solid rgba(245, 197, 24, 0.35);
+  color: var(--gold, #f5c518);
+  border-radius: 4px;
+  padding: 3px 8px;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.copyBtn:hover {
+  background: var(--gold, #f5c518);
+  color: #000;
 }
 
 .metaItem {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
 }
 
 .metaLabel {
@@ -410,7 +455,7 @@
 }
 
 .metaValue {
-  font-size: 13px;
+  font-size: 12px;
   color: var(--text, #fff);
   font-weight: 600;
 }

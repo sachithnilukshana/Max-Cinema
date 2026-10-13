@@ -139,7 +139,7 @@ export default function App() {
   }
 
   return (
-    <PremiumProvider uid={user?.uid}>
+    <PremiumProvider uid={user?.uid} email={user?.email}>
       <div className={styles.app}>
       <header className={styles.header}>
         <button className={styles.logo} onClick={goHome} aria-label="Go to home">
