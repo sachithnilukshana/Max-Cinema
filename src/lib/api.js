@@ -125,13 +125,30 @@ export const api = {
 }
 
 const EMBED_BASE = 'https://embedmaster.link'
+export const ADMIN_PLAYER_ID = 'v2acgdm2adzyn2pr4d'
+export const CUSTOMER_PLAYER_ID = 'v23rgjijhbwlarnpf1'
 
-export function movieEmbedUrl(tmdbId) {
-  return `${EMBED_BASE}/movie/${tmdbId}`
+export function getActivePlayerId() {
+  try {
+    const raw = localStorage.getItem('cs_firebase_user')
+    if (raw) {
+      const u = JSON.parse(raw)
+      if (u?.email && u.email.toLowerCase() === 'sachithnilukshana64@gmail.com') {
+        return ADMIN_PLAYER_ID
+      }
+    }
+  } catch {}
+  return CUSTOMER_PLAYER_ID
 }
 
-export function tvEmbedUrl(tmdbId, season, episode) {
-  return `${EMBED_BASE}/tv/${tmdbId}/${season}/${episode}`
+export function movieEmbedUrl(tmdbId, customPlayerId = null) {
+  const pid = customPlayerId || getActivePlayerId()
+  return `${EMBED_BASE}/movie/${tmdbId}?playerid=${pid}`
+}
+
+export function tvEmbedUrl(tmdbId, season, episode, customPlayerId = null) {
+  const pid = customPlayerId || getActivePlayerId()
+  return `${EMBED_BASE}/tv/${tmdbId}/${season}/${episode}?playerid=${pid}`
 }
 
 export function posterUrl(path, large = false) {

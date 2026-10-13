@@ -6,10 +6,13 @@ import {
   resetPassword,
   signOutUser,
   readableAuthError,
+  grantPremium,
 } from '../lib/firebase.js'
+import { usePremium } from '../lib/PremiumContext.jsx'
 import styles from './Login.module.css'
 
 export default function Login({ user, onBack, onBrowseMovies, onBrowseHistory }) {
+  const { isPremium, plan: currentPlan } = usePremium()
   const [mode, setMode] = useState('signin') // 'signin' | 'signup' | 'forgot'
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -19,6 +22,14 @@ export default function Login({ user, onBack, onBrowseMovies, onBrowseHistory })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+
+  // Payment / Premium upgrade state
+  const [selectedPlan, setSelectedPlan] = useState('yearly') // 'monthly' | 'yearly' | 'lifetime'
+  const [payModalOpen, setPayModalOpen] = useState(false)
+  const [paymentProcessing, setPaymentProcessing] = useState(false)
+  const [cardNumber, setCardNumber] = useState('')
+  const [cardExpiry, setCardExpiry] = useState('')
+  const [cardCvc, setCardCvc] = useState('')
 
   function switchMode(nextMode) {
     setMode(nextMode)
@@ -108,20 +119,6 @@ export default function Login({ user, onBack, onBrowseMovies, onBrowseHistory })
     }
   }
 
-  async function handleOwnerQuickLogin() {
-    setError('')
-    setSuccess('')
-    setLoading(true)
-    try {
-      await signInWithEmail('sachithnilukshana64@gmail.com', 'Sachith@2011')
-      setSuccess('Welcome back, Sachith!')
-    } catch (err) {
-      setError(readableAuthError(err))
-    } finally {
-      setLoading(false)
-    }
-  }
-
   async function handleSignOut() {
     setLoading(true)
     setError('')
@@ -134,6 +131,27 @@ export default function Login({ user, onBack, onBrowseMovies, onBrowseHistory })
       setError(readableAuthError(err))
     } finally {
       setLoading(false)
+    }
+  }
+
+  async function handleActivatePremium(e) {
+    e?.preventDefault?.()
+    if (!user?.uid) {
+      setError('Please sign in or create an account first to enable Ad-Free.')
+      return
+    }
+
+    setPaymentProcessing(true)
+    setError('')
+    try {
+      const days = selectedPlan === 'monthly' ? 30 : selectedPlan === 'yearly' ? 365 : 3650
+      await grantPremium(user.uid, selectedPlan, days)
+      setSuccess('🎉 Payment successful! Ad-Free Premium is now active on your account.')
+      setPayModalOpen(false)
+    } catch (err) {
+      setError('Payment processing encountered an issue: ' + (err.message || 'Please try again.'))
+    } finally {
+      setPaymentProcessing(false)
     }
   }
 
@@ -155,19 +173,55 @@ export default function Login({ user, onBack, onBrowseMovies, onBrowseHistory })
             <h1 className={styles.title}>{user.displayName || 'Cinema Member'}</h1>
             <p className={styles.subtitle}>{user.email}</p>
             <div className={styles.badgeRow}>
-              <span className={styles.vipBadge}>★ Max Cinema Member</span>
-              <span className={styles.statusBadge}>Connected</span>
+              <span className={styles.vipBadge}>
+                {user.email?.toLowerCase() === 'sachithnilukshana64@gmail.com' ? '👑 Admin' : '★ Max Cinema Member'}
+              </span>
+              <span className={isPremium ? styles.premiumBadge : styles.statusBadge}>
+                {isPremium ? '✨ Ad-Free Active' : 'Free Tier (Ads)'}
+              </span>
             </div>
 
             <div className={styles.profileMeta}>
               <div className={styles.metaItem}>
                 <span className={styles.metaLabel}>User ID</span>
-                <span className={styles.metaValue}>{user.uid ? user.uid.slice(0, 14) + '…' : 'member'}</span>
+                <span className={styles.metaValue}>{user.uid ? user.uid.slice(0, 12) + '…' : 'member'}</span>
               </div>
               <div className={styles.metaItem}>
-                <span className={styles.metaLabel}>Sync</span>
-                <span className={styles.metaValue}>Realtime Cloud</span>
+                <span className={styles.metaLabel}>Ads Status</span>
+                <span className={styles.metaValue}>{isPremium ? 'Blocked' : 'Enabled'}</span>
               </div>
+            </div>
+
+            {/* ── Ad-Free Premium Management Card ── */}
+            <div className={styles.premiumCard}>
+              <div className={styles.premiumHeader}>
+                <span className={styles.premiumIcon}>{isPremium ? '🛡️' : '💎'}</span>
+                <div>
+                  <h3 className={styles.premiumTitle}>
+                    {isPremium ? 'Ad-Free Premium Active' : 'Upgrade to Ad-Free'}
+                  </h3>
+                  <p className={styles.premiumSub}>
+                    {isPremium
+                      ? `Enjoy zero banner ads and uninterrupted playback (${currentPlan || 'Active'} Plan).`
+                      : 'Remove all Google AdSense and promotional ads completely.'}
+                  </p>
+                </div>
+              </div>
+
+              {isPremium ? (
+                <div className={styles.premiumActiveInfo}>
+                  <span>✓ All Google AdSense ads disabled</span>
+                  <span>✓ High-speed streaming activated</span>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  className={styles.upgradeBtn}
+                  onClick={() => setPayModalOpen(true)}
+                >
+                  ⚡ Remove Ads ($2.99 / mo)
+                </button>
+              )}
             </div>
 
             <div className={styles.actionGrid}>
@@ -337,17 +391,6 @@ export default function Login({ user, onBack, onBrowseMovies, onBrowseHistory })
                 >
                   {loading ? 'Signing in…' : 'Sign In'}
                 </button>
-
-                <div className={styles.ownerShortcut}>
-                  <button
-                    type="button"
-                    className={styles.ownerBtn}
-                    onClick={handleOwnerQuickLogin}
-                    disabled={loading}
-                  >
-                    ⚡ Owner Quick Login (Sachith)
-                  </button>
-                </div>
               </form>
             )}
 
@@ -458,13 +501,120 @@ export default function Login({ user, onBack, onBrowseMovies, onBrowseHistory })
               </form>
             )}
 
+            <div className={styles.adFreePromo}>
+              <span>✨ <b>Want 100% Ad-Free Streaming?</b> Sign in to activate Max Cinema Premium and remove all ads.</span>
+            </div>
+
             <div className={styles.footerNote}>
               <span>Powered by Firebase Authentication · Max Cinema</span>
             </div>
           </>
         )}
       </div>
+
+      {/* ── Payment / Upgrade Modal ── */}
+      {payModalOpen && (
+        <div className={styles.modalOverlay} onClick={() => setPayModalOpen(false)}>
+          <div className={styles.modalCard} onClick={e => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <h2>Upgrade to Ad-Free</h2>
+              <button
+                type="button"
+                className={styles.modalClose}
+                onClick={() => setPayModalOpen(false)}
+              >
+                ✕
+              </button>
+            </div>
+
+            <p className={styles.modalDesc}>
+              Select your plan to remove all Google AdSense and third-party promotional ads on all your devices.
+            </p>
+
+            <div className={styles.planSelector}>
+              <button
+                type="button"
+                className={`${styles.planOption} ${selectedPlan === 'monthly' ? styles.planActive : ''}`}
+                onClick={() => setSelectedPlan('monthly')}
+              >
+                <div className={styles.planName}>Monthly Pass</div>
+                <div className={styles.planPrice}>$2.99<span>/mo</span></div>
+                <div className={styles.planSub}>Cancel anytime</div>
+              </button>
+
+              <button
+                type="button"
+                className={`${styles.planOption} ${selectedPlan === 'yearly' ? styles.planActive : ''}`}
+                onClick={() => setSelectedPlan('yearly')}
+              >
+                <span className={styles.bestValueBadge}>Best Value</span>
+                <div className={styles.planName}>Annual Pass</div>
+                <div className={styles.planPrice}>$24.99<span>/yr</span></div>
+                <div className={styles.planSub}>Save 30%</div>
+              </button>
+            </div>
+
+            <form onSubmit={handleActivatePremium} className={styles.payForm}>
+              <div className={styles.inputGroup}>
+                <label>Cardholder Name</label>
+                <input
+                  type="text"
+                  placeholder="Full Name"
+                  defaultValue={user?.displayName || ''}
+                  required
+                />
+              </div>
+
+              <div className={styles.inputGroup}>
+                <label>Card Number</label>
+                <input
+                  type="text"
+                  placeholder="•••• •••• •••• ••••"
+                  maxLength="19"
+                  value={cardNumber}
+                  onChange={e => setCardNumber(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div className={styles.cardRow}>
+                <div className={styles.inputGroup}>
+                  <label>Expiry</label>
+                  <input
+                    type="text"
+                    placeholder="MM/YY"
+                    maxLength="5"
+                    value={cardExpiry}
+                    onChange={e => setCardExpiry(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className={styles.inputGroup}>
+                  <label>CVC</label>
+                  <input
+                    type="text"
+                    placeholder="CVC"
+                    maxLength="4"
+                    value={cardCvc}
+                    onChange={e => setCardCvc(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                className={styles.paySubmitBtn}
+                disabled={paymentProcessing}
+              >
+                {paymentProcessing
+                  ? 'Activating Premium…'
+                  : `Complete Payment (${selectedPlan === 'monthly' ? '$2.99' : '$24.99'})`}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
-

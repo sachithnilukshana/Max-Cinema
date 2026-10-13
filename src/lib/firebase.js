@@ -10,6 +10,7 @@ import {
   updateProfile,
   sendPasswordResetEmail,
 } from 'firebase/auth'
+import { getDatabase, ref, get, set, onValue } from 'firebase/database'
 
 export const firebaseConfig = {
   apiKey: "AIzaSyDKEaciYyTJM4j8B6QOq4nTB9Y6lhIeWBg",
@@ -24,6 +25,7 @@ export const firebaseConfig = {
 
 export const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0]
 export const auth = getAuth(app)
+export const db = getDatabase(app)
 
 const LOCAL_USER_KEY = 'cs_firebase_user'
 
@@ -76,31 +78,15 @@ export async function signInWithEmail(email, password) {
     throw new Error('Please enter both email and password.')
   }
 
-  try {
-    const cred = await signInWithEmailAndPassword(auth, cleanEmail, cleanPassword)
-    const user = {
-      uid: cred.user.uid,
-      id: cred.user.uid,
-      email: cred.user.email,
-      displayName: cred.user.displayName || cred.user.email?.split('@')[0] || 'Member',
-    }
-    saveLocalUser(user)
-    return user
-  } catch (error) {
-    // Owner fallback so owner credentials always work smoothly
-    if (cleanEmail === 'sachithnilukshana64@gmail.com' && cleanPassword === 'Sachith@2011') {
-      const ownerUser = {
-        uid: 'owner-sachithnilukshana64',
-        id: 'owner-sachithnilukshana64',
-        email: 'sachithnilukshana64@gmail.com',
-        displayName: 'Sachith',
-      }
-      saveLocalUser(ownerUser)
-      window.dispatchEvent(new CustomEvent('Max Cinema:authchanged', { detail: ownerUser }))
-      return ownerUser
-    }
-    throw error
+  const cred = await signInWithEmailAndPassword(auth, cleanEmail, cleanPassword)
+  const user = {
+    uid: cred.user.uid,
+    id: cred.user.uid,
+    email: cred.user.email,
+    displayName: cred.user.displayName || cred.user.email?.split('@')[0] || 'Member',
   }
+  saveLocalUser(user)
+  return user
 }
 
 export async function createAccountWithEmail(email, password, displayName) {
@@ -153,6 +139,53 @@ export async function signOutUser() {
   } catch {}
 }
 
+// ── Premium / Ad-Free Status ────────────────────────────────────────────────
+
+/**
+ * Read premium status once for a user from Firebase RTDB.
+ * Path: /users/{uid}/premium → { active: boolean, plan: string, expiresAt: number|null }
+ */
+export async function getPremiumStatus(uid) {
+  if (!uid) return { active: false }
+  try {
+    const snap = await get(ref(db, `users/${uid}/premium`))
+    if (!snap.exists()) return { active: false }
+    const data = snap.val()
+    // Respect expiry if set
+    if (data.expiresAt && Date.now() > data.expiresAt) return { active: false, expired: true }
+    return { active: Boolean(data.active), plan: data.plan || 'monthly', expiresAt: data.expiresAt || null }
+  } catch {
+    return { active: false }
+  }
+}
+
+/**
+ * Subscribe to live premium status changes for a user.
+ * Returns an unsubscribe function.
+ */
+export function observePremiumStatus(uid, callback) {
+  if (!uid) { callback({ active: false }); return () => {} }
+  const premRef = ref(db, `users/${uid}/premium`)
+  const unsub = onValue(premRef, snap => {
+    if (!snap.exists()) { callback({ active: false }); return }
+    const data = snap.val()
+    if (data.expiresAt && Date.now() > data.expiresAt) { callback({ active: false, expired: true }); return }
+    callback({ active: Boolean(data.active), plan: data.plan || 'monthly', expiresAt: data.expiresAt || null })
+  }, () => callback({ active: false }))
+  return unsub
+}
+
+/**
+ * Admin-only: grant premium to a user. Call this from the Firebase console
+ * or a trusted server — do NOT expose this to regular clients.
+ * Path: /users/{uid}/premium → { active: true, plan: 'monthly'|'yearly', expiresAt: unixMs|null }
+ */
+export async function grantPremium(uid, plan = 'monthly', durationDays = 30) {
+  if (!uid) throw new Error('uid required')
+  const expiresAt = durationDays ? Date.now() + durationDays * 24 * 60 * 60 * 1000 : null
+  await set(ref(db, `users/${uid}/premium`), { active: true, plan, expiresAt, grantedAt: Date.now() })
+}
+
 export function readableAuthError(error) {
   const code = error?.code || ''
   const message = String(error?.message || '')
@@ -177,4 +210,3 @@ export function readableAuthError(error) {
   }
   return message.replace(/^Firebase:\s*/i, '').replace(/\s*\(auth\/[^)]+\)\.?$/, '') || 'Authentication error. Please try again.'
 }
-

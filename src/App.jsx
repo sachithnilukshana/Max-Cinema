@@ -8,6 +8,7 @@ import Login from './pages/Login.jsx'
 import { getActiveProfile, saveActiveProfileRecord } from './lib/profile.js'
 import { observeAuth } from './lib/firebase.js'
 import { trackSearch } from './lib/cinescopeApi.js'
+import { PremiumProvider } from './lib/PremiumContext.jsx'
 import styles from './App.module.css'
 import CineScopeAd from './components/CineScopeAd.jsx'
 
@@ -138,7 +139,8 @@ export default function App() {
   }
 
   return (
-    <div className={styles.app}>
+    <PremiumProvider uid={user?.uid}>
+      <div className={styles.app}>
       <header className={styles.header}>
         <button className={styles.logo} onClick={goHome} aria-label="Go to home">
           <img className={styles.logoImage} src="/max-cinema-logo.png" alt="" />
@@ -281,6 +283,7 @@ export default function App() {
           </form>
         </div>
       )}
-    </div>
+      </div>
+    </PremiumProvider>
   )
 }

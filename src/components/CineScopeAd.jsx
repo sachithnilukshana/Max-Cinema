@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { cinescopeApi } from '../lib/cinescopeApi.js'
+import { usePremium } from '../lib/PremiumContext.jsx'
 import AdUnit from './AdUnit.jsx'
 import styles from './CineScopeAd.module.css'
 
@@ -10,10 +11,13 @@ function getDevice() {
 }
 
 export default function CineScopeAd({ placement = 'HOMEPAGE', slot, className = '' }) {
+  const { isPremium } = usePremium()
   const [ad, setAd] = useState(null)
   const [loaded, setLoaded] = useState(false)
   const containerRef = useRef(null)
   const device = getDevice()
+
+  if (isPremium) return null
 
   // Fetch the best ad for this placement + device on mount / when placement changes
   useEffect(() => {

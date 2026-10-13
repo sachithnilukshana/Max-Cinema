@@ -1,11 +1,15 @@
 import { useEffect, useRef } from 'react'
+import { usePremium } from '../lib/PremiumContext.jsx'
 import styles from './AdUnit.module.css'
 
 const AD_CLIENT = 'ca-pub-1450329989131749'
 
 export default function AdUnit({ slot, format = 'auto', responsive = true, className = '' }) {
+  const { isPremium } = usePremium()
   const adRef = useRef(null)
   const requested = useRef(false)
+
+  if (isPremium) return null
 
   useEffect(() => {
     if (!slot || requested.current || !adRef.current) return
