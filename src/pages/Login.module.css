@@ -706,6 +706,87 @@
   cursor: wait;
 }
 
+/* ── Admin Premium Manager Box ── */
+.adminBox {
+  width: 100%;
+  background: linear-gradient(135deg, rgba(245, 197, 24, 0.12), rgba(0, 0, 0, 0.6));
+  border: 1px solid rgba(245, 197, 24, 0.5);
+  border-radius: 12px;
+  padding: 18px;
+  margin-bottom: 1.5rem;
+  text-align: left;
+}
+
+.adminBoxHeader {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 14px;
+}
+
+.adminCrown {
+  font-size: 26px;
+  line-height: 1;
+}
+
+.adminBoxTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--gold, #f5c518);
+  margin: 0 0 4px 0;
+}
+
+.adminBoxSub {
+  font-size: 12px;
+  color: var(--text-muted, #aaa);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.adminForm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.planDropdown {
+  background: var(--bg-input, #0d0d0d);
+  border: 1px solid var(--border, #2a2a2a);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 13px;
+  color: var(--text, #fff);
+  outline: none;
+  cursor: pointer;
+}
+
+.planDropdown:focus {
+  border-color: var(--gold, #f5c518);
+}
+
+.adminSubmitBtn {
+  margin-top: 4px;
+  background: linear-gradient(135deg, var(--gold, #f5c518), #e50914);
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  padding: 11px;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.adminSubmitBtn:hover:not(:disabled) {
+  filter: brightness(1.15);
+  transform: translateY(-1px);
+}
+
+.adminSubmitBtn:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
 @media (max-width: 480px) {
   .card {
     padding: 1.5rem 1.25rem;

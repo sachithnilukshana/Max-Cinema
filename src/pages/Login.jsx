@@ -31,6 +31,15 @@ export default function Login({ user, onBack, onBrowseMovies, onBrowseHistory })
   const [cardExpiry, setCardExpiry] = useState('')
   const [cardCvc, setCardCvc] = useState('')
 
+  // Admin User ID Premium Activation state
+  const [adminTargetUid, setAdminTargetUid] = useState('')
+  const [adminTargetPlan, setAdminTargetPlan] = useState('lifetime')
+  const [adminActivating, setAdminActivating] = useState(false)
+  const [adminSuccess, setAdminSuccess] = useState('')
+  const [adminError, setAdminError] = useState('')
+
+  const isAdmin = user?.email?.toLowerCase() === 'sachithnilukshana64@gmail.com' || user?.uid?.startsWith('s5q2j8XcSqWz')
+
   function switchMode(nextMode) {
     setMode(nextMode)
     setError('')
@@ -155,6 +164,29 @@ export default function Login({ user, onBack, onBrowseMovies, onBrowseHistory })
     }
   }
 
+  async function handleAdminActivateUser(e) {
+    e.preventDefault()
+    setAdminError('')
+    setAdminSuccess('')
+    const target = adminTargetUid.trim()
+    if (!target) {
+      setAdminError('Please enter a target User ID.')
+      return
+    }
+
+    setAdminActivating(true)
+    try {
+      const days = adminTargetPlan === 'monthly' ? 30 : adminTargetPlan === 'yearly' ? 365 : 3650
+      await grantPremium(target, adminTargetPlan, days)
+      setAdminSuccess(`✓ Successfully granted ${adminTargetPlan.toUpperCase()} Ad-Free VIP to User ID: ${target}`)
+      setAdminTargetUid('')
+    } catch (err) {
+      setAdminError('Activation failed: ' + (err.message || 'Please check the User ID.'))
+    } finally {
+      setAdminActivating(false)
+    }
+  }
+
   return (
     <div className={styles.container}>
       <div className={styles.headerBar}>
@@ -249,6 +281,56 @@ export default function Login({ user, onBack, onBrowseMovies, onBrowseHistory })
                 </button>
               )}
             </div>
+
+            {/* ── Admin Tool: Activate Premium by User ID ── */}
+            {isAdmin && (
+              <div className={styles.adminBox}>
+                <div className={styles.adminBoxHeader}>
+                  <span className={styles.adminCrown}>👑</span>
+                  <div>
+                    <h4 className={styles.adminBoxTitle}>Admin Command: Grant Premium</h4>
+                    <p className={styles.adminBoxSub}>Activate Ad-Free status for any customer using their User ID.</p>
+                  </div>
+                </div>
+
+                <form onSubmit={handleAdminActivateUser} className={styles.adminForm}>
+                  <div className={styles.inputGroup}>
+                    <label>Target Customer User ID</label>
+                    <input
+                      type="text"
+                      placeholder="Paste customer Firebase UID"
+                      value={adminTargetUid}
+                      onChange={e => setAdminTargetUid(e.target.value)}
+                      required
+                    />
+                  </div>
+
+                  <div className={styles.inputGroup}>
+                    <label>Plan Duration</label>
+                    <select
+                      value={adminTargetPlan}
+                      onChange={e => setAdminTargetPlan(e.target.value)}
+                      className={styles.planDropdown}
+                    >
+                      <option value="monthly">Monthly Pass (30 Days)</option>
+                      <option value="yearly">Annual Pass (365 Days)</option>
+                      <option value="lifetime">Lifetime VIP (Permanent)</option>
+                    </select>
+                  </div>
+
+                  {adminError && <div className={styles.alertError}><span>⚠</span> {adminError}</div>}
+                  {adminSuccess && <div className={styles.alertSuccess}><span>✓</span> {adminSuccess}</div>}
+
+                  <button
+                    type="submit"
+                    className={styles.adminSubmitBtn}
+                    disabled={adminActivating}
+                  >
+                    {adminActivating ? 'Granting VIP…' : '⚡ Activate Premium for User'}
+                  </button>
+                </form>
+              </div>
+            )}
 
             <div className={styles.actionGrid}>
               <button

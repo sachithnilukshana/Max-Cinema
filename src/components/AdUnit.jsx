@@ -9,19 +9,17 @@ export default function AdUnit({ slot, format = 'auto', responsive = true, class
   const adRef = useRef(null)
   const requested = useRef(false)
 
-  if (isPremium) return null
-
   useEffect(() => {
-    if (!slot || requested.current || !adRef.current) return
+    if (isPremium || !slot || requested.current || !adRef.current) return
     try {
       ;(window.adsbygoogle = window.adsbygoogle || []).push({})
       requested.current = true
     } catch {
       // Ad blockers and unavailable ad inventory should not interrupt the app.
     }
-  }, [slot])
+  }, [slot, isPremium])
 
-  if (!slot) return null
+  if (isPremium || !slot) return null
 
   return (
     <aside className={`${styles.wrap} ${className}`} aria-label="Advertisement">

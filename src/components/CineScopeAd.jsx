@@ -17,10 +17,9 @@ export default function CineScopeAd({ placement = 'HOMEPAGE', slot, className = 
   const containerRef = useRef(null)
   const device = getDevice()
 
-  if (isPremium) return null
-
   // Fetch the best ad for this placement + device on mount / when placement changes
   useEffect(() => {
+    if (isPremium) return
     let active = true
     setAd(null)
     setLoaded(false)
@@ -39,20 +38,20 @@ export default function CineScopeAd({ placement = 'HOMEPAGE', slot, className = 
       .finally(() => { if (active) setLoaded(true) })
 
     return () => { active = false }
-  }, [placement]) // device is stable per render — no need in deps
+  }, [placement, isPremium]) // device is stable per render — no need in deps
 
   // Inject raw adCode (supports third-party script tags)
   useEffect(() => {
-    if (!ad?.adCode || !containerRef.current) return
+    if (isPremium || !ad?.adCode || !containerRef.current) return
     const container = containerRef.current
     container.innerHTML = ''
     const range = document.createRange()
     range.selectNode(container)
     const fragment = range.createContextualFragment(ad.adCode)
     container.appendChild(fragment)
-  }, [ad])
+  }, [ad, isPremium])
 
-  if (!loaded) return null // don't flash an empty slot while loading
+  if (isPremium || !loaded) return null // don't render ads if premium or loading
 
   if (ad?.adCode) {
     return (
