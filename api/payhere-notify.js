@@ -38,7 +38,7 @@ export default async function handler(req, res) {
       const adminPass = process.env.ADMIN_PASSWORD || 'Sachith@2011'
       const apiKey = process.env.FIREBASE_API_KEY || 'AIzaSyDKEaciYyTJM4j8B6QOq4nTB9Y6lhIeWBg'
       const adminUid = process.env.ADMIN_UID || 's5q2j8XcSqWzwtk1nKVP0Ap09bs1'
-      const botToken = process.env.TELEGRAM_BOT_TOKEN || '8538036210:AAFtVHOJflTWidvJJXY_IEMMEz0HNQa4BJU'
+      const botToken = process.env.TELEGRAM_BOT_TOKEN || '8882793489:AAGs43RKRxS0qO3T_h-bpzprevpOLnLMh1E'
       const adminChatId = process.env.ADMIN_CHAT_ID || '8963612786'
 
       // Calculate expiry

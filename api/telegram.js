@@ -92,7 +92,7 @@ export default async function handler(req, res) {
   // Telegram only sends POST
   if (req.method !== 'POST') return res.status(405).send('Method Not Allowed')
 
-  const BOT_TOKEN = process.env.BOT_TOKEN || process.env.TELEGRAM_BOT_TOKEN || '8538036210:AAFtVHOJflTWidvJJXY_IEMMEz0HNQa4BJU'
+  const BOT_TOKEN = process.env.BOT_TOKEN || process.env.TELEGRAM_BOT_TOKEN || '8882793489:AAGs43RKRxS0qO3T_h-bpzprevpOLnLMh1E'
   const ADMIN_CHAT_ID = String(process.env.ADMIN_CHAT_ID || '8963612786')
   const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'sachithnilukshana64@gmail.com'
   const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Sachith@2011'

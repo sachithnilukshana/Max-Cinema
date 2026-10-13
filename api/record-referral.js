@@ -9,7 +9,7 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Missing refCode or newUserUid' })
     }
 
-    const botToken = process.env.TELEGRAM_BOT_TOKEN || '8538036210:AAFtVHOJflTWidvJJXY_IEMMEz0HNQa4BJU'
+    const botToken = process.env.TELEGRAM_BOT_TOKEN || '8882793489:AAGs43RKRxS0qO3T_h-bpzprevpOLnLMh1E'
     const adminChatId = process.env.ADMIN_CHAT_ID || '8963612786'
 
     // Notify Telegram Admin about the new referral

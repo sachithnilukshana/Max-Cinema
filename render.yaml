@@ -20,7 +20,7 @@ services:
       - key: FIREBASE_API_KEY
         value: AIzaSyDKEaciYyTJM4j8B6QOq4nTB9Y6lhIeWBg
       - key: BOT_TOKEN
-        value: 8538036210:AAFtVHOJflTWidvJJXY_IEMMEz0HNQa4BJU
+        value: 8882793489:AAGs43RKRxS0qO3T_h-bpzprevpOLnLMh1E
       - key: ADMIN_CHAT_ID
         value: 8963612786
 
