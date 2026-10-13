@@ -124,12 +124,14 @@ export const api = {
     tmdbFetch(`/discover/tv${q({ with_original_language: 'ko', sort_by: 'popularity.desc', page })}`),
 }
 
+const EMBED_BASE = 'https://embedmaster.link'
+
 export function movieEmbedUrl(tmdbId) {
-  return `/api/play/movie/${tmdbId}`
+  return `${EMBED_BASE}/movie/${tmdbId}`
 }
 
 export function tvEmbedUrl(tmdbId, season, episode) {
-  return `/api/play/tv/${tmdbId}/${season}/${episode}`
+  return `${EMBED_BASE}/tv/${tmdbId}/${season}/${episode}`
 }
 
 export function posterUrl(path, large = false) {

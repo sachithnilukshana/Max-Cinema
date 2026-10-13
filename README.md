@@ -30,7 +30,10 @@
   Browse thousands of movies and TV series powered by TMDB and CineScope curated endpoints. Live trending charts, top rated releases, and popular picks updated in real time.
 
 - **🍿 Seamless Streaming & Player Controls**  
-  Built-in cinematic video playback with responsive iframe handling, full-screen toggle, multi-season/episode selectors, and next-episode shortcuts.
+  Built-in cinematic video playback powered by **EmbedMaster** (`https://embedmaster.link`) with responsive iframe handling, full-screen toggle, multi-season/episode selectors, and next-episode shortcuts — zero API key required.
+
+- **🔐 Member Accounts & Firebase Authentication**  
+  Full authentication suite with Email/Password sign-in, account registration, password reset, and one-click Google Sign-In powered by Firebase. Seamlessly syncs personal watch history and favorites across devices.
 
 - **🔍 Global Command Palette (`Ctrl+K` or `/`)**  
   Instant keyboard-first search and navigation across all movies, TV shows, and watchlists with live suggestions and debounced queries.
@@ -120,6 +123,7 @@ Max-Cinema/
 │   │   ├── Movies.jsx          # Movie exploration and discovery page
 │   │   ├── TV.jsx              # TV series exploration page
 │   │   ├── WatchHistory.jsx    # User watch history and playback log
+│   │   ├── Login.jsx           # Firebase Authentication (Sign In, Sign Up, Google, Reset)
 │   │   ├── PrivacyPolicy.jsx   # Interactive privacy policy
 │   │   └── Terms.jsx           # Terms of service page
 │   ├── App.jsx                 # Main application root with tab & route state
@@ -164,9 +168,9 @@ Open `.env` and provide your credentials:
 # TMDB API Key (v3) or Read Access Token
 TMDB_API_KEY=your_tmdb_api_key_here
 
-# (Optional) Licensed embed playback base URL & key
-EMBED_BASE=https://your-licensed-provider.example
-EMBED_API_KEY=your_provider_key
+# Playback provider (defaults to EmbedMaster: https://embedmaster.link; no API key needed)
+EMBED_BASE=https://embedmaster.link
+# EMBED_API_KEY=your_optional_provider_key
 
 # Supabase (Optional)
 VITE_SUPABASE_URL=https://your-project.supabase.co

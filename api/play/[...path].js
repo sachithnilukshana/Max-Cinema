@@ -8,18 +8,14 @@ function parseEmbedBase(value) {
 }
 
 export default function handler(req, res) {
-  const embedBase = parseEmbedBase(process.env.EMBED_BASE)
-  const embedApiKey = process.env.EMBED_API_KEY
-  if (!embedBase || !embedApiKey) {
-    if (res && typeof res.status === 'function') {
-      return res.status(503).send('Playback is not configured. Add a licensed provider to the environment.')
-    }
-    return new Response('Playback is not configured.', { status: 503 })
-  }
+  const embedBase = parseEmbedBase(process.env.EMBED_BASE) || new URL('https://embedmaster.link')
+  const embedApiKey = (process.env.EMBED_API_KEY || '').trim()
 
   let parts = []
   if (req.query && Array.isArray(req.query.path)) {
     parts = req.query.path
+  } else if (req.query && typeof req.query.path === 'string') {
+    parts = req.query.path.split('/').filter(Boolean)
   } else {
     const pathname = new URL(req.url, 'http://localhost').pathname
     parts = pathname.split('/').filter(Boolean).slice(2)
@@ -35,8 +31,10 @@ export default function handler(req, res) {
     return new Response('Invalid playback request.', { status: 400 })
   }
 
-  const target = new URL(`/embed/${parts.join('/')}`, embedBase)
-  target.searchParams.set('apikey', embedApiKey)
+  const target = new URL(`/${parts.join('/')}`, embedBase)
+  if (embedApiKey) {
+    target.searchParams.set('apikey', embedApiKey)
+  }
 
   if (res && typeof res.redirect === 'function') {
     res.setHeader('Referrer-Policy', 'no-referrer')
@@ -53,3 +51,4 @@ export default function handler(req, res) {
     },
   })
 }
+

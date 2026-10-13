@@ -4,7 +4,9 @@ import TV from './pages/TV.jsx'
 import WatchHistory from './pages/WatchHistory.jsx'
 import PrivacyPolicy from './pages/PrivacyPolicy.jsx'
 import Terms from './pages/Terms.jsx'
-import { getActiveProfile } from './lib/profile.js'
+import Login from './pages/Login.jsx'
+import { getActiveProfile, saveActiveProfileRecord } from './lib/profile.js'
+import { observeAuth } from './lib/firebase.js'
 import { trackSearch } from './lib/cinescopeApi.js'
 import styles from './App.module.css'
 import CineScopeAd from './components/CineScopeAd.jsx'
@@ -24,12 +26,29 @@ export default function App() {
     return ['movies', 'tv', 'history'].includes(saved) ? saved : 'movies'
   })
   const [homeKey, setHomeKey] = useState(0)
-  const [profile] = useState(getActiveProfile)
+  const [profile, setProfile] = useState(getActiveProfile)
+  const [user, setUser] = useState(null)
   const [theme, setTheme] = useState(readTheme)
   const [commandOpen, setCommandOpen] = useState(false)
   const [commandQuery, setCommandQuery] = useState('')
   const [path, setPath] = useState(readPath)
   const [privacyNotice, setPrivacyNotice] = useState('')
+
+  useEffect(() => {
+    return observeAuth(nextUser => {
+      setUser(nextUser)
+      if (nextUser) {
+        const p = saveActiveProfileRecord({
+          id: nextUser.uid,
+          name: nextUser.displayName || nextUser.email?.split('@')[0] || 'Member',
+        })
+        setProfile(p)
+      } else {
+        const p = getActiveProfile()
+        setProfile(p)
+      }
+    })
+  }, [])
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme
@@ -59,13 +78,19 @@ export default function App() {
     return () => window.removeEventListener('popstate', handlePopState)
   }, [])
 
+  const isPrivacyPage = path === '/privacy-policy' || path === '/privacy' || path === '/privacy.html'
+  const isTermsPage = path === '/terms' || path === '/terms.html'
+  const isLoginPage = path === '/login' || path === '/account'
+
   useEffect(() => {
-    document.title = path === '/privacy-policy'
+    document.title = isPrivacyPage
       ? 'Privacy Policy | Max Cinema'
-      : path === '/terms'
+      : isTermsPage
         ? 'Terms of Use | Max Cinema'
-        : 'Max Cinema'
-  }, [path])
+        : isLoginPage
+          ? 'Account & Sign In | Max Cinema'
+          : 'Max Cinema'
+  }, [isPrivacyPage, isTermsPage, isLoginPage])
 
   function navigate(nextPath) {
     if (readPath() !== nextPath) window.history.pushState({}, '', nextPath)
@@ -112,9 +137,6 @@ export default function App() {
     setCommandQuery('')
   }
 
-  const isPrivacyPage = path === '/privacy-policy' || path === '/privacy' || path === '/privacy.html'
-  const isTermsPage = path === '/terms' || path === '/terms.html'
-
   return (
     <div className={styles.app}>
       <header className={styles.header}>
@@ -124,19 +146,19 @@ export default function App() {
         </button>
         <nav className={styles.tabs}>
           <button
-            className={`${styles.tab} ${tab === 'movies' ? styles.active : ''}`}
+            className={`${styles.tab} ${tab === 'movies' && !isLoginPage ? styles.active : ''}`}
             onClick={() => goTab('movies')}
           >
             Movies
           </button>
           <button
-            className={`${styles.tab} ${tab === 'tv' ? styles.active : ''}`}
+            className={`${styles.tab} ${tab === 'tv' && !isLoginPage ? styles.active : ''}`}
             onClick={() => goTab('tv')}
           >
             TV Series
           </button>
           <button
-            className={`${styles.tab} ${tab === 'history' ? styles.active : ''}`}
+            className={`${styles.tab} ${tab === 'history' && !isLoginPage ? styles.active : ''}`}
             onClick={() => goTab('history')}
           >
             Watch History
@@ -154,6 +176,29 @@ export default function App() {
           </button>
           <button
             type="button"
+            className={user ? styles.userAccountButton : styles.signInButton}
+            onClick={() => navigate('/login')}
+            aria-label={user ? `Signed in as ${user.displayName || user.email}` : 'Sign in to Max Cinema'}
+            title={user ? `Account: ${user.displayName || user.email}` : 'Sign in'}
+          >
+            {user ? (
+              <>
+                <span className={styles.userInitial}>
+                  {(user.displayName || user.email || 'U')[0].toUpperCase()}
+                </span>
+                <span className={styles.userName}>
+                  {user.displayName?.split(' ')[0] || user.email?.split('@')[0]}
+                </span>
+              </>
+            ) : (
+              <>
+                <span className={styles.signInIcon}>👤</span>
+                <span>Sign In</span>
+              </>
+            )}
+          </button>
+          <button
+            type="button"
             className={styles.themeButton}
             onClick={() => setTheme(current => current === 'dark' ? 'light' : 'dark')}
             aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
@@ -168,6 +213,13 @@ export default function App() {
           <PrivacyPolicy onBack={goHome} onOpenPrivacyChoices={openPrivacyChoices} />
         ) : isTermsPage ? (
           <Terms onBack={goHome} />
+        ) : isLoginPage ? (
+          <Login
+            user={user}
+            onBack={goHome}
+            onBrowseMovies={() => goTab('movies')}
+            onBrowseHistory={() => goTab('history')}
+          />
         ) : (
           <>
             {tab === 'movies' && <Movies key={homeKey} profile={profile} />}
@@ -190,6 +242,10 @@ export default function App() {
           {' '}| Digital Entertainment Democratized
         </p>
         <p className={styles.footerLinks}>
+          <a href="/login" onClick={event => { event.preventDefault(); navigate('/login') }}>
+            {user ? 'My Account' : 'Sign In'}
+          </a>
+          <span aria-hidden="true">·</span>
           <a href="/privacy-policy" onClick={event => { event.preventDefault(); navigate('/privacy-policy') }}>Privacy Policy</a>
           <span aria-hidden="true">·</span>
           <a href="/terms" onClick={event => { event.preventDefault(); navigate('/terms') }}>Terms of Use</a>
@@ -204,10 +260,11 @@ export default function App() {
       </footer>
 
       <nav className={styles.mobileNav} aria-label="Mobile navigation">
-        <button className={tab === 'movies' ? styles.mobileActive : ''} onClick={() => goTab('movies')}>⌂<span>Movies</span></button>
-        <button className={tab === 'tv' ? styles.mobileActive : ''} onClick={() => goTab('tv')}>▣<span>TV</span></button>
-        <button className={tab === 'history' ? styles.mobileActive : ''} onClick={() => goTab('history')}>⏱<span>History</span></button>
+        <button className={tab === 'movies' && !isLoginPage ? styles.mobileActive : ''} onClick={() => goTab('movies')}>⌂<span>Movies</span></button>
+        <button className={tab === 'tv' && !isLoginPage ? styles.mobileActive : ''} onClick={() => goTab('tv')}>▣<span>TV</span></button>
+        <button className={tab === 'history' && !isLoginPage ? styles.mobileActive : ''} onClick={() => goTab('history')}>⏱<span>History</span></button>
         <button onClick={() => setCommandOpen(true)}>🔍<span>Search</span></button>
+        <button className={isLoginPage ? styles.mobileActive : ''} onClick={() => navigate('/login')}>👤<span>{user ? 'Account' : 'Sign In'}</span></button>
       </nav>
 
       {commandOpen && (

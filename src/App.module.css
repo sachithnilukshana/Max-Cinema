@@ -113,6 +113,72 @@
   color: var(--text);
 }
 
+.signInButton {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--gold, #f5c518);
+  border: none;
+  border-radius: 20px;
+  color: #000;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.signInButton:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.signInIcon {
+  font-size: 13px;
+}
+
+.userAccountButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-input, #141414);
+  border: 1px solid var(--border, #2a2a2a);
+  border-radius: 20px;
+  color: var(--text, #fff);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 12px 4px 5px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  max-width: 140px;
+}
+
+.userAccountButton:hover {
+  border-color: var(--gold, #f5c518);
+  color: var(--gold, #f5c518);
+}
+
+.userInitial {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold, #f5c518), #e50914);
+  color: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.userName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .profileButton {
   max-width: 120px;
   overflow: hidden;
@@ -459,7 +525,7 @@
     bottom: 0;
     left: 0;
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     border-top: 0.5px solid #2a2a2a;
     background: color-mix(in srgb, var(--bg) 93%, transparent);
     backdrop-filter: blur(16px);

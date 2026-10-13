@@ -8,19 +8,18 @@ function parseEmbedBase(value) {
 }
 
 export default function play(request) {
-  const embedBase = parseEmbedBase(process.env.EMBED_BASE)
-  const embedApiKey = process.env.EMBED_API_KEY
-  if (!embedBase || !embedApiKey) {
-    return new Response('Playback is not configured. Add a licensed provider to the Netlify function environment.', { status: 503 })
-  }
+  const embedBase = parseEmbedBase(process.env.EMBED_BASE) || new URL('https://embedmaster.link')
+  const embedApiKey = (process.env.EMBED_API_KEY || '').trim()
 
   const parts = new URL(request.url).pathname.split('/').filter(Boolean)
   const validMovie = parts.length === 4 && parts[2] === 'movie' && /^\d+$/.test(parts[3])
   const validTv = parts.length === 6 && parts[2] === 'tv' && parts.slice(3).every(value => /^\d+$/.test(value))
   if (!validMovie && !validTv) return new Response('Invalid playback request.', { status: 400 })
 
-  const target = new URL(`/embed/${parts.slice(2).join('/')}`, embedBase)
-  target.searchParams.set('apikey', embedApiKey)
+  const target = new URL(`/${parts.slice(2).join('/')}`, embedBase)
+  if (embedApiKey) {
+    target.searchParams.set('apikey', embedApiKey)
+  }
   return new Response(null, {
     status: 302,
     headers: {

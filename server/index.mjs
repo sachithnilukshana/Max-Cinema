@@ -14,7 +14,7 @@ function readSecret(name) {
 }
 const tmdbApiKey = readSecret('TMDB_API_KEY')
 const tmdbToken = readSecret('TMDB_READ_ACCESS_TOKEN')
-const embedBase = process.env.EMBED_BASE
+const embedBase = process.env.EMBED_BASE || 'https://embedmaster.link'
 const embedApiKey = readSecret('EMBED_API_KEY')
 const cache = new Map()
 const cacheTtlMs = 5 * 60 * 1000
@@ -32,7 +32,7 @@ function parseEmbedBase(value) {
   }
 }
 
-const embedBaseUrl = parseEmbedBase(embedBase)
+const embedBaseUrl = parseEmbedBase(embedBase) || new URL('https://embedmaster.link')
 
 const mimeTypes = {
   '.css': 'text/css; charset=utf-8',
@@ -169,11 +169,6 @@ async function proxyTmdb(requestUrl, request, response) {
 }
 
 function playEmbed(pathname, response) {
-  if (!embedBaseUrl || !embedApiKey) {
-    send(response, 503, 'Playback is not configured. Add a licensed provider to the server environment.')
-    return
-  }
-
   const parts = pathname.split('/').filter(Boolean)
   const validMovie = parts.length === 4 && parts[2] === 'movie' && /^\d+$/.test(parts[3])
   const validTv = parts.length === 6 && parts[2] === 'tv' && parts.slice(3).every(value => /^\d+$/.test(value))
@@ -182,8 +177,8 @@ function playEmbed(pathname, response) {
     return
   }
 
-  const target = new URL(`/embed/${parts.slice(2).join('/')}`, embedBaseUrl)
-  target.searchParams.set('apikey', embedApiKey)
+  const target = new URL(`/${parts.slice(2).join('/')}`, embedBaseUrl)
+  if (embedApiKey) target.searchParams.set('apikey', embedApiKey)
   response.writeHead(302, { Location: target.toString(), 'Referrer-Policy': 'no-referrer', ...securityHeaders() })
   response.end()
 }
