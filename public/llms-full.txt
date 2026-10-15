@@ -37,3 +37,4 @@ Users can upgrade to VIP status for:
 - Editorial Contact: https://max-cinema.vercel.app/about
 - Privacy Policy: https://max-cinema.vercel.app/privacy-policy
 - Terms of Use: https://max-cinema.vercel.app/terms
+

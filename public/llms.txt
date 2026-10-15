@@ -17,3 +17,4 @@
 ## API & Integrations
 - [Telegram Bot](https://t.me/maxcinemabot_bot): Official automated assistant (@maxcinemabot_bot) for instant recommendations and account assistance.
 - [GitHub Repository](https://github.com/sachithnilukshana/Max-Cinema): Source repository, issue tracker, and community documentation.
+
