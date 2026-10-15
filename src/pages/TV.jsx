@@ -170,7 +170,7 @@ export default function TV({ profile }) {
 
   return (
     <div>
-      <h1 className={styles.srOnly}>Max Cinema — Stream Top 24 TV Series & Episodes</h1>
+      <h2 className={styles.srOnly}>Trending TV Series &amp; Episodes</h2>
       <form className={styles.searchRow} onSubmit={search} role="search" aria-label="Search TV Series">
         <input
           value={query}

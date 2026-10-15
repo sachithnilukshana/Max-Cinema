@@ -8,9 +8,11 @@
     <!-- Primary Meta Tags -->
     <title>Max Cinema — Free Movies, TV Shows & Streaming Discovery</title>
     <meta name="title" content="Max Cinema — Free Movies, TV Shows & Streaming Discovery" />
-    <meta name="description" content="Discover, save, and stream top 24 trending movies and popular TV series on Max Cinema. Enjoy high-definition cinema discovery, personal watchlists, and VIP features." />
+    <meta name="description" content="Discover, save, and stream top 24 trending movies and TV series on Max Cinema. Enjoy HD streaming discovery, personal watchlists, and VIP cinema features." />
     <meta name="author" content="Max Cinema Editorial Team" />
-    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+    <meta name="robots" content="index, follow" />
+    <meta property="article:published_time" content="2026-01-01T00:00:00Z" />
+    <meta property="article:modified_time" content="2026-10-15T23:00:00Z" />
 
     <!-- Canonical URL -->
     <link rel="canonical" href="https://max-cinema.vercel.app/" />
@@ -20,7 +22,7 @@
     <meta property="og:site_name" content="Max Cinema" />
     <meta property="og:url" content="https://max-cinema.vercel.app/" />
     <meta property="og:title" content="Max Cinema — Free Movies, TV Shows & Streaming Discovery" />
-    <meta property="og:description" content="Discover, save, and stream top 24 trending movies and popular TV series on Max Cinema. Enjoy high-definition cinema discovery, personal watchlists, and VIP features." />
+    <meta property="og:description" content="Discover, save, and stream top 24 trending movies and TV series on Max Cinema. Enjoy HD streaming discovery, personal watchlists, and VIP cinema features." />
     <meta property="og:image" content="https://max-cinema.vercel.app/og-image.jpg" />
     <meta property="og:image:secure_url" content="https://max-cinema.vercel.app/og-image.jpg" />
     <meta property="og:image:type" content="image/jpeg" />
@@ -34,7 +36,7 @@
     <meta name="twitter:creator" content="@maxcinemabot_bot" />
     <meta name="twitter:url" content="https://max-cinema.vercel.app/" />
     <meta name="twitter:title" content="Max Cinema — Free Movies, TV Shows & Streaming Discovery" />
-    <meta name="twitter:description" content="Discover, save, and stream top 24 trending movies and popular TV series on Max Cinema. Enjoy high-definition cinema discovery, personal watchlists, and VIP features." />
+    <meta name="twitter:description" content="Discover, save, and stream top 24 trending movies and TV series on Max Cinema. Enjoy HD streaming discovery, personal watchlists, and VIP cinema features." />
     <meta name="twitter:image" content="https://max-cinema.vercel.app/og-image.jpg" />
 
     <!-- PWA & Favicons -->
@@ -58,108 +60,113 @@
     <meta name="google-adsense-account" content="ca-pub-1450329989131749" />
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1450329989131749" crossorigin="anonymous"></script>
 
-    <!-- Structured Data (JSON-LD) -->
+    <!-- Structured Data (JSON-LD) - Separated top-level types to guarantee 100% schema validation -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@graph": [
+      "@type": "WebSite",
+      "@id": "https://max-cinema.vercel.app/#website",
+      "url": "https://max-cinema.vercel.app/",
+      "name": "Max Cinema",
+      "description": "Discover, save, and stream top 24 trending movies and television series.",
+      "inLanguage": "en",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://max-cinema.vercel.app/?search={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "@id": "https://max-cinema.vercel.app/#organization",
+      "name": "Max Cinema",
+      "url": "https://max-cinema.vercel.app/",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://max-cinema.vercel.app/max-cinema-logo.png",
+        "width": 1280,
+        "height": 1280
+      },
+      "sameAs": [
+        "https://github.com/sachithnilukshana/Max-Cinema",
+        "https://t.me/maxcinemabot_bot",
+        "https://max-cinema-telegram-bot1.onrender.com"
+      ]
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "@id": "https://max-cinema.vercel.app/#breadcrumb",
+      "itemListElement": [
         {
-          "@type": "WebSite",
-          "@id": "https://max-cinema.vercel.app/#website",
-          "url": "https://max-cinema.vercel.app/",
-          "name": "Max Cinema",
-          "description": "Discover, save, and stream top 24 trending movies and television series.",
-          "inLanguage": "en",
-          "potentialAction": {
-            "@type": "SearchAction",
-            "target": "https://max-cinema.vercel.app/?search={search_term_string}",
-            "query-input": "required name=search_term_string"
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://max-cinema.vercel.app/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Top Movies",
+          "item": "https://max-cinema.vercel.app/#movies"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "TV Series",
+          "item": "https://max-cinema.vercel.app/#tv"
+        },
+        {
+          "@type": "ListItem",
+          "position": 4,
+          "name": "VIP Premium",
+          "item": "https://max-cinema.vercel.app/payment"
+        }
+      ]
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "@id": "https://max-cinema.vercel.app/#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is Max Cinema and how does it work?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Max Cinema is a web-based streaming discovery destination that curates the top 24 trending movies and top 24 TV series each week. It combines community rating intelligence from The Movie Database with fast high-definition playback, personal watchlists, and viewing statistics. Viewers can search any movie or show, filter by mood or genre, track episodes, and enjoy a clean cinematic experience on mobile, tablet, and desktop devices."
           }
         },
         {
-          "@type": "Organization",
-          "@id": "https://max-cinema.vercel.app/#organization",
-          "name": "Max Cinema",
-          "url": "https://max-cinema.vercel.app/",
-          "logo": {
-            "@type": "ImageObject",
-            "url": "https://max-cinema.vercel.app/max-cinema-logo.png",
-            "width": 1280,
-            "height": 1280
-          },
-          "sameAs": [
-            "https://github.com/sachithnilukshana/Max-Cinema",
-            "https://t.me/maxcinemabot_bot",
-            "https://max-cinema-telegram-bot1.onrender.com"
-          ]
+          "@type": "Question",
+          "name": "How can I load and stream the top 24 trending movies and TV series?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "On Max Cinema, the Movies and TV Series sections automatically fetch and display the top 24 trending titles of the week with posters, synopsis details, release dates, and verified ratings. Simply click or tap on any title card to launch the integrated high-definition player. For TV series, an interactive season and episode selector allows seamless tracking of your viewing progression."
+          }
         },
         {
-          "@type": "BreadcrumbList",
-          "@id": "https://max-cinema.vercel.app/#breadcrumb",
-          "itemListElement": [
-            {
-              "@type": "ListItem",
-              "position": 1,
-              "name": "Home",
-              "item": "https://max-cinema.vercel.app/"
-            },
-            {
-              "@type": "ListItem",
-              "position": 2,
-              "name": "Top Movies",
-              "item": "https://max-cinema.vercel.app/#movies"
-            },
-            {
-              "@type": "ListItem",
-              "position": 3,
-              "name": "TV Series",
-              "item": "https://max-cinema.vercel.app/#tv"
-            },
-            {
-              "@type": "ListItem",
-              "position": 4,
-              "name": "VIP Premium",
-              "item": "https://max-cinema.vercel.app/payment"
-            }
-          ]
+          "@type": "Question",
+          "name": "What advantages does the Max Cinema VIP Membership provide?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Max Cinema VIP is an optional premium tier designed for cinephiles. VIP subscribers enjoy an ad-free viewing experience, direct high-bitrate HD/4K playback streams, priority content servers, and exclusive early access to newly cataloged features. VIP access can be unlocked using Cash Scan Connect Virtual Cards or secure PayHere billing."
+          }
         },
         {
-          "@type": "FAQPage",
-          "@id": "https://max-cinema.vercel.app/#faq",
-          "mainEntity": [
-            {
-              "@type": "Question",
-              "name": "What is Max Cinema and how does it work?",
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "Max Cinema is a web-based streaming discovery destination that curates the top 24 trending movies and top 24 TV series each week. It combines community rating intelligence from The Movie Database with fast high-definition playback, personal watchlists, and viewing statistics. Viewers can search any movie or show, filter by mood or genre, track episodes, and enjoy a clean cinematic experience on mobile, tablet, and desktop devices."
-              }
-            },
-            {
-              "@type": "Question",
-              "name": "How can I load and stream the top 24 trending movies and TV series?",
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "On Max Cinema, the Movies and TV Series sections automatically fetch and display the top 24 trending titles of the week with posters, synopsis details, release dates, and verified ratings. Simply click or tap on any title card to launch the integrated high-definition player. For TV series, an interactive season and episode selector allows seamless tracking of your viewing progression."
-              }
-            },
-            {
-              "@type": "Question",
-              "name": "What advantages does the Max Cinema VIP Membership provide?",
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "Max Cinema VIP is an optional premium tier designed for cinephiles. VIP subscribers enjoy an ad-free viewing experience, direct high-bitrate HD/4K playback streams, priority content servers, and exclusive early access to newly cataloged features. VIP access can be unlocked using Cash Scan Connect Virtual Cards or secure PayHere billing."
-              }
-            },
-            {
-              "@type": "Question",
-              "name": "Is Max Cinema compatible with mobile phones and offline use?",
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "Yes, Max Cinema is built as a Progressive Web App (PWA). You can install it directly to your home screen on iOS, Android, and desktop browsers without visiting an app store. It features offline caching of application assets, responsive touch controls, and dark-mode optimization for mobile viewing."
-              }
-            }
-          ]
+          "@type": "Question",
+          "name": "Is Max Cinema compatible with mobile phones and offline use?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes, Max Cinema is built as a Progressive Web App (PWA). You can install it directly to your home screen on iOS, Android, and desktop browsers without visiting an app store. It features offline caching of application assets, responsive touch controls, and dark-mode optimization for mobile viewing."
+          }
         }
       ]
     }
@@ -181,7 +188,8 @@
             <li><a href="/watchlist">My Watchlist</a></li>
             <li><a href="/stats">Viewing Stats</a></li>
             <li><a href="/payment">VIP Premium</a></li>
-            <li><a href="/about">About &amp; Contact</a></li>
+            <li><a href="/about">About Us</a></li>
+            <li><a href="/contact">Contact Support</a></li>
           </ul>
         </nav>
       </header>
@@ -237,7 +245,9 @@
       <footer>
         <p>&copy; 2026 Max Cinema. All rights reserved | Digital Entertainment Democratized · Curated by Max Cinema Editorial</p>
         <p>
-          <a href="/about">About &amp; Contact</a> ·
+          <a href="/about">About Us</a> ·
+          <a href="/contact">Contact Support</a> ·
+          <a href="/about#editorial">Editorial Policy</a> ·
           <a href="/login">Account</a> ·
           <a href="/payment">VIP Membership</a> ·
           <a href="/privacy-policy">Privacy Policy</a> ·

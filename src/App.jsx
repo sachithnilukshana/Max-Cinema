@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-const Movies = React.lazy(() => import('./pages/Movies.jsx'))
+import Movies from './pages/Movies.jsx'
 const TV = React.lazy(() => import('./pages/TV.jsx'))
 const WatchHistory = React.lazy(() => import('./pages/WatchHistory.jsx'))
 const Watchlist = React.lazy(() => import('./pages/Watchlist.jsx'))
@@ -264,6 +264,7 @@ export default function App() {
         </header>
 
         <main id="main-content" className={styles.main}>
+          <h1 className={styles.srOnly}>Max Cinema — Free Movies, TV Shows &amp; Streaming Discovery</h1>
           <React.Suspense fallback={<div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--gold)' }}>Loading…</div>}>
             {isAboutPage ? (
               <About onBack={goHome} />
@@ -315,6 +316,37 @@ export default function App() {
               </>
             )}
           </React.Suspense>
+
+          {path === '/' && tab === 'movies' && (
+            <section className={styles.editorialGuide} aria-label="Editorial Guide and Catalog Summary">
+              <div className={styles.guideCard}>
+                <div className={styles.trustBadges}>
+                  <span>✦ Certified TMDB API Partner Metadata</span>
+                  <span>✦ 256-Bit SSL Encryption</span>
+                  <span>✦ Ad-Safe Streaming</span>
+                </div>
+                <h2>Discover Top 24 Movies &amp; TV Series on Max Cinema</h2>
+                <p>
+                  Max Cinema is your premier digital cinema discovery destination. Browse the top 24 trending movies and top 24 TV series each week, complete with verified community ratings, multi-resolution posters, and high-definition playback. Filter by mood, genres (including Action, Drama, Comedy, and Horror), and release years to discover what to watch next.
+                </p>
+                <h3>Personalized Cinema Experience &amp; VIP Perks</h3>
+                <p>
+                  Save titles directly to your private watchlist, track watch history, and analyze your personal viewing stats with streak rewards. Upgrade to Max Cinema VIP for zero ad interruptions and ultra-high-definition streaming via Cash Scan Connect Virtual Cards or PayHere.
+                </p>
+                <div className={styles.guideMeta}>
+                  <p className={styles.byline}>
+                    Curated by <strong>Max Cinema Editorial Team</strong> · Published: <time dateTime="2026-10-15">October 15, 2026</time>
+                  </p>
+                  <div className={styles.shareLinks}>
+                    <span>Share:</span>
+                    <a href="https://t.me/share/url?url=https://max-cinema.vercel.app&text=Watch%20Top%20Movies%20on%20Max%20Cinema" target="_blank" rel="noopener noreferrer">Telegram</a>
+                    <a href="https://twitter.com/intent/tweet?url=https://max-cinema.vercel.app&text=Discover%20trending%20movies%20on%20Max%20Cinema" target="_blank" rel="noopener noreferrer">X (Twitter)</a>
+                    <a href="https://api.whatsapp.com/send?text=https://max-cinema.vercel.app" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+                  </div>
+                </div>
+              </div>
+            </section>
+          )}
         </main>
 
         <footer className={styles.footer}>
@@ -331,7 +363,11 @@ export default function App() {
           </p>
           <p className={styles.footerLinks}>
             <a href="/about" onClick={event => { event.preventDefault(); navigate('/about') }}>
-              About &amp; Contact
+              About Us
+            </a>
+            <span aria-hidden="true">·</span>
+            <a href="/contact" onClick={event => { event.preventDefault(); navigate('/about') }}>
+              Contact Support
             </a>
             <span aria-hidden="true">·</span>
             <a href="/login" onClick={event => { event.preventDefault(); navigate('/login') }}>
@@ -345,6 +381,8 @@ export default function App() {
             <a href="/privacy-policy" onClick={event => { event.preventDefault(); navigate('/privacy-policy') }}>Privacy Policy</a>
             <span aria-hidden="true">·</span>
             <a href="/terms" onClick={event => { event.preventDefault(); navigate('/terms') }}>Terms of Use</a>
+            <span aria-hidden="true">·</span>
+            <a href="/about#editorial" onClick={event => { event.preventDefault(); navigate('/about') }}>Editorial Policy</a>
             <span aria-hidden="true">·</span>
             <a href="https://t.me/maxcinemabot_bot" target="_blank" rel="noopener noreferrer">
               Telegram Bot

@@ -226,7 +226,7 @@ export default function Movies({ profile, adminConfig }) {
 
   return (
     <div>
-      <h1 className={styles.srOnly}>Max Cinema — Stream Top 24 Movies & Discover New Releases</h1>
+      <h2 className={styles.srOnly}>Trending Movies &amp; Discover New Releases</h2>
       <form className={styles.searchRow} onSubmit={search} role="search" aria-label="Search Movies">
         <input
           value={query}
