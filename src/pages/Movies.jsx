@@ -32,7 +32,7 @@ function hydrate(key) {
   try { const v = sessionStorage.getItem(key); return v ? JSON.parse(v) : null } catch { return null }
 }
 
-export default function Movies({ profile, adminConfig }) {
+export default function Movies({ profile, adminConfig, onSelectTitle }) {
   const savedQuery = hydrate('mv_query') || ''
   const savedPlayer = hydrate('mv_player')
 
@@ -168,6 +168,10 @@ export default function Movies({ profile, adminConfig }) {
   }
 
   function select(item) {
+    if (onSelectTitle) {
+      onSelectTitle(item)
+      return
+    }
     trackMovieView(item)
 
     const mediaType = item.media_type || 'movie'

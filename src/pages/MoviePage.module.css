@@ -1,0 +1,125 @@
+.pageWrap {
+  width: 100%;
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 1.25rem 1rem 4rem;
+}
+
+.topBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
+}
+
+.backBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--surface-2, #1a1a1a);
+  color: var(--gold, #c8a96e);
+  border: 1px solid var(--border-subtle, rgba(200, 169, 110, 0.3));
+  border-radius: 8px;
+  padding: 0.55rem 1.1rem;
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.backBtn:hover {
+  background: var(--gold, #c8a96e);
+  color: #000;
+  border-color: var(--gold, #c8a96e);
+  transform: translateX(-2px);
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.88rem;
+  color: var(--text-muted, #8e8e8e);
+}
+
+.breadcrumb a,
+.breadcrumb button {
+  background: none;
+  border: none;
+  color: var(--text-muted, #8e8e8e);
+  padding: 0;
+  font-size: inherit;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.breadcrumb a:hover,
+.breadcrumb button:hover {
+  color: var(--gold, #c8a96e);
+}
+
+.breadcrumbCurrent {
+  color: var(--text-primary, #ffffff);
+  font-weight: 500;
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.stateBox {
+  min-height: 50vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  text-align: center;
+  padding: 3rem 1rem;
+}
+
+.spinner {
+  width: 44px;
+  height: 44px;
+  border: 3px solid rgba(200, 169, 110, 0.2);
+  border-top-color: var(--gold, #c8a96e);
+  border-radius: 50%;
+  animation: spin 0.85s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.errorTitle {
+  color: #ff6b6b;
+  font-size: 1.25rem;
+  margin-bottom: 0.4rem;
+}
+
+.errorDesc {
+  color: var(--text-muted, #8e8e8e);
+  max-width: 480px;
+  line-height: 1.6;
+}
+
+.playerSection {
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 640px) {
+  .pageWrap {
+    padding: 0.75rem 0.65rem 3rem;
+  }
+  .breadcrumb {
+    font-size: 0.8rem;
+  }
+  .breadcrumbCurrent {
+    max-width: 150px;
+  }
+}

@@ -17,7 +17,7 @@ import styles from './TV.module.css'
 function persist(key, val) { try { sessionStorage.setItem(key, JSON.stringify(val)) } catch {} }
 function hydrate(key) { try { const v = sessionStorage.getItem(key); return v ? JSON.parse(v) : null } catch { return null } }
 
-export default function TV({ profile }) {
+export default function TV({ profile, onSelectShow }) {
   const [query, setQuery] = useState(() => hydrate('tv_query') || '')
   const [results, setResults] = useState([])
   const [loading, setLoading] = useState(true)
@@ -89,6 +89,10 @@ export default function TV({ profile }) {
   }
 
   function selectShow(item) {
+    if (onSelectShow) {
+      onSelectShow(item)
+      return
+    }
     trackTVView(item)
     setSelected(item)
     persist('tv_selected', item)
@@ -130,6 +134,10 @@ export default function TV({ profile }) {
   }
 
   function resumeShow(item) {
+    if (onSelectShow) {
+      onSelectShow(item)
+      return
+    }
     if (!item.season || !item.episode) {
       selectShow(item)
       return

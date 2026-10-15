@@ -22,7 +22,7 @@ function formatTimeAgo(isoString) {
   }
 }
 
-export default function WatchHistory({ profile, onBrowse }) {
+export default function WatchHistory({ profile, onBrowse, onSelect }) {
   const [history, setHistory] = useState([])
   const [filter, setFilter] = useState('all') // 'all' | 'movie' | 'tv'
   const [player, setPlayer] = useState(null)
@@ -40,6 +40,10 @@ export default function WatchHistory({ profile, onBrowse }) {
   }, [profile.id])
 
   function handlePlay(item) {
+    if (onSelect) {
+      onSelect(item)
+      return
+    }
     const isTV = item.media_type === 'tv' || Boolean(item.season)
     const title = item.title || item.name
     const src = isTV

@@ -95,8 +95,8 @@ export default function Player({
     const base = window.location.origin
     const url  = tmdbId
       ? (mediaType === 'tv'
-          ? `${base}/tv/${tmdbId}`
-          : `${base}/movie/${tmdbId}`)
+          ? `${base}/tvshow/${tmdbId}`
+          : `${base}/mov/${tmdbId}`)
       : window.location.href
 
     try {

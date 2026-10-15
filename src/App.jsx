@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import Movies from './pages/Movies.jsx'
 const TV = React.lazy(() => import('./pages/TV.jsx'))
+const MoviePage = React.lazy(() => import('./pages/MoviePage.jsx'))
+const TVShowPage = React.lazy(() => import('./pages/TVShowPage.jsx'))
 const WatchHistory = React.lazy(() => import('./pages/WatchHistory.jsx'))
 const Watchlist = React.lazy(() => import('./pages/Watchlist.jsx'))
 const Stats = React.lazy(() => import('./pages/Stats.jsx'))
@@ -93,14 +95,24 @@ export default function App() {
     return () => window.removeEventListener('popstate', handlePopState)
   }, [])
 
+  const movieMatch = path.match(/^\/(?:mov|movie)\/([^/?#]+)/)
+  const tvMatch = path.match(/^\/(?:tvshow|tv)\/([^/?#]+)(?:\/(\d+)\/(\d+))?/)
+
+  const isMovieRoute = Boolean(movieMatch)
+  const isTVRoute = Boolean(tvMatch)
+
+  const movieRouteId = movieMatch ? movieMatch[1] : null
+  const tvRouteId = tvMatch ? tvMatch[1] : null
+  const tvRouteSeason = tvMatch && tvMatch[2] ? parseInt(tvMatch[2], 10) : undefined
+  const tvRouteEpisode = tvMatch && tvMatch[3] ? parseInt(tvMatch[3], 10) : undefined
+
   // Deep linking detection
   useEffect(() => {
     const deepLink = parseDeepLink(path)
     if (deepLink) {
       if (deepLink.type === 'watchlist') setTab('watchlist')
       else if (deepLink.type === 'stats') setTab('stats')
-      else if (deepLink.type === 'movie') setTab('movies')
-      else if (deepLink.type === 'tv') setTab('tv')
+      else if (deepLink.type === 'party') setTab('party')
     }
   }, [path])
 
@@ -111,6 +123,7 @@ export default function App() {
   const isAboutPage = path === '/about' || path === '/contact'
 
   useEffect(() => {
+    if (isMovieRoute || isTVRoute) return
     document.title = isPrivacyPage
       ? 'Privacy Policy | Max Cinema'
       : isTermsPage
@@ -122,7 +135,7 @@ export default function App() {
             : isAboutPage
               ? 'About Us & Contact | Max Cinema'
               : 'Max Cinema — Free Movies, TV Shows & Streaming Discovery'
-  }, [isPrivacyPage, isTermsPage, isLoginPage, isPaymentPage, isAboutPage])
+  }, [isPrivacyPage, isTermsPage, isLoginPage, isPaymentPage, isAboutPage, isMovieRoute, isTVRoute])
 
   function navigate(nextPath) {
     if (readPath() !== nextPath) window.history.pushState({}, '', nextPath)
@@ -182,13 +195,13 @@ export default function App() {
           </button>
           <nav className={styles.tabs}>
             <button
-              className={`${styles.tab} ${tab === 'movies' && !isLoginPage && !isPaymentPage ? styles.active : ''}`}
+              className={`${styles.tab} ${(isMovieRoute || (tab === 'movies' && path === '/')) && !isLoginPage && !isPaymentPage ? styles.active : ''}`}
               onClick={() => goTab('movies')}
             >
               Movies
             </button>
             <button
-              className={`${styles.tab} ${tab === 'tv' && !isLoginPage && !isPaymentPage ? styles.active : ''}`}
+              className={`${styles.tab} ${(isTVRoute || (tab === 'tv' && path === '/')) && !isLoginPage && !isPaymentPage ? styles.active : ''}`}
               onClick={() => goTab('tv')}
             >
               TV Series
@@ -266,7 +279,32 @@ export default function App() {
         <main id="main-content" className={styles.main}>
           <h1 className={styles.srOnly}>Max Cinema — Free Movies, TV Shows &amp; Streaming Discovery</h1>
           <React.Suspense fallback={<div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--gold)' }}>Loading…</div>}>
-            {isAboutPage ? (
+            {isMovieRoute ? (
+              <MoviePage
+                tmdbId={movieRouteId}
+                profile={profile}
+                onBack={() => {
+                  if (window.history.length > 1) window.history.back()
+                  else goHome()
+                }}
+                onSelectMovie={id => navigate(`/mov/${id}`)}
+                onSelectTV={id => navigate(`/tvshow/${id}`)}
+              />
+            ) : isTVRoute ? (
+              <TVShowPage
+                tmdbId={tvRouteId}
+                initialSeason={tvRouteSeason}
+                initialEpisode={tvRouteEpisode}
+                profile={profile}
+                onBack={() => {
+                  if (window.history.length > 1) window.history.back()
+                  else goTab('tv')
+                }}
+                onSelectMovie={id => navigate(`/mov/${id}`)}
+                onSelectTV={id => navigate(`/tvshow/${id}`)}
+                onNavigate={p => navigate(p)}
+              />
+            ) : isAboutPage ? (
               <About onBack={goHome} />
             ) : isPrivacyPage ? (
               <PrivacyPolicy onBack={goHome} onOpenPrivacyChoices={openPrivacyChoices} />
@@ -282,7 +320,18 @@ export default function App() {
             ) : isPaymentPage || tab === 'payment' ? (
               <Payment user={user} onBack={goHome} />
             ) : tab === 'watchlist' ? (
-              <Watchlist profile={profile} onBrowse={() => goTab('movies')} onSelect={() => goTab('movies')} />
+              <Watchlist
+                profile={profile}
+                onBrowse={() => goTab('movies')}
+                onSelect={item => {
+                  const id = item.id || item.tmdbId
+                  if (item.media_type === 'tv' || item.name) {
+                    navigate(`/tvshow/${id}`)
+                  } else {
+                    navigate(`/mov/${id}`)
+                  }
+                }}
+              />
             ) : tab === 'stats' ? (
               <Stats profile={profile} user={user} />
             ) : tab === 'party' ? (
@@ -310,9 +359,47 @@ export default function App() {
               </div>
             ) : (
               <>
-                {tab === 'movies' && <Movies key={homeKey} profile={profile} />}
-                {tab === 'tv' && <TV profile={profile} />}
-                {tab === 'history' && <WatchHistory profile={profile} onBrowse={() => goTab('movies')} />}
+                {tab === 'movies' && (
+                  <Movies
+                    key={homeKey}
+                    profile={profile}
+                    onSelectTitle={item => {
+                      const id = item.id || item.tmdbId
+                      if (item.media_type === 'tv' || item.name) {
+                        navigate(`/tvshow/${id}`)
+                      } else {
+                        navigate(`/mov/${id}`)
+                      }
+                    }}
+                  />
+                )}
+                {tab === 'tv' && (
+                  <TV
+                    profile={profile}
+                    onSelectShow={item => {
+                      const id = item.id || item.tmdbId
+                      if (item.season && item.episode) {
+                        navigate(`/tvshow/${id}/${item.season}/${item.episode}`)
+                      } else {
+                        navigate(`/tvshow/${id}`)
+                      }
+                    }}
+                  />
+                )}
+                {tab === 'history' && (
+                  <WatchHistory
+                    profile={profile}
+                    onBrowse={() => goTab('movies')}
+                    onSelect={item => {
+                      const id = item.id || item.tmdbId
+                      if (item.media_type === 'tv' || item.season || item.name) {
+                        navigate(`/tvshow/${id}/${item.season || 1}/${item.episode || 1}`)
+                      } else {
+                        navigate(`/mov/${id}`)
+                      }
+                    }}
+                  />
+                )}
               </>
             )}
           </React.Suspense>
@@ -402,8 +489,8 @@ export default function App() {
         </footer>
 
         <nav className={styles.mobileNav} aria-label="Mobile navigation">
-          <button className={tab === 'movies' && !isLoginPage && !isPaymentPage ? styles.mobileActive : ''} onClick={() => goTab('movies')}>⌂<span>Movies</span></button>
-          <button className={tab === 'tv' && !isLoginPage && !isPaymentPage ? styles.mobileActive : ''} onClick={() => goTab('tv')}>▣<span>TV</span></button>
+          <button className={(isMovieRoute || (tab === 'movies' && path === '/')) && !isLoginPage && !isPaymentPage ? styles.mobileActive : ''} onClick={() => goTab('movies')}>⌂<span>Movies</span></button>
+          <button className={(isTVRoute || (tab === 'tv' && path === '/')) && !isLoginPage && !isPaymentPage ? styles.mobileActive : ''} onClick={() => goTab('tv')}>▣<span>TV</span></button>
           <button className={tab === 'watchlist' && !isLoginPage && !isPaymentPage ? styles.mobileActive : ''} onClick={() => goTab('watchlist')}>❤️<span>Saved</span></button>
           <button className={tab === 'history' && !isLoginPage && !isPaymentPage ? styles.mobileActive : ''} onClick={() => goTab('history')}>⏱<span>History</span></button>
           <button className={tab === 'stats' && !isLoginPage && !isPaymentPage ? styles.mobileActive : ''} onClick={() => goTab('stats')}>📊<span>Stats</span></button>

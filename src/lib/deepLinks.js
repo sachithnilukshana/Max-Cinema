@@ -8,7 +8,11 @@ const BASE_URL = 'https://max-cinema.vercel.app'
  * Returns null when the path does not match any known pattern.
  *
  * Supported patterns:
+ *   /mov/:id                         → { type: 'movie', id }
  *   /movie/:id                       → { type: 'movie', id }
+ *   /tvshow/:id                      → { type: 'tv', id }
+ *   /tvshow/:id/:season/:episode     → { type: 'tv', id, season, episode }
+ *   /tv/:id                          → { type: 'tv', id }
  *   /tv/:id/:season/:episode         → { type: 'tv', id, season, episode }
  *   /watchlist                       → { type: 'watchlist' }
  *   /stats                           → { type: 'stats' }
@@ -23,11 +27,11 @@ export function parseDeepLink(pathname) {
 
   const [first, second, third, fourth] = segments
 
-  if (first === 'movie' && second) {
+  if ((first === 'mov' || first === 'movie') && second) {
     return { type: 'movie', id: second }
   }
 
-  if (first === 'tv' && second) {
+  if ((first === 'tvshow' || first === 'tv') && second) {
     const result = { type: 'tv', id: second }
     if (third) result.season = parseInt(third, 10) || 1
     if (fourth) result.episode = parseInt(fourth, 10) || 1
@@ -48,21 +52,22 @@ export function parseDeepLink(pathname) {
 /**
  * Build a relative movie deep link path.
  * @param {string|number} tmdbId
- * @returns {string} e.g. '/movie/123456'
+ * @returns {string} e.g. '/mov/123456'
  */
 export function buildMovieLink(tmdbId) {
-  return '/movie/' + tmdbId
+  return '/mov/' + tmdbId
 }
 
 /**
  * Build a relative TV deep link path.
  * @param {string|number} tmdbId
- * @param {number} season
- * @param {number} episode
- * @returns {string} e.g. '/tv/tt0903747/1/1'
+ * @param {number} [season]
+ * @param {number} [episode]
+ * @returns {string} e.g. '/tvshow/1399' or '/tvshow/1399/1/1'
  */
 export function buildTVLink(tmdbId, season, episode) {
-  return `/tv/${tmdbId}/${season}/${episode}`
+  if (season && episode) return `/tvshow/${tmdbId}/${season}/${episode}`
+  return `/tvshow/${tmdbId}`
 }
 
 /**
@@ -95,11 +100,11 @@ export async function copyToClipboard(text) {
  */
 export function getShareUrl(type, id, season, episode) {
   if (type === 'movie' && id) {
-    return `${BASE_URL}/movie/${id}`
+    return `${BASE_URL}/mov/${id}`
   }
   if (type === 'tv' && id) {
-    if (season && episode) return `${BASE_URL}/tv/${id}/${season}/${episode}`
-    return `${BASE_URL}/tv/${id}`
+    if (season && episode) return `${BASE_URL}/tvshow/${id}/${season}/${episode}`
+    return `${BASE_URL}/tvshow/${id}`
   }
   if (type === 'watchlist') return `${BASE_URL}/watchlist`
   if (type === 'stats') return `${BASE_URL}/stats`
