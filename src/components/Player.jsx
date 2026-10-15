@@ -1,4 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react'
+import CastModal from './CastModal.jsx'
+import { isCastConnected, castMediaToReceiver } from '../lib/castSync.js'
 import styles from './Player.module.css'
 
 // Keyboard shortcut help overlay
@@ -25,6 +27,31 @@ export default function Player({
   const [reportDetails, setReportDetails] = useState('')
   const [reportSent, setReportSent] = useState(false)
   const [shareCopied, setShareCopied] = useState(false)
+  const [castOpen, setCastOpen] = useState(false)
+  const [isCasting, setIsCasting] = useState(() => isCastConnected())
+
+  useEffect(() => {
+    const handleCastChange = event => {
+      setIsCasting(Boolean(event.detail?.connected))
+    }
+    window.addEventListener('Max Cinema:castchange', handleCastChange)
+    return () => window.removeEventListener('Max Cinema:castchange', handleCastChange)
+  }, [])
+
+  // Auto-sync to connected Fire TV if already paired
+  useEffect(() => {
+    if (isCastConnected() && tmdbId) {
+      const s = badge?.match(/S(\d+)/)?.[1]
+      const e = badge?.match(/E(\d+)/)?.[1]
+      castMediaToReceiver({
+        tmdbId,
+        mediaType: mediaType || 'movie',
+        title,
+        season: s ? Number(s) : 1,
+        episode: e ? Number(e) : 1,
+      }).catch(() => {})
+    }
+  }, [tmdbId, badge, mediaType, title])
 
   // ── Fullscreen sync ──────────────────────────────────────────────────────
   useEffect(() => {
@@ -132,6 +159,20 @@ export default function Player({
         <div className={styles.metaTop}>
           <h2 className={styles.title}>{title}</h2>
           <div className={styles.metaActions}>
+            {/* Cast to TV button */}
+            <button
+              type="button"
+              className={`${styles.iconBtn} ${isCasting ? styles.castActive : ''}`}
+              onClick={() => setCastOpen(true)}
+              title={isCasting ? 'Connected to Fire TV (click to manage)' : 'Cast to Fire TV / Smart TV'}
+              aria-label="Cast to Fire TV or Smart TV"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M2 16.1A5 5 0 0 1 5.9 20M2 12.05A9 9 0 0 1 9.95 20M2 8V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6"/>
+                <line x1="2" y1="20" x2="2.01" y2="20"/>
+              </svg>
+            </button>
+
             {/* Share button */}
             <button
               type="button"
@@ -295,6 +336,18 @@ export default function Player({
           </div>
         </div>
       )}
+
+      <CastModal
+        isOpen={castOpen}
+        onClose={() => setCastOpen(false)}
+        currentMedia={{
+          tmdbId,
+          mediaType: mediaType || 'movie',
+          title,
+          season: badge?.match(/S(\d+)/)?.[1],
+          episode: badge?.match(/E(\d+)/)?.[1],
+        }}
+      />
     </div>
   )
 }

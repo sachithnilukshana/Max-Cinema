@@ -3,6 +3,7 @@ import Movies from './pages/Movies.jsx'
 const TV = React.lazy(() => import('./pages/TV.jsx'))
 const MoviePage = React.lazy(() => import('./pages/MoviePage.jsx'))
 const TVShowPage = React.lazy(() => import('./pages/TVShowPage.jsx'))
+const FireTVReceiver = React.lazy(() => import('./pages/FireTVReceiver.jsx'))
 const WatchHistory = React.lazy(() => import('./pages/WatchHistory.jsx'))
 const Watchlist = React.lazy(() => import('./pages/Watchlist.jsx'))
 const Stats = React.lazy(() => import('./pages/Stats.jsx'))
@@ -13,6 +14,8 @@ const Terms = React.lazy(() => import('./pages/Terms.jsx'))
 const Login = React.lazy(() => import('./pages/Login.jsx'))
 const About = React.lazy(() => import('./pages/About.jsx'))
 import PWAInstallPrompt from './components/PWAInstallPrompt.jsx'
+import CastModal from './components/CastModal.jsx'
+import { isCastConnected, connectToReceiver } from './lib/castSync.js'
 import { getActiveProfile, saveActiveProfileRecord } from './lib/profile.js'
 import { observeAuth } from './lib/firebase.js'
 import { trackSearch } from './lib/cinescopeApi.js'
@@ -44,6 +47,28 @@ export default function App() {
   const [commandQuery, setCommandQuery] = useState('')
   const [path, setPath] = useState(readPath)
   const [privacyNotice, setPrivacyNotice] = useState('')
+  const [castModalOpen, setCastModalOpen] = useState(false)
+  const [isCasting, setIsCasting] = useState(() => isCastConnected())
+
+  useEffect(() => {
+    const handleCastChange = event => {
+      setIsCasting(Boolean(event.detail?.connected))
+    }
+    window.addEventListener('Max Cinema:castchange', handleCastChange)
+    return () => window.removeEventListener('Max Cinema:castchange', handleCastChange)
+  }, [])
+
+  useEffect(() => {
+    try {
+      const urlParams = new URLSearchParams(window.location.search)
+      const code = urlParams.get('cast')
+      if (code) {
+        connectToReceiver(code)
+          .then(() => setCastModalOpen(true))
+          .catch(() => {})
+      }
+    } catch {}
+  }, [])
 
   useEffect(() => {
     return observeAuth(nextUser => {
@@ -95,6 +120,7 @@ export default function App() {
     return () => window.removeEventListener('popstate', handlePopState)
   }, [])
 
+  const isFireTvRoute = path === '/firetv' || path === '/cast' || path === '/tv-mode'
   const movieMatch = path.match(/^\/(?:mov|movie)\/([^/?#]+)/)
   const tvMatch = path.match(/^\/(?:tvshow|tv)\/([^/?#]+)(?:\/(\d+)\/(\d+))?/)
 
@@ -123,7 +149,7 @@ export default function App() {
   const isAboutPage = path === '/about' || path === '/contact'
 
   useEffect(() => {
-    if (isMovieRoute || isTVRoute) return
+    if (isFireTvRoute || isMovieRoute || isTVRoute) return
     document.title = isPrivacyPage
       ? 'Privacy Policy | Max Cinema'
       : isTermsPage
@@ -135,7 +161,7 @@ export default function App() {
             : isAboutPage
               ? 'About Us & Contact | Max Cinema'
               : 'Max Cinema — Free Movies, TV Shows & Streaming Discovery'
-  }, [isPrivacyPage, isTermsPage, isLoginPage, isPaymentPage, isAboutPage, isMovieRoute, isTVRoute])
+  }, [isPrivacyPage, isTermsPage, isLoginPage, isPaymentPage, isAboutPage, isFireTvRoute, isMovieRoute, isTVRoute])
 
   function navigate(nextPath) {
     if (readPath() !== nextPath) window.history.pushState({}, '', nextPath)
@@ -236,6 +262,16 @@ export default function App() {
             <button
               type="button"
               className={styles.searchTrigger}
+              onClick={() => setCastModalOpen(true)}
+              aria-label="Cast to Fire TV or Smart TV"
+              title={isCasting ? 'Connected to Fire TV (click to manage)' : 'Cast to Fire TV / Smart TV'}
+              style={isCasting ? { borderColor: '#00ff88', color: '#00ff88' } : undefined}
+            >
+              📺 {isCasting ? 'Casting' : 'Cast TV'}
+            </button>
+            <button
+              type="button"
+              className={styles.searchTrigger}
               onClick={() => setCommandOpen(true)}
               aria-label="Search movies and series"
               title="Search (Ctrl+K or /)"
@@ -279,7 +315,9 @@ export default function App() {
         <main id="main-content" className={styles.main}>
           <h1 className={styles.srOnly}>Max Cinema — Free Movies, TV Shows &amp; Streaming Discovery</h1>
           <React.Suspense fallback={<div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--gold)' }}>Loading…</div>}>
-            {isMovieRoute ? (
+            {isFireTvRoute ? (
+              <FireTVReceiver />
+            ) : isMovieRoute ? (
               <MoviePage
                 tmdbId={movieRouteId}
                 profile={profile}
@@ -471,6 +509,8 @@ export default function App() {
             <span aria-hidden="true">·</span>
             <a href="/about#editorial" onClick={event => { event.preventDefault(); navigate('/about') }}>Editorial Policy</a>
             <span aria-hidden="true">·</span>
+            <a href="/firetv" onClick={event => { event.preventDefault(); navigate('/firetv') }}>Fire TV Mode 📺</a>
+            <span aria-hidden="true">·</span>
             <a href="https://t.me/maxcinemabot_bot" target="_blank" rel="noopener noreferrer">
               Telegram Bot
             </a>
@@ -494,6 +534,7 @@ export default function App() {
           <button className={tab === 'watchlist' && !isLoginPage && !isPaymentPage ? styles.mobileActive : ''} onClick={() => goTab('watchlist')}>❤️<span>Saved</span></button>
           <button className={tab === 'history' && !isLoginPage && !isPaymentPage ? styles.mobileActive : ''} onClick={() => goTab('history')}>⏱<span>History</span></button>
           <button className={tab === 'stats' && !isLoginPage && !isPaymentPage ? styles.mobileActive : ''} onClick={() => goTab('stats')}>📊<span>Stats</span></button>
+          <button onClick={() => setCastModalOpen(true)} style={isCasting ? { color: '#00ff88' } : undefined}>📺<span>Cast</span></button>
           <button className={isPaymentPage || tab === 'payment' ? styles.mobileActive : ''} onClick={() => navigate('/payment')}>👑<span>VIP</span></button>
           <button className={isLoginPage ? styles.mobileActive : ''} onClick={() => navigate('/login')}>👤<span>{user ? 'Account' : 'Login'}</span></button>
         </nav>
@@ -514,6 +555,11 @@ export default function App() {
             </form>
           </div>
         )}
+
+        <CastModal
+          isOpen={castModalOpen}
+          onClose={() => setCastModalOpen(false)}
+        />
       </div>
     </PremiumProvider>
   )

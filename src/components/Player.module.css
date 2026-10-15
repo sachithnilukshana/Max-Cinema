@@ -61,6 +61,12 @@
   border-color: rgba(200,169,110,0.5);
 }
 
+.castActive {
+  color: #00ff88 !important;
+  border-color: rgba(0, 255, 136, 0.6) !important;
+  box-shadow: 0 0 8px rgba(0, 255, 136, 0.3);
+}
+
 .closeBtn {
   display: grid;
   place-items: center;

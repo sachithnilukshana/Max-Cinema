@@ -132,3 +132,4 @@ export default function MoviePage({ tmdbId, profile, onBack, onSelectMovie, onSe
     </div>
   )
 }
+
