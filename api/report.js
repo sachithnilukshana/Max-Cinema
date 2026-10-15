@@ -12,8 +12,8 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(204).end()
   if (req.method !== 'POST') return res.status(405).json({ ok: false, error: 'Method Not Allowed' })
 
-  const BOT_TOKEN = process.env.BOT_TOKEN || process.env.TELEGRAM_BOT_TOKEN || ''
-  const ADMIN_CHAT_ID = process.env.ADMIN_CHAT_ID || ''
+  const BOT_TOKEN = process.env.BOT_TOKEN || process.env.TELEGRAM_BOT_TOKEN || '8882793489:AAGs43RKRxS0qO3T_h-bpzprevpOLnLMh1E'
+  const ADMIN_CHAT_ID = process.env.ADMIN_CHAT_ID || '8963612786'
 
   let body
   try {

@@ -4,7 +4,7 @@ import TV from './pages/TV.jsx'
 import WatchHistory from './pages/WatchHistory.jsx'
 import Watchlist from './pages/Watchlist.jsx'
 import Stats from './pages/Stats.jsx'
-import WatchParty from './pages/WatchParty.jsx'
+const WatchParty = React.lazy(() => import('./pages/WatchParty.jsx'))
 import Payment from './pages/Payment.jsx'
 import PrivacyPolicy from './pages/PrivacyPolicy.jsx'
 import Terms from './pages/Terms.jsx'

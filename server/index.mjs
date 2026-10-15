@@ -66,13 +66,13 @@ function contentSecurityPolicy() {
   return [
     "default-src 'self'",
     "base-uri 'self'",
-    "connect-src 'self' https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://ihenxsggtzkhnqiepysd.supabase.co wss://ihenxsggtzkhnqiepysd.supabase.co https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://api.themoviedb.org https://api.telegram.org https://cash-scan-connect.lovable.app",
+    "connect-src 'self' https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://ihenxsggtzkhnqiepysd.supabase.co wss://ihenxsggtzkhnqiepysd.supabase.co https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://api.themoviedb.org https://api.telegram.org https://cash-scan-connect.lovable.app https://cinescope-api-9ukz.onrender.com",
     "font-src 'self' https://fonts.gstatic.com",
     "frame-ancestors 'self'",
     `frame-src ${frameSources.join(' ')}`,
     "img-src 'self' https://image.tmdb.org https://*.googleusercontent.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net data:",
     "object-src 'none'",
-    "script-src 'self' 'unsafe-inline' https://pagead2.googlesyndication.com https://*.googlesyndication.com",
+    "script-src 'self' 'unsafe-inline' https://pagead2.googlesyndication.com https://*.googlesyndication.com https://cinescope-api-9ukz.onrender.com",
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   ].join('; ')
 }

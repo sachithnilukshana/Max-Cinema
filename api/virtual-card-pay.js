@@ -57,27 +57,34 @@ export default async function handler(req, res) {
       const authData = await authRes.json()
 
       if (authData.idToken) {
-        const patchUrl = `https://firestore.googleapis.com/v1/projects/login-6a0e1/databases/(default)/documents/users/${adminUid}?updateMask.fieldPaths=premiumUsers.${uid}&key=${apiKey}`
-        await fetch(patchUrl, {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${authData.idToken}`,
+        const docUrl = `https://firestore.googleapis.com/v1/projects/login-6a0e1/databases/(default)/documents/users/${adminUid}?key=${apiKey}`
+        const authHeaders = { 'Content-Type': 'application/json', Authorization: `Bearer ${authData.idToken}` }
+
+        // Read existing premiumUsers map, merge new grant, then write back
+        const docRes = await fetch(docUrl, { headers: authHeaders })
+        const doc = docRes.ok ? await docRes.json() : {}
+        const existingPremiumUsers = doc.fields?.premiumUsers?.mapValue?.fields || {}
+
+        existingPremiumUsers[uid] = {
+          mapValue: {
+            fields: {
+              active: { booleanValue: true },
+              plan: { stringValue: planId || 'vip' },
+              grantedAt: { integerValue: Date.now().toString() },
+              expiresAt: { integerValue: expiresAt.toString() },
+              paymentMethod: { stringValue: 'Cash Scan Connect Virtual Card' },
+              virtualCard: { stringValue: maskedCard },
+              cardholder: { stringValue: cardholderName || 'Cardholder' },
+            },
           },
+        }
+
+        await fetch(`${docUrl}&updateMask.fieldPaths=premiumUsers`, {
+          method: 'PATCH',
+          headers: authHeaders,
           body: JSON.stringify({
             fields: {
-              [`premiumUsers.${uid}`]: {
-                mapValue: {
-                  fields: {
-                    plan: { stringValue: planId || 'vip' },
-                    grantedAt: { integerValue: Date.now().toString() },
-                    expiresAt: { integerValue: expiresAt.toString() },
-                    paymentMethod: { stringValue: 'Cash Scan Connect Virtual Card' },
-                    virtualCard: { stringValue: maskedCard },
-                    cardholder: { stringValue: cardholderName || 'Cardholder' },
-                  },
-                },
-              },
+              premiumUsers: { mapValue: { fields: existingPremiumUsers } },
             },
           }),
         })
