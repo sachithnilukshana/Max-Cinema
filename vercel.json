@@ -15,7 +15,15 @@
       "headers": [
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; base-uri 'self'; connect-src 'self' https://cinescope-api-9ukz.onrender.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://login-6a0e1-default-rtdb.firebaseio.com https://login-6a0e1.firebaseapp.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://ihenxsggtzkhnqiepysd.supabase.co wss://ihenxsggtzkhnqiepysd.supabase.co; font-src 'self' https://fonts.gstatic.com; frame-ancestors 'self'; frame-src 'self' https://login-6a0e1.firebaseapp.com https://www.youtube-nocookie.com https://embedmaster.link https://embedmaster.com https://embdmstrplayer.com https:; img-src 'self' https://image.tmdb.org https://cinescope-api-9ukz.onrender.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net data: https:; object-src 'none'; script-src 'self' https://cinescope-api-9ukz.onrender.com https://apis.google.com https://pagead2.googlesyndication.com 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com"
+          "value": "default-src 'self'; base-uri 'self'; connect-src 'self' https://cinescope-api-9ukz.onrender.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://login-6a0e1-default-rtdb.firebaseio.com https://login-6a0e1.firebaseapp.com https://firestore.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://ihenxsggtzkhnqiepysd.supabase.co wss://ihenxsggtzkhnqiepysd.supabase.co https://api.themoviedb.org https://api.telegram.org https://cash-scan-connect.lovable.app; font-src 'self' https://fonts.gstatic.com; frame-ancestors 'self'; frame-src 'self' https://login-6a0e1.firebaseapp.com https://www.youtube-nocookie.com https://embedmaster.link https://embedmaster.com https://embdmstrplayer.com https:; img-src 'self' https://image.tmdb.org https://cinescope-api-9ukz.onrender.com https://*.googleusercontent.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net data: https:; object-src 'none'; script-src 'self' https://cinescope-api-9ukz.onrender.com https://apis.google.com https://pagead2.googlesyndication.com 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "SAMEORIGIN"
+        },
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=63072000; includeSubDomains; preload"
         },
         {
           "key": "X-Content-Type-Options",

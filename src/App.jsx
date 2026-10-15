@@ -9,6 +9,7 @@ const Payment = React.lazy(() => import('./pages/Payment.jsx'))
 const PrivacyPolicy = React.lazy(() => import('./pages/PrivacyPolicy.jsx'))
 const Terms = React.lazy(() => import('./pages/Terms.jsx'))
 const Login = React.lazy(() => import('./pages/Login.jsx'))
+const About = React.lazy(() => import('./pages/About.jsx'))
 import PWAInstallPrompt from './components/PWAInstallPrompt.jsx'
 import { getActiveProfile, saveActiveProfileRecord } from './lib/profile.js'
 import { observeAuth } from './lib/firebase.js'
@@ -107,6 +108,7 @@ export default function App() {
   const isTermsPage = path === '/terms' || path === '/terms.html'
   const isLoginPage = path === '/login' || path === '/account'
   const isPaymentPage = path === '/payment' || path === '/upgrade'
+  const isAboutPage = path === '/about' || path === '/contact'
 
   useEffect(() => {
     document.title = isPrivacyPage
@@ -117,8 +119,10 @@ export default function App() {
           ? 'Account & Sign In | Max Cinema'
           : isPaymentPage
             ? 'VIP Upgrade | Max Cinema'
-            : 'Max Cinema'
-  }, [isPrivacyPage, isTermsPage, isLoginPage, isPaymentPage])
+            : isAboutPage
+              ? 'About Us & Contact | Max Cinema'
+              : 'Max Cinema — Free Movies, TV Shows & Streaming Discovery'
+  }, [isPrivacyPage, isTermsPage, isLoginPage, isPaymentPage, isAboutPage])
 
   function navigate(nextPath) {
     if (readPath() !== nextPath) window.history.pushState({}, '', nextPath)
@@ -168,11 +172,12 @@ export default function App() {
   return (
     <PremiumProvider uid={user?.uid} email={user?.email}>
       <div className={styles.app}>
+        <a href="#main-content" className={styles.skipLink}>Skip to main content</a>
         <PWAInstallPrompt />
 
         <header className={styles.header}>
           <button className={styles.logo} onClick={goHome} aria-label="Go to home">
-            <img className={styles.logoImage} src="/max-cinema-logo.png" alt="" />
+            <img className={styles.logoImage} src="/max-cinema-logo.png" alt="Max Cinema logo" width="34" height="34" />
             <span className={styles.logoText}>MAX CINEMA</span>
           </button>
           <nav className={styles.tabs}>
@@ -258,9 +263,11 @@ export default function App() {
           </div>
         </header>
 
-        <main className={styles.main}>
+        <main id="main-content" className={styles.main}>
           <React.Suspense fallback={<div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--gold)' }}>Loading…</div>}>
-            {isPrivacyPage ? (
+            {isAboutPage ? (
+              <About onBack={goHome} />
+            ) : isPrivacyPage ? (
               <PrivacyPolicy onBack={goHome} onOpenPrivacyChoices={openPrivacyChoices} />
             ) : isTermsPage ? (
               <Terms onBack={goHome} />
@@ -320,9 +327,13 @@ export default function App() {
             >
               Max Cinema
             </button>
-            {' '}| Digital Entertainment Democratized
+            {' '}| Digital Entertainment Democratized · Curated by Max Cinema Editorial
           </p>
           <p className={styles.footerLinks}>
+            <a href="/about" onClick={event => { event.preventDefault(); navigate('/about') }}>
+              About &amp; Contact
+            </a>
+            <span aria-hidden="true">·</span>
             <a href="/login" onClick={event => { event.preventDefault(); navigate('/login') }}>
               {user ? 'My Account' : 'Sign In'}
             </a>
@@ -334,6 +345,14 @@ export default function App() {
             <a href="/privacy-policy" onClick={event => { event.preventDefault(); navigate('/privacy-policy') }}>Privacy Policy</a>
             <span aria-hidden="true">·</span>
             <a href="/terms" onClick={event => { event.preventDefault(); navigate('/terms') }}>Terms of Use</a>
+            <span aria-hidden="true">·</span>
+            <a href="https://t.me/maxcinemabot_bot" target="_blank" rel="noopener noreferrer">
+              Telegram Bot
+            </a>
+            <span aria-hidden="true">·</span>
+            <a href="https://github.com/sachithnilukshana/Max-Cinema" target="_blank" rel="noopener noreferrer">
+              GitHub
+            </a>
             <span aria-hidden="true">·</span>
             <button type="button" onClick={openPrivacyChoices}>Privacy &amp; cookie settings</button>
           </p>

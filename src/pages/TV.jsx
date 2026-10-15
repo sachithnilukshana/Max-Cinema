@@ -31,16 +31,16 @@ export default function TV({ profile }) {
   const didRestore = useRef(false)
   const { isPremium } = usePremium()
 
-  // Load trending or restore last search
+  // Load trending (24 top TV series) or restore last search
   useEffect(() => {
     const savedQuery = hydrate('tv_query') || ''
     if (savedQuery) {
-      api.searchTV(savedQuery)
+      api.searchTV(savedQuery, 24)
         .then(d => setResults(d.results || []))
         .catch(error => setError(apiErrorMessage(error, 'TV series')))
         .finally(() => setLoading(false))
     } else {
-      api.trendingTV()
+      api.trendingTV(24)
         .then(d => setResults(d.results || []))
         .catch(error => setError(apiErrorMessage(error, 'Trending series')))
         .finally(() => setLoading(false))
@@ -170,12 +170,14 @@ export default function TV({ profile }) {
 
   return (
     <div>
-      <form className={styles.searchRow} onSubmit={search}>
+      <h1 className={styles.srOnly}>Max Cinema — Stream Top 24 TV Series & Episodes</h1>
+      <form className={styles.searchRow} onSubmit={search} role="search" aria-label="Search TV Series">
         <input
           value={query}
           onChange={e => setQuery(e.target.value)}
           placeholder="Search TV series…"
           className={styles.input}
+          aria-label="Search TV series"
         />
         <button type="submit" className={styles.btn}>Search</button>
       </form>

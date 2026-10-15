@@ -1,0 +1,19 @@
+# Max Cinema
+
+> Max Cinema is a world-class streaming discovery platform for movies, trending television series, personalized watchlists, and VIP cinema entertainment.
+
+## Core Features
+- [Movies](https://max-cinema.vercel.app/): Browse top 24 trending movies and discover titles by genre, release year, language, and audience rating.
+- [TV Series](https://max-cinema.vercel.app/): Explore top 24 trending television series with complete episode progression and season picker.
+- [Personal Watchlist](https://max-cinema.vercel.app/watchlist): Save favorite films, track viewing history, and organize queued titles.
+- [Viewing Stats](https://max-cinema.vercel.app/stats): Analyze personal viewing habits, total watch time, streaks, and favorite genres.
+- [VIP Premium](https://max-cinema.vercel.app/payment): Ad-free playback, ultra-high-definition streaming, and priority server routing.
+
+## Details & Policies
+- [About & Contact](https://max-cinema.vercel.app/about): Mission, editorial standards, content curation methodology, and support contacts.
+- [Privacy Policy](https://max-cinema.vercel.app/privacy-policy): User privacy commitment, cookie policies, and data protection practices.
+- [Terms of Use](https://max-cinema.vercel.app/terms): Terms of service, acceptable usage guidelines, and intellectual property statements.
+
+## API & Integrations
+- [Telegram Bot](https://t.me/maxcinemabot_bot): Official automated assistant (@maxcinemabot_bot) for instant recommendations and account assistance.
+- [GitHub Repository](https://github.com/sachithnilukshana/Max-Cinema): Source repository, issue tracker, and community documentation.

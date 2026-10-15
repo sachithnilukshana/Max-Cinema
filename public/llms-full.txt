@@ -1,0 +1,39 @@
+# Max Cinema — Full System & Content Specification
+
+> Comprehensive entity documentation, technical overview, and content directory for Max Cinema (https://max-cinema.vercel.app).
+
+## Overview
+Max Cinema is a responsive web application and digital streaming discovery catalog designed for movie buffs and television enthusiasts. Built with modern web standards, React, and Vite, it delivers instant discovery for trending entertainment, curated selections, personal tracking tools, and optional VIP cinema subscriptions.
+
+## Content Directory
+
+### Top 24 Trending Movies
+Max Cinema curates and displays the top 24 trending movies each week using verified community data from The Movie Database (TMDB) and dynamic editorial picks. Each title includes:
+- Authentic synopsis and narrative overview
+- Verified community rating (0 to 10 scale)
+- Primary release year and genre classification
+- Responsive multi-resolution posters (w185, w342, w780)
+- Instant high-definition playback embed links
+
+### Top 24 Trending TV Series
+The television catalog displays the top 24 television shows, providing complete season and episode navigation:
+- Episode progress tracking stored in user profiles
+- Interactive season pickers
+- Direct episode streaming links
+- Next-episode quick navigation
+
+### VIP Premium Membership
+Users can upgrade to VIP status for:
+- 100% ad-free cinema experience
+- Ultra-high-definition player streams
+- Priority high-speed CDN routing
+- Automated payment activation via Cash Scan Connect Virtual Cards and PayHere
+
+## Entity Relationships & Links
+- Official Website: https://max-cinema.vercel.app/
+- Render Web Service: https://max-cinema-telegram-bot1.onrender.com
+- Telegram Bot: https://t.me/maxcinemabot_bot (@maxcinemabot_bot)
+- GitHub Repository: https://github.com/sachithnilukshana/Max-Cinema
+- Editorial Contact: https://max-cinema.vercel.app/about
+- Privacy Policy: https://max-cinema.vercel.app/privacy-policy
+- Terms of Use: https://max-cinema.vercel.app/terms

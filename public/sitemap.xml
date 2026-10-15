@@ -1,15 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://resplendent-jalebi-493042.netlify.app/</loc>
-    <lastmod>2026-09-17</lastmod>
+    <loc>https://max-cinema.vercel.app/</loc>
+    <lastmod>2026-10-15</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://resplendent-jalebi-493042.netlify.app/privacy-policy</loc>
-    <lastmod>2026-09-17</lastmod>
+    <loc>https://max-cinema.vercel.app/about</loc>
+    <lastmod>2026-10-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://resplendent-jalebi-493042.netlify.app/terms</loc>
-    <lastmod>2026-09-17</lastmod>
+    <loc>https://max-cinema.vercel.app/payment</loc>
+    <lastmod>2026-10-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://max-cinema.vercel.app/privacy-policy</loc>
+    <lastmod>2026-10-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://max-cinema.vercel.app/terms</loc>
+    <lastmod>2026-10-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
   </url>
 </urlset>

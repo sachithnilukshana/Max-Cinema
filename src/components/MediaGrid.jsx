@@ -6,7 +6,7 @@ export default function MediaGrid({ items, type, onSelect, selectedId, loading, 
   if (loading) {
     return (
       <div className={styles.grid}>
-        {Array.from({ length: 10 }).map((_, i) => (
+        {Array.from({ length: 24 }).map((_, i) => (
           <div key={i} className={styles.skeleton}>
             <div className={styles.skeletonPoster} />
             <div className={styles.skeletonLine} />

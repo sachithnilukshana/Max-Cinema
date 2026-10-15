@@ -45,25 +45,105 @@ export function apiErrorMessage(error, title = 'Titles') {
 
 export const api = {
   // ── Trending ─────────────────────────────────────────────────────────
-  trendingMovies: () => tmdbFetch('/trending/movie/week'),
-  trendingTV:     () => tmdbFetch('/trending/tv/week'),
+  trendingMovies: async (limit = 24) => {
+    const page1 = await tmdbFetch(`/trending/movie/week${q({ page: 1 })}`)
+    if (limit <= (page1.results?.length || 0)) return page1
+    try {
+      const page2 = await tmdbFetch(`/trending/movie/week${q({ page: 2 })}`)
+      const combined = [...(page1.results || []), ...(page2.results || [])].slice(0, limit)
+      return { ...page1, results: combined }
+    } catch {
+      return page1
+    }
+  },
+  trendingTV: async (limit = 24) => {
+    const page1 = await tmdbFetch(`/trending/tv/week${q({ page: 1 })}`)
+    if (limit <= (page1.results?.length || 0)) return page1
+    try {
+      const page2 = await tmdbFetch(`/trending/tv/week${q({ page: 2 })}`)
+      const combined = [...(page1.results || []), ...(page2.results || [])].slice(0, limit)
+      return { ...page1, results: combined }
+    } catch {
+      return page1
+    }
+  },
 
   // ── Top Rated ────────────────────────────────────────────────────────
-  topRatedMovies: (page = 1) => tmdbFetch(`/movie/top_rated${q({ page })}`),
-  topRatedTV:     (page = 1) => tmdbFetch(`/tv/top_rated${q({ page })}`),
+  topRatedMovies: async (page = 1, limit = 24) => {
+    const page1 = await tmdbFetch(`/movie/top_rated${q({ page })}`)
+    if (limit <= (page1.results?.length || 0)) return page1
+    try {
+      const page2 = await tmdbFetch(`/movie/top_rated${q({ page: page + 1 })}`)
+      const combined = [...(page1.results || []), ...(page2.results || [])].slice(0, limit)
+      return { ...page1, results: combined }
+    } catch {
+      return page1
+    }
+  },
+  topRatedTV: async (page = 1, limit = 24) => {
+    const page1 = await tmdbFetch(`/tv/top_rated${q({ page })}`)
+    if (limit <= (page1.results?.length || 0)) return page1
+    try {
+      const page2 = await tmdbFetch(`/tv/top_rated${q({ page: page + 1 })}`)
+      const combined = [...(page1.results || []), ...(page2.results || [])].slice(0, limit)
+      return { ...page1, results: combined }
+    } catch {
+      return page1
+    }
+  },
 
   // ── Popular ──────────────────────────────────────────────────────────
-  popularMovies: (page = 1) => tmdbFetch(`/movie/popular${q({ page })}`),
-  popularTV:     (page = 1) => tmdbFetch(`/tv/popular${q({ page })}`),
+  popularMovies: async (page = 1, limit = 24) => {
+    const page1 = await tmdbFetch(`/movie/popular${q({ page })}`)
+    if (limit <= (page1.results?.length || 0)) return page1
+    try {
+      const page2 = await tmdbFetch(`/movie/popular${q({ page: page + 1 })}`)
+      const combined = [...(page1.results || []), ...(page2.results || [])].slice(0, limit)
+      return { ...page1, results: combined }
+    } catch {
+      return page1
+    }
+  },
+  popularTV: async (page = 1, limit = 24) => {
+    const page1 = await tmdbFetch(`/tv/popular${q({ page })}`)
+    if (limit <= (page1.results?.length || 0)) return page1
+    try {
+      const page2 = await tmdbFetch(`/tv/popular${q({ page: page + 1 })}`)
+      const combined = [...(page1.results || []), ...(page2.results || [])].slice(0, limit)
+      return { ...page1, results: combined }
+    } catch {
+      return page1
+    }
+  },
 
   // ── Search ───────────────────────────────────────────────────────────
-  searchMovies: (query) => tmdbFetch(`/search/movie${q({ query })}`),
-  searchTV:     (query) => tmdbFetch(`/search/tv${q({ query })}`),
+  searchMovies: async (query, limit = 24) => {
+    const page1 = await tmdbFetch(`/search/movie${q({ query, page: 1 })}`)
+    if (limit <= (page1.results?.length || 0)) return page1
+    try {
+      const page2 = await tmdbFetch(`/search/movie${q({ query, page: 2 })}`)
+      const combined = [...(page1.results || []), ...(page2.results || [])].slice(0, limit)
+      return { ...page1, results: combined }
+    } catch {
+      return page1
+    }
+  },
+  searchTV: async (query, limit = 24) => {
+    const page1 = await tmdbFetch(`/search/tv${q({ query, page: 1 })}`)
+    if (limit <= (page1.results?.length || 0)) return page1
+    try {
+      const page2 = await tmdbFetch(`/search/tv${q({ query, page: 2 })}`)
+      const combined = [...(page1.results || []), ...(page2.results || [])].slice(0, limit)
+      return { ...page1, results: combined }
+    } catch {
+      return page1
+    }
+  },
 
   // ── Discover (filtered browsing) ─────────────────────────────────────
-  discoverMovies: ({
+  discoverMovies: async ({
     language, genre, sortBy = 'popularity.desc', year,
-    minRating, page = 1, keywords,
+    minRating, page = 1, keywords, limit = 24,
   } = {}) => {
     const params = {
       sort_by: sortBy,
@@ -75,12 +155,20 @@ export const api = {
       'vote_count.gte': minRating ? 100 : undefined,
       with_keywords: keywords || undefined,
     }
-    return tmdbFetch(`/discover/movie${q(params)}`)
+    const page1 = await tmdbFetch(`/discover/movie${q(params)}`)
+    if (limit <= (page1.results?.length || 0)) return page1
+    try {
+      const page2 = await tmdbFetch(`/discover/movie${q({ ...params, page: page + 1 })}`)
+      const combined = [...(page1.results || []), ...(page2.results || [])].slice(0, limit)
+      return { ...page1, results: combined }
+    } catch {
+      return page1
+    }
   },
 
-  discoverTV: ({
+  discoverTV: async ({
     language, genre, sortBy = 'popularity.desc', year,
-    minRating, page = 1, keywords,
+    minRating, page = 1, keywords, limit = 24,
   } = {}) => {
     const params = {
       sort_by: sortBy,
@@ -92,7 +180,15 @@ export const api = {
       'vote_count.gte': minRating ? 100 : undefined,
       with_keywords: keywords || undefined,
     }
-    return tmdbFetch(`/discover/tv${q(params)}`)
+    const page1 = await tmdbFetch(`/discover/tv${q(params)}`)
+    if (limit <= (page1.results?.length || 0)) return page1
+    try {
+      const page2 = await tmdbFetch(`/discover/tv${q({ ...params, page: page + 1 })}`)
+      const combined = [...(page1.results || []), ...(page2.results || [])].slice(0, limit)
+      return { ...page1, results: combined }
+    } catch {
+      return page1
+    }
   },
 
   // ── Details ──────────────────────────────────────────────────────────

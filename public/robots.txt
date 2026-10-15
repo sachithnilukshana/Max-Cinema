@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://resplendent-jalebi-493042.netlify.app/sitemap.xml
+Sitemap: https://max-cinema.vercel.app/sitemap.xml

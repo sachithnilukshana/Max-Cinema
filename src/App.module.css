@@ -4,6 +4,24 @@
   min-height: 100vh;
 }
 
+.skipLink {
+  position: absolute;
+  top: -100px;
+  left: 1rem;
+  background: var(--gold);
+  color: #0a0a0a;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 700;
+  z-index: 10000;
+  text-decoration: none;
+  transition: top 0.2s;
+}
+
+.skipLink:focus {
+  top: 1rem;
+}
+
 .header {
   position: sticky;
   top: 0;

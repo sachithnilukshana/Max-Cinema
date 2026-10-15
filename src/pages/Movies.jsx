@@ -70,32 +70,42 @@ export default function Movies({ profile, adminConfig }) {
       })
       .catch(() => {})
 
-    // 3. Search or Trending
+    // 3. Search or Trending (loads 24 top movies)
     if (savedQuery) {
-      api.searchMovies(savedQuery)
+      api.searchMovies(savedQuery, 24)
         .then(d => setResults(d.results || []))
         .catch(error => setError(apiErrorMessage(error, 'Movies')))
         .finally(() => setLoading(false))
     } else {
-      // First try CineScope trending
+      // First try CineScope trending, backfill to 24 with TMDB
       cinescopeApi.getTrending()
-        .then(data => {
+        .then(async data => {
+          let list = []
           if (Array.isArray(data) && data.length > 0) {
-            const normalized = data.map(normalizeCinescopeItem).filter(Boolean)
-            setApiTrending(normalized)
-            setResults(normalized)
-            setLoading(false)
-          } else {
-            // Fallback to TMDB trending
-            return api.trendingMovies()
-              .then(d => setResults(d.results || []))
-              .catch(error => setError(apiErrorMessage(error, 'Trending movies')))
-              .finally(() => setLoading(false))
+            list = data.map(normalizeCinescopeItem).filter(Boolean)
           }
+          if (list.length < 24) {
+            try {
+              const tmdb = await api.trendingMovies(24)
+              const tmdbList = tmdb.results || []
+              const seen = new Set(list.map(x => x.id || x.tmdbId))
+              for (const item of tmdbList) {
+                if (!seen.has(item.id)) {
+                  list.push(item)
+                  seen.add(item.id)
+                }
+                if (list.length >= 24) break
+              }
+            } catch {}
+          }
+          const final24 = list.slice(0, 24)
+          setApiTrending(final24)
+          setResults(final24)
+          setLoading(false)
         })
         .catch(() => {
-          // Fallback to TMDB trending
-          api.trendingMovies()
+          // Fallback to TMDB trending (24 items)
+          api.trendingMovies(24)
             .then(d => setResults(d.results || []))
             .catch(error => setError(apiErrorMessage(error, 'Trending movies')))
             .finally(() => setLoading(false))
@@ -216,12 +226,14 @@ export default function Movies({ profile, adminConfig }) {
 
   return (
     <div>
-      <form className={styles.searchRow} onSubmit={search}>
+      <h1 className={styles.srOnly}>Max Cinema — Stream Top 24 Movies & Discover New Releases</h1>
+      <form className={styles.searchRow} onSubmit={search} role="search" aria-label="Search Movies">
         <input
           value={query}
           onChange={e => setQuery(e.target.value)}
           placeholder="Search movies…"
           className={styles.input}
+          aria-label="Search movies"
         />
         <button type="submit" className={styles.btn}>Search</button>
       </form>
@@ -317,7 +329,7 @@ export default function Movies({ profile, adminConfig }) {
             setResults(apiTrending)
             setLoading(false)
           } else {
-            api.trendingMovies()
+            api.trendingMovies(24)
               .then(data => setResults(data.results || []))
               .catch(error => setError(apiErrorMessage(error, 'Trending movies')))
               .finally(() => setLoading(false))
