@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react'
-import Movies from './pages/Movies.jsx'
-import TV from './pages/TV.jsx'
-import WatchHistory from './pages/WatchHistory.jsx'
-import Watchlist from './pages/Watchlist.jsx'
-import Stats from './pages/Stats.jsx'
+const Movies = React.lazy(() => import('./pages/Movies.jsx'))
+const TV = React.lazy(() => import('./pages/TV.jsx'))
+const WatchHistory = React.lazy(() => import('./pages/WatchHistory.jsx'))
+const Watchlist = React.lazy(() => import('./pages/Watchlist.jsx'))
+const Stats = React.lazy(() => import('./pages/Stats.jsx'))
 const WatchParty = React.lazy(() => import('./pages/WatchParty.jsx'))
-import Payment from './pages/Payment.jsx'
-import PrivacyPolicy from './pages/PrivacyPolicy.jsx'
-import Terms from './pages/Terms.jsx'
-import Login from './pages/Login.jsx'
+const Payment = React.lazy(() => import('./pages/Payment.jsx'))
+const PrivacyPolicy = React.lazy(() => import('./pages/PrivacyPolicy.jsx'))
+const Terms = React.lazy(() => import('./pages/Terms.jsx'))
+const Login = React.lazy(() => import('./pages/Login.jsx'))
 import PWAInstallPrompt from './components/PWAInstallPrompt.jsx'
 import { getActiveProfile, saveActiveProfileRecord } from './lib/profile.js'
 import { observeAuth } from './lib/firebase.js'
@@ -259,53 +259,55 @@ export default function App() {
         </header>
 
         <main className={styles.main}>
-          {isPrivacyPage ? (
-            <PrivacyPolicy onBack={goHome} onOpenPrivacyChoices={openPrivacyChoices} />
-          ) : isTermsPage ? (
-            <Terms onBack={goHome} />
-          ) : isLoginPage ? (
-            <Login
-              user={user}
-              onBack={goHome}
-              onBrowseMovies={() => goTab('movies')}
-              onBrowseHistory={() => goTab('history')}
-            />
-          ) : isPaymentPage || tab === 'payment' ? (
-            <Payment user={user} onBack={goHome} />
-          ) : tab === 'watchlist' ? (
-            <Watchlist profile={profile} onBrowse={() => goTab('movies')} onSelect={() => goTab('movies')} />
-          ) : tab === 'stats' ? (
-            <Stats profile={profile} user={user} />
-          ) : tab === 'party' ? (
-            <div style={{ textAlign: 'center', padding: '5rem 1.5rem', maxWidth: '540px', margin: '0 auto' }}>
-              <div style={{ fontSize: '3.5rem', marginBottom: '1rem' }}>🍿</div>
-              <h2 style={{ color: 'var(--gold)', fontFamily: 'var(--font-heading)', marginBottom: '0.8rem' }}>Watch Party Temporarily Paused</h2>
-              <p style={{ color: 'var(--text-muted)', marginBottom: '1.8rem', lineHeight: 1.6 }}>
-                Watch Party is temporarily undergoing scheduled maintenance and performance upgrades. We'll be back shortly!
-              </p>
-              <button
-                type="button"
-                onClick={goHome}
-                style={{
-                  background: 'var(--gold)',
-                  color: '#000',
-                  fontWeight: 600,
-                  border: 'none',
-                  borderRadius: '6px',
-                  padding: '10px 22px',
-                  cursor: 'pointer'
-                }}
-              >
-                Back to Movies
-              </button>
-            </div>
-          ) : (
-            <>
-              {tab === 'movies' && <Movies key={homeKey} profile={profile} />}
-              {tab === 'tv' && <TV profile={profile} />}
-              {tab === 'history' && <WatchHistory profile={profile} onBrowse={() => goTab('movies')} />}
-            </>
-          )}
+          <React.Suspense fallback={<div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--gold)' }}>Loading…</div>}>
+            {isPrivacyPage ? (
+              <PrivacyPolicy onBack={goHome} onOpenPrivacyChoices={openPrivacyChoices} />
+            ) : isTermsPage ? (
+              <Terms onBack={goHome} />
+            ) : isLoginPage ? (
+              <Login
+                user={user}
+                onBack={goHome}
+                onBrowseMovies={() => goTab('movies')}
+                onBrowseHistory={() => goTab('history')}
+              />
+            ) : isPaymentPage || tab === 'payment' ? (
+              <Payment user={user} onBack={goHome} />
+            ) : tab === 'watchlist' ? (
+              <Watchlist profile={profile} onBrowse={() => goTab('movies')} onSelect={() => goTab('movies')} />
+            ) : tab === 'stats' ? (
+              <Stats profile={profile} user={user} />
+            ) : tab === 'party' ? (
+              <div style={{ textAlign: 'center', padding: '5rem 1.5rem', maxWidth: '540px', margin: '0 auto' }}>
+                <div style={{ fontSize: '3.5rem', marginBottom: '1rem' }}>🍿</div>
+                <h2 style={{ color: 'var(--gold)', fontFamily: 'var(--font-heading)', marginBottom: '0.8rem' }}>Watch Party Temporarily Paused</h2>
+                <p style={{ color: 'var(--text-muted)', marginBottom: '1.8rem', lineHeight: 1.6 }}>
+                  Watch Party is temporarily undergoing scheduled maintenance and performance upgrades. We'll be back shortly!
+                </p>
+                <button
+                  type="button"
+                  onClick={goHome}
+                  style={{
+                    background: 'var(--gold)',
+                    color: '#000',
+                    fontWeight: 600,
+                    border: 'none',
+                    borderRadius: '6px',
+                    padding: '10px 22px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Back to Movies
+                </button>
+              </div>
+            ) : (
+              <>
+                {tab === 'movies' && <Movies key={homeKey} profile={profile} />}
+                {tab === 'tv' && <TV profile={profile} />}
+                {tab === 'history' && <WatchHistory profile={profile} onBrowse={() => goTab('movies')} />}
+              </>
+            )}
+          </React.Suspense>
         </main>
 
         <footer className={styles.footer}>

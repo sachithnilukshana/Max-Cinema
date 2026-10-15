@@ -40,9 +40,20 @@ async function getAdminToken() {
 
 export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store, no-cache')
-  res.setHeader('Access-Control-Allow-Origin', '*')
+  const origin = req.headers?.origin || ''
+  const allowedOrigins = [
+    'https://max-cinema-telegram-bot1.onrender.com',
+    'https://max-cinema.vercel.app',
+    'http://localhost:5173',
+    'http://localhost:8787',
+    'http://127.0.0.1:5173',
+    'http://127.0.0.1:8787',
+  ]
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin)
+  }
 
-  if (req.method === 'OPTIONS') return res.status(200).end()
+  if (req.method === 'OPTIONS') return res.status(204).end()
 
   const uid = String(req.query?.uid || '').trim()
   if (!uid || uid.length < 10) {
