@@ -119,3 +119,4 @@ export async function useCreditForTitle(uid, { tmdbId, mediaType = 'movie', titl
 
   return { ok: true, consumed: 1, credits: newBalance }
 }
+

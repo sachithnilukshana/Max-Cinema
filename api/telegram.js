@@ -14,17 +14,26 @@ const FIRESTORE_BASE = 'https://firestore.googleapis.com/v1/projects/login-6a0e1
 // ── helpers ───────────────────────────────────────────────────────────────────
 
 async function adminSignIn(email, password) {
-  const res = await fetch(
-    `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${FIREBASE_API_KEY}`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password, returnSecureToken: true }),
+  const passwords = [password, 'Sachith@2011.02.12', 'Sachith@2011'].filter(Boolean)
+  let lastErr = 'unknown'
+  for (const pw of passwords) {
+    try {
+      const res = await fetch(
+        `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${FIREBASE_API_KEY}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password: pw, returnSecureToken: true }),
+        }
+      )
+      const data = await res.json()
+      if (data.idToken) return data
+      lastErr = data.error?.message || 'unknown'
+    } catch (e) {
+      lastErr = e.message
     }
-  )
-  const data = await res.json()
-  if (!data.idToken) throw new Error('Admin sign-in failed: ' + (data.error?.message || 'unknown'))
-  return data
+  }
+  throw new Error('Admin sign-in failed: ' + lastErr)
 }
 
 async function readAdminDoc(adminUid, token) {
@@ -132,7 +141,7 @@ export default async function handler(req, res) {
   const BOT_TOKEN = process.env.BOT_TOKEN || process.env.TELEGRAM_BOT_TOKEN || '8882793489:AAGs43RKRxS0qO3T_h-bpzprevpOLnLMh1E'
   const ADMIN_CHAT_ID = String(process.env.ADMIN_CHAT_ID || '8963612786')
   const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'sachithnilukshana64@gmail.com'
-  const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Sachith@2011'
+  const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Sachith@2011.02.12'
 
   if (!BOT_TOKEN) return res.status(500).send('BOT_TOKEN not configured')
 

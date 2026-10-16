@@ -18,21 +18,31 @@ async function getAdminToken() {
   }
 
   const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'sachithnilukshana64@gmail.com'
-  const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Sachith@2011'
+  const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Sachith@2011.02.12'
+  const passwords = [ADMIN_PASSWORD, 'Sachith@2011.02.12', 'Sachith@2011'].filter(Boolean)
 
-  const res = await fetch(
-    `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${FIREBASE_API_KEY}`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: ADMIN_EMAIL, password: ADMIN_PASSWORD, returnSecureToken: true }),
-    }
-  )
-  const data = await res.json()
-  if (!data.idToken) throw new Error('Admin auth failed')
+  let authData = null
+  for (const pw of passwords) {
+    try {
+      const res = await fetch(
+        `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${FIREBASE_API_KEY}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: ADMIN_EMAIL, password: pw, returnSecureToken: true }),
+        }
+      )
+      const data = await res.json()
+      if (data.idToken) {
+        authData = data
+        break
+      }
+    } catch {}
+  }
+  if (!authData?.idToken) throw new Error('Admin auth failed')
 
-  _cachedAdminToken = data.idToken
-  _cachedAdminUid = data.localId
+  _cachedAdminToken = authData.idToken
+  _cachedAdminUid = authData.localId
   _tokenExpiry = Date.now() + 55 * 60 * 1000 // 55 minutes
 
   return { token: data.idToken, uid: data.localId }
