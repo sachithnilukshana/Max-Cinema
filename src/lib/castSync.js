@@ -1,10 +1,7 @@
 // ── Fire TV & Smart TV Real-Time Cast Sync ─────────────────────────────────
-// Connects phone/laptop directly to Fire TV via Firebase Realtime Database
-import { db } from './firebase.js'
-import { ref, set, get, onValue, update, remove, onDisconnect } from 'firebase/database'
+// Zero-permission, bulletproof sync using /api/cast backend endpoint
 
 const STORAGE_KEY = 'cs_active_cast_code'
-const RTDB_PREFIX = 'cast_sessions'
 
 function notifyCastChange(detail) {
   try {
@@ -30,63 +27,66 @@ export function isCastConnected() {
 
 /**
  * Receiver (Fire TV) side session creator.
- * Sets up the 6-digit room on Firebase and listens for incoming media commands.
+ * Registers code with /api/cast and continuously polls for incoming media commands.
  */
 export function createReceiverSession(code, { onMediaChange, onCommand, onStatusChange } = {}) {
-  if (!db) {
-    console.warn('Firebase RTDB not initialized')
-    return () => {}
+  let isMounted = true
+  let mediaSeq = 0
+  let cmdSeq = 0
+  let pollTimer = null
+
+  // 1. Register room
+  fetch('/api/cast', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'create', code }),
+  })
+    .then(res => res.json())
+    .then(() => {
+      if (!isMounted) return
+      startPolling()
+    })
+    .catch(err => {
+      console.warn('[castSync] Could not register session:', err)
+      if (isMounted) startPolling()
+    })
+
+  function startPolling() {
+    if (!isMounted) return
+
+    const poll = async () => {
+      if (!isMounted) return
+      try {
+        const res = await fetch(`/api/cast?action=poll&code=${code}&mediaSeq=${mediaSeq}&cmdSeq=${cmdSeq}`)
+        if (res.ok) {
+          const data = await res.json()
+          if (!isMounted) return
+
+          onStatusChange?.({ active: true, connectedSender: Boolean(data.senderConnected) })
+
+          if (data.media) {
+            mediaSeq = data.mediaSeq
+            onMediaChange?.(data.media)
+          }
+
+          if (data.command) {
+            cmdSeq = data.cmdSeq
+            onCommand?.(data.command)
+          }
+        }
+      } catch {}
+
+      if (isMounted) {
+        pollTimer = setTimeout(poll, 1400)
+      }
+    }
+
+    poll()
   }
 
-  const sessionRef = ref(db, `${RTDB_PREFIX}/${code}`)
-
-  // Register session with TV metadata
-  set(sessionRef, {
-    tvActive: true,
-    createdAt: Date.now(),
-    lastSeen: Date.now(),
-    device: 'Fire TV / Smart TV',
-    media: null,
-    command: null,
-  }).catch(err => console.warn('Could not register TV session in RTDB:', err))
-
-  // Clean up if TV disconnects
-  try {
-    onDisconnect(sessionRef).remove()
-  } catch {}
-
-  // Heartbeat every 20s
-  const heartbeat = setInterval(() => {
-    update(sessionRef, { lastSeen: Date.now() }).catch(() => {})
-  }, 20000)
-
-  let previousMediaTime = 0
-  let previousCmdTime = 0
-
-  const unsubscribe = onValue(sessionRef, snapshot => {
-    if (!snapshot.exists()) {
-      onStatusChange?.({ active: false })
-      return
-    }
-
-    const data = snapshot.val()
-    onStatusChange?.({ active: true, connectedSender: Boolean(data.senderActive) })
-
-    if (data.media && data.media.timestamp !== previousMediaTime) {
-      previousMediaTime = data.media.timestamp
-      onMediaChange?.(data.media)
-    }
-
-    if (data.command && data.command.timestamp !== previousCmdTime) {
-      previousCmdTime = data.command.timestamp
-      onCommand?.(data.command)
-    }
-  })
-
   return () => {
-    clearInterval(heartbeat)
-    unsubscribe()
-    remove(sessionRef).catch(() => {})
+    isMounted = false
+    if (pollTimer) clearTimeout(pollTimer)
   }
 }
 
@@ -99,26 +99,21 @@ export async function connectToReceiver(rawCode) {
     throw new Error('Please enter a valid 6-digit code shown on your Fire TV screen.')
   }
 
-  if (!db) {
-    // Local fallback for offline testing
-    localStorage.setItem(STORAGE_KEY, code)
-    notifyCastChange({ connected: true, code })
-    return { success: true, code }
-  }
-
-  const sessionRef = ref(db, `${RTDB_PREFIX}/${code}`)
-  const snapshot = await get(sessionRef)
-
-  if (!snapshot.exists()) {
-    throw new Error('Fire TV session not found. Make sure https://max-cinema.vercel.app/firetv is open on your Fire TV.')
-  }
-
-  await update(sessionRef, {
-    senderActive: true,
-    senderConnectedAt: Date.now(),
+  const res = await fetch('/api/cast', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'connect', code }),
   })
 
-  localStorage.setItem(STORAGE_KEY, code)
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}))
+    throw new Error(data.error || 'Fire TV session not found. Make sure max-cinema.vercel.app/firetv is open on your Fire TV.')
+  }
+
+  try {
+    localStorage.setItem(STORAGE_KEY, code)
+  } catch {}
+
   notifyCastChange({ connected: true, code })
   return { success: true, code }
 }
@@ -128,12 +123,6 @@ export async function connectToReceiver(rawCode) {
  */
 export async function disconnectCast() {
   const code = getActiveCastCode()
-  if (code && db) {
-    try {
-      const sessionRef = ref(db, `${RTDB_PREFIX}/${code}`)
-      await update(sessionRef, { senderActive: false })
-    } catch {}
-  }
   try {
     localStorage.removeItem(STORAGE_KEY)
   } catch {}
@@ -159,28 +148,35 @@ export async function castMediaToReceiver(item) {
     timestamp: Date.now(),
   }
 
-  if (db) {
-    const sessionRef = ref(db, `${RTDB_PREFIX}/${code}`)
-    await update(sessionRef, {
-      media: mediaPayload,
-      command: { type: 'play', timestamp: Date.now() },
+  try {
+    const res = await fetch('/api/cast', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'send', code, media: mediaPayload }),
     })
+    if (!res.ok) return false
+    notifyCastChange({ connected: true, code, media: mediaPayload })
+    return true
+  } catch {
+    return false
   }
-
-  notifyCastChange({ connected: true, code, media: mediaPayload })
-  return true
 }
 
 /**
  * Send playback command to Fire TV (e.g. 'pause', 'play', 'stop').
  */
-export async function sendCastCommand(type) {
+export async function sendCastCommand(command) {
   const code = getActiveCastCode()
-  if (!code || !db) return false
+  if (!code) return false
 
-  const sessionRef = ref(db, `${RTDB_PREFIX}/${code}`)
-  await update(sessionRef, {
-    command: { type, timestamp: Date.now() },
-  })
-  return true
+  try {
+    await fetch('/api/cast', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'command', code, command }),
+    })
+    return true
+  } catch {
+    return false
+  }
 }

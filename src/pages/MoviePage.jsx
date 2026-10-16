@@ -14,7 +14,7 @@ export default function MoviePage({ tmdbId, profile, onBack, onSelectMovie, onSe
   const [movie, setMovie] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const { isPremium } = usePremium()
+  const { isPremium, isUnlocked } = usePremium()
 
   useEffect(() => {
     if (!tmdbId) return
@@ -84,7 +84,7 @@ export default function MoviePage({ tmdbId, profile, onBack, onSelectMovie, onSe
 
   const year = getYear(movie.release_date)
   const rating = formatRating(movie.vote_average)
-  const embedUrl = movieEmbedUrl(tmdbId, isPremium)
+  const embedUrl = movieEmbedUrl(tmdbId, isPremium || isUnlocked(tmdbId))
   const movieItem = { ...movie, media_type: 'movie' }
 
   return (

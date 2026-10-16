@@ -255,3 +255,42 @@
   color: var(--gold, #c8a96e);
   font-weight: 600;
 }
+
+.fireTvHelpBanner {
+  background: rgba(200, 169, 110, 0.08);
+  border: 1px solid rgba(200, 169, 110, 0.25);
+  border-radius: 10px;
+  padding: 0.9rem;
+  margin-bottom: 1.25rem;
+  font-size: 0.83rem;
+  line-height: 1.5;
+  color: #ddd;
+}
+
+.fireTvHelpBanner strong {
+  color: var(--gold, #c8a96e);
+}
+
+.fireTvHelpBanner p {
+  margin: 0.35rem 0 0.5rem;
+  color: #bbb;
+}
+
+.fireTvHelpBanner ul {
+  margin: 0;
+  padding-left: 1.15rem;
+}
+
+.fireTvHelpBanner li {
+  margin-bottom: 0.35rem;
+}
+
+.urlPill {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(200, 169, 110, 0.35);
+  padding: 1px 6px;
+  border-radius: 4px;
+  color: var(--gold, #c8a96e);
+  font-family: monospace;
+}
+

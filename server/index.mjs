@@ -8,6 +8,8 @@ import virtualCardPayHandler from '../api/virtual-card-pay.js'
 import reportHandler from '../api/report.js'
 import recordReferralHandler from '../api/record-referral.js'
 import payhereNotifyHandler from '../api/payhere-notify.js'
+import castHandler from '../api/cast.js'
+import useCreditHandler from '../api/use-credit.js'
 
 const rootDir = fileURLToPath(new URL('..', import.meta.url))
 
@@ -305,6 +307,10 @@ const server = createServer((request, response) => {
     runHandler(recordReferralHandler, request, response, requestUrl)
   } else if (requestUrl.pathname === '/api/payhere-notify') {
     runHandler(payhereNotifyHandler, request, response, requestUrl)
+  } else if (requestUrl.pathname === '/api/cast') {
+    runHandler(castHandler, request, response, requestUrl)
+  } else if (requestUrl.pathname === '/api/use-credit') {
+    runHandler(useCreditHandler, request, response, requestUrl)
   } else if (requestUrl.pathname.startsWith('/api/')) {
     send(response, 404, 'API endpoint not found.')
   } else {

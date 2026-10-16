@@ -19,7 +19,7 @@ import { isCastConnected, connectToReceiver } from './lib/castSync.js'
 import { getActiveProfile, saveActiveProfileRecord } from './lib/profile.js'
 import { observeAuth } from './lib/firebase.js'
 import { trackSearch } from './lib/cinescopeApi.js'
-import { PremiumProvider } from './lib/PremiumContext.jsx'
+import { PremiumProvider, usePremium } from './lib/PremiumContext.jsx'
 import { parseDeepLink } from './lib/deepLinks.js'
 import { getRefCodeFromUrl, recordReferral } from './lib/referral.js'
 import styles from './App.module.css'
@@ -33,6 +33,19 @@ function readSession(key) { try { return sessionStorage.getItem(key) } catch { r
 function writeSession(key, value) { try { sessionStorage.setItem(key, value) } catch {} }
 function readTheme() { try { return localStorage.getItem('cs_theme') || 'dark' } catch { return 'dark' } }
 function readPath() { return window.location.pathname.replace(/\/+$/, '') || '/' }
+function HeaderCredits({ onOpenVip }) {
+  const { isPremium, credits } = usePremium()
+  return (
+    <button
+      type="button"
+      className={isPremium ? styles.headerVipPill : styles.headerCreditPill}
+      onClick={onOpenVip}
+      title={isPremium ? 'VIP Active — Unlimited Ad-Free Streaming' : `You have ${credits} VIP credit(s). Click to view VIP options.`}
+    >
+      {isPremium ? '👑 VIP' : `🎟️ ${credits} Credit${credits === 1 ? '' : 's'}`}
+    </button>
+  )
+}
 
 export default function App() {
   const [tab, setTab] = useState(() => {
@@ -259,6 +272,7 @@ export default function App() {
             </button>
           </nav>
           <div className={styles.headerRight}>
+            <HeaderCredits onOpenVip={() => navigate('/payment')} />
             <button
               type="button"
               className={styles.searchTrigger}

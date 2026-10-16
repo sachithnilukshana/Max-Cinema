@@ -174,3 +174,4 @@ export default function FireTVReceiver() {
 function stepItemClass(styles) {
   return styles.stepItem
 }
+

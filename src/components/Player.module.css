@@ -426,3 +426,108 @@
   font-size: 14px;
   padding: 20px 0;
 }
+
+.vipActiveBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: linear-gradient(90deg, rgba(200, 169, 110, 0.15), rgba(20, 20, 20, 0.6));
+  border: 1px solid rgba(200, 169, 110, 0.4);
+  border-radius: 8px;
+  padding: 8px 14px;
+  margin: 10px 0;
+  font-size: 0.85rem;
+  color: var(--gold, #c8a96e);
+  font-weight: 500;
+}
+
+.vipTag {
+  background: var(--gold, #c8a96e);
+  color: #000;
+  font-weight: 700;
+  font-size: 0.72rem;
+  padding: 2px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.creditOfferBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: #151515;
+  border: 1px solid #2e281b;
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin: 10px 0;
+  flex-wrap: wrap;
+}
+
+.creditOfferLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.creditBadge {
+  background: rgba(200, 169, 110, 0.16);
+  color: var(--gold, #c8a96e);
+  border: 1px solid rgba(200, 169, 110, 0.35);
+  font-weight: 600;
+  font-size: 0.8rem;
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+.creditOfferText {
+  color: #bbb;
+  font-size: 0.84rem;
+}
+
+.redeemCreditBtn {
+  background: linear-gradient(135deg, #c8a96e, #dfc08a);
+  color: #0d0d0d;
+  font-weight: 600;
+  font-size: 0.82rem;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+  white-space: nowrap;
+}
+
+.redeemCreditBtn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(200, 169, 110, 0.3);
+}
+
+.redeemCreditBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.getCreditBtn {
+  color: var(--gold, #c8a96e);
+  border: 1px solid rgba(200, 169, 110, 0.4);
+  font-size: 0.8rem;
+  padding: 4px 10px;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+
+.getCreditBtn:hover {
+  background: rgba(200, 169, 110, 0.15);
+}
+
+.creditSuccessMsg {
+  color: #00ff88;
+  font-size: 0.85rem;
+  margin: 6px 0;
+  font-weight: 500;
+}

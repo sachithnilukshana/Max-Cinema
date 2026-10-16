@@ -29,7 +29,7 @@ export default function TVShowPage({
   const [episode, setEpisode] = useState(initialEpisode || 1)
   const [isPlaying, setIsPlaying] = useState(true)
   const [episodeProgress, setEpisodeProgress] = useState({})
-  const { isPremium } = usePremium()
+  const { isPremium, isUnlocked } = usePremium()
   const playerAnchorRef = useRef(null)
 
   useEffect(() => {
@@ -165,7 +165,7 @@ export default function TVShowPage({
 
   const year = getYear(show.first_air_date)
   const rating = formatRating(show.vote_average)
-  const embedUrl = tvEmbedUrl(tmdbId, season, episode, isPremium)
+  const embedUrl = tvEmbedUrl(tmdbId, season, episode, isPremium || isUnlocked(tmdbId))
   const currentItem = { ...show, media_type: 'tv', season, episode }
 
   return (

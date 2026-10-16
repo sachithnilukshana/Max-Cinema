@@ -244,7 +244,7 @@ export function observePremiumStatus(uid, callback) {
   }
   window.addEventListener('Max Cinema:premiumchange', onLocalChange)
 
-  // 3. Check server-side status (captures Telegram bot grants)
+  // 3. Check server-side status (captures Telegram bot grants and credits)
   fetch(`/api/check-premium?uid=${encodeURIComponent(uid)}`)
     .then(r => r.json())
     .then(status => {
@@ -254,8 +254,13 @@ export function observePremiumStatus(uid, callback) {
           plan: status.plan || 'monthly',
           expiresAt: status.expiresAt || null,
         })
-        callback({ active: true, plan: status.plan || 'monthly', expiresAt: status.expiresAt || null })
       }
+      callback({
+        active: Boolean(status.active),
+        plan: status.plan || 'monthly',
+        expiresAt: status.expiresAt || null,
+        credits: typeof status.credits === 'number' ? status.credits : undefined,
+      })
     })
     .catch(() => {}) // Fail silently — localStorage is the fallback
 

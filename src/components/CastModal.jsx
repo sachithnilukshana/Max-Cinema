@@ -141,6 +141,17 @@ export default function CastModal({ isOpen, onClose, currentMedia }) {
         </div>
 
         <div className={styles.body}>
+          <div className={styles.fireTvHelpBanner}>
+            <strong>💡 Seeing &quot;Available for specific video sites&quot; in Chrome?</strong>
+            <p>
+              Amazon Fire TV restricts direct Chrome tab casting. Connect Max Cinema to your TV instantly:
+            </p>
+            <ul>
+              <li><strong>Method 1:</strong> Open <em>Silk Browser</em> on Fire TV &rarr; go to <span className={styles.urlPill}>max-cinema.vercel.app/firetv</span> &rarr; enter code below.</li>
+              <li><strong>Method 2:</strong> Install free <em>AirScreen</em> app on your Fire TV from Amazon Appstore to enable native Chrome tab casting!</li>
+            </ul>
+          </div>
+
           {tab === 'firetv' && (
             <div>
               {connectedCode ? (
@@ -251,3 +262,4 @@ export default function CastModal({ isOpen, onClose, currentMedia }) {
     </div>
   )
 }
+

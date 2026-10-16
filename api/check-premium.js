@@ -68,31 +68,33 @@ export default async function handler(req, res) {
     })
 
     if (!docRes.ok) {
-      return res.status(200).json({ active: false })
+      return res.status(200).json({ active: false, credits: 0 })
     }
 
     const doc = await docRes.json()
     const premiumUsers = doc.fields?.premiumUsers?.mapValue?.fields || {}
     const grant = premiumUsers[uid]?.mapValue?.fields
+    const credits = Number(grant?.credits?.integerValue || 0)
 
     if (!grant || grant.active?.booleanValue !== true) {
-      return res.status(200).json({ active: false })
+      return res.status(200).json({ active: false, credits })
     }
 
     const expiresAt = grant.expiresAt?.integerValue ? Number(grant.expiresAt.integerValue) : null
     if (expiresAt && Date.now() > expiresAt) {
-      return res.status(200).json({ active: false, expired: true })
+      return res.status(200).json({ active: false, expired: true, credits })
     }
 
     return res.status(200).json({
       active: true,
       plan: grant.plan?.stringValue || 'monthly',
       expiresAt,
+      credits,
     })
   } catch (err) {
     console.error('[check-premium]', err.message)
     // Fail open — client will use localStorage fallback
-    return res.status(200).json({ active: false })
+    return res.status(200).json({ active: false, credits: 0 })
   }
 }
 
