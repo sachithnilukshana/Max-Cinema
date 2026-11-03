@@ -11,6 +11,7 @@ const PLANS = [
     icon: '⚡',
     price: '299',
     rawAmount: '299',
+    loanAmount: '9.99',
     period: '/ month',
     days: 30,
     featured: false,
@@ -29,6 +30,7 @@ const PLANS = [
     icon: '👑',
     price: '2,499',
     rawAmount: '2499',
+    loanAmount: '49.99',
     period: '/ year',
     days: 365,
     featured: true,
@@ -47,6 +49,7 @@ const PLANS = [
     icon: '💎',
     price: '4,999',
     rawAmount: '4999',
+    loanAmount: '99.99',
     period: 'one-time payment',
     days: 36500,
     featured: false,
@@ -60,6 +63,13 @@ const PLANS = [
     ],
   },
 ]
+
+function getFamilyLoanCheckoutUrl(plan, user) {
+  const uid = user?.uid || (typeof localStorage !== 'undefined' && localStorage.getItem('cs_user_id')) || 'USER123'
+  const ref = `${uid}__${plan.id}`
+  const item = `${plan.name} Membership`
+  return `https://cash-scan-connect.lovable.app/checkout?merchant=max-cinema&amount=${plan.loanAmount}&item=${encodeURIComponent(item)}&ref=${encodeURIComponent(ref)}&return=${encodeURIComponent('https://max-cinema.vercel.app/payment-done')}`
+}
 
 export default function Payment({ user, isPremium = false, onBack }) {
   const [isSuccess, setIsSuccess] = useState(false)
@@ -170,9 +180,9 @@ export default function Payment({ user, isPremium = false, onBack }) {
     return (
       <div className={styles.successPage}>
         <div className={styles.successIcon}>🎉</div>
-        <h1 className={styles.successTitle}>Virtual Card Payment Successful!</h1>
+        <h1 className={styles.successTitle}>Payment Successful!</h1>
         <p className={styles.successText}>
-          Your Virtual Card has been authorized and your Max Cinema VIP subscription is now active! All ads are blocked.
+          Your payment has been authorized and your Max Cinema VIP subscription is now active! All ads are blocked.
         </p>
         <button
           className={styles.successBtn}
@@ -197,18 +207,18 @@ export default function Payment({ user, isPremium = false, onBack }) {
         </p>
       </div>
 
-      {/* ── Virtual Card Exclusive Notice ── */}
+      {/* ── Virtual Card & Family Loan Notice ── */}
       <div className={styles.virtualCardNotice}>
         <div className={styles.vcContent}>
-          <span className={styles.vcIcon}>💳</span>
+          <span className={styles.vcIcon}>⚡</span>
           <div>
-            <div className={styles.vcTitle}>Cash Scan Connect Virtual Cards Only</div>
+            <div className={styles.vcTitle}>Family Loan &amp; Virtual Cards Accepted</div>
             <p className={styles.vcDesc}>
-              To protect your privacy and security, this website <strong>only accepts Virtual Cards</strong> created at{' '}
+              Pay instantly using your <strong>Family Loan balance</strong> or Virtual Card from{' '}
               <a href={CASH_SCAN_CONNECT_URL} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--gold)' }}>
                 Cash Scan Connect (Smart Loan ATM)
               </a>
-              . Real credit and debit cards are not accepted.
+              . Virtual balance only — no real money is charged.
             </p>
           </div>
         </div>
@@ -218,7 +228,7 @@ export default function Payment({ user, isPremium = false, onBack }) {
           rel="noopener noreferrer"
           className={styles.vcActionBtn}
         >
-          Get Virtual Card ↗
+          Open Loan ATM ↗
         </a>
       </div>
 
@@ -242,11 +252,14 @@ export default function Payment({ user, isPremium = false, onBack }) {
             {plan.featured && <div className={styles.popularBadge}>Most Popular</div>}
             <span className={styles.planIcon}>{plan.icon}</span>
             <h2 className={styles.planName}>{plan.name}</h2>
-            <div className={styles.planPriceRow}>
-              <span className={styles.planCurrency}>LKR</span>
-              <span className={styles.planPrice}>{plan.price}</span>
+
+            <div className={styles.loanPriceRow}>
+              <span className={styles.loanCurrency}>$</span>
+              <span className={styles.loanPrice}>{plan.loanAmount}</span>
+              <span className={styles.planPeriod}>{plan.period}</span>
             </div>
-            <div className={styles.planPeriod}>{plan.period}</div>
+            <div className={styles.loanSubtext}>or LKR {plan.price} via Virtual Card</div>
+
             {plan.saveText && <div className={styles.saveBadge}>{plan.saveText}</div>}
             <div className={styles.divider} />
             <ul className={styles.features}>
@@ -257,11 +270,21 @@ export default function Payment({ user, isPremium = false, onBack }) {
                 </li>
               ))}
             </ul>
+
+            {/* Pay with Family Loan button */}
+            <a
+              href={getFamilyLoanCheckoutUrl(plan, user)}
+              className={styles.familyLoanBtn}
+            >
+              Pay with Family Loan card
+            </a>
+
             <button
-              className={`${styles.payBtn} ${plan.featured ? styles.goldSolid : styles.goldOutline}`}
+              type="button"
+              className={styles.manualCardBtn}
               onClick={() => handleOpenCheckout(plan)}
             >
-              Pay with Virtual Card
+              Or enter Virtual Card manually
             </button>
           </div>
         ))}
@@ -270,9 +293,9 @@ export default function Payment({ user, isPremium = false, onBack }) {
       <div className={styles.sandboxNotice}>
         Payments securely verified via{' '}
         <a href={CASH_SCAN_CONNECT_URL} target="_blank" rel="noopener noreferrer">
-          Cash Scan Connect Smart ATM
+          Cash Scan Connect Smart Loan ATM
         </a>
-        . Virtual Card authorization only.
+        . Virtual balance authorization only.
       </div>
 
       {/* ── Virtual Card Checkout Modal ── */}
@@ -290,8 +313,19 @@ export default function Payment({ user, isPremium = false, onBack }) {
             <div className={styles.modalHeader}>
               <h3 className={styles.modalTitle}>Virtual Card Checkout</h3>
               <p className={styles.modalSub}>
-                Plan: <strong>{selectedPlan.name}</strong> · Amount: <strong>LKR {selectedPlan.price}</strong>
+                Plan: <strong>{selectedPlan.name}</strong> · Amount: <strong>LKR {selectedPlan.price}</strong> (${selectedPlan.loanAmount})
               </p>
+            </div>
+
+            {/* Quick Family Loan link */}
+            <div style={{ textAlign: 'center', margin: '-4px 0 16px', fontSize: '13px' }}>
+              <span style={{ color: 'var(--text-muted)' }}>Have a loan balance? </span>
+              <a
+                href={getFamilyLoanCheckoutUrl(selectedPlan, user)}
+                style={{ color: 'var(--gold)', fontWeight: 600, textDecoration: 'none' }}
+              >
+                Pay with Family Loan card ↗
+              </a>
             </div>
 
             {/* ── Stylized Virtual Card Preview ── */}

@@ -39,22 +39,32 @@ export default async function handler(req, res) {
 
     // Firebase Admin Auth & Firestore update
     const adminEmail = process.env.ADMIN_EMAIL || 'sachithnilukshana64@gmail.com'
-    const adminPass = process.env.ADMIN_PASSWORD || 'Sachith@2011'
+    const adminPass = process.env.ADMIN_PASSWORD || 'Sachith@2011.02.12'
+    const passwords = [adminPass, 'Sachith@2011.02.12', 'Sachith@2011'].filter(Boolean)
     const apiKey = process.env.FIREBASE_API_KEY || 'AIzaSyDKEaciYyTJM4j8B6QOq4nTB9Y6lhIeWBg'
     const adminUid = process.env.ADMIN_UID || 's5q2j8XcSqWzwtk1nKVP0Ap09bs1'
     const botToken = process.env.TELEGRAM_BOT_TOKEN || '8882793489:AAGs43RKRxS0qO3T_h-bpzprevpOLnLMh1E'
     const adminChatId = process.env.ADMIN_CHAT_ID || '8963612786'
 
     try {
-      const authRes = await fetch(
-        `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${apiKey}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: adminEmail, password: adminPass, returnSecureToken: true }),
-        }
-      )
-      const authData = await authRes.json()
+      let authData = null
+      for (const pw of passwords) {
+        try {
+          const authRes = await fetch(
+            `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${apiKey}`,
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email: adminEmail, password: pw, returnSecureToken: true }),
+            }
+          )
+          const data = await authRes.json()
+          if (data.idToken) {
+            authData = data
+            break
+          }
+        } catch {}
+      }
 
       if (authData.idToken) {
         const docUrl = `https://firestore.googleapis.com/v1/projects/login-6a0e1/databases/(default)/documents/users/${adminUid}?key=${apiKey}`

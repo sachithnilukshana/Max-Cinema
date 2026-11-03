@@ -10,6 +10,7 @@ import recordReferralHandler from '../api/record-referral.js'
 import payhereNotifyHandler from '../api/payhere-notify.js'
 import castHandler from '../api/cast.js'
 import useCreditHandler from '../api/use-credit.js'
+import familyLoanVerifyHandler from '../api/family-loan-verify.js'
 
 const rootDir = fileURLToPath(new URL('..', import.meta.url))
 
@@ -311,6 +312,8 @@ const server = createServer((request, response) => {
     runHandler(castHandler, request, response, requestUrl)
   } else if (requestUrl.pathname === '/api/use-credit') {
     runHandler(useCreditHandler, request, response, requestUrl)
+  } else if (requestUrl.pathname === '/api/family-loan-verify') {
+    runHandler(familyLoanVerifyHandler, request, response, requestUrl)
   } else if (requestUrl.pathname.startsWith('/api/')) {
     send(response, 404, 'API endpoint not found.')
   } else {

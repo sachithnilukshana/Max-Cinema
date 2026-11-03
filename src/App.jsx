@@ -9,6 +9,7 @@ const Watchlist = React.lazy(() => import('./pages/Watchlist.jsx'))
 const Stats = React.lazy(() => import('./pages/Stats.jsx'))
 const WatchParty = React.lazy(() => import('./pages/WatchParty.jsx'))
 const Payment = React.lazy(() => import('./pages/Payment.jsx'))
+const PaymentDone = React.lazy(() => import('./pages/PaymentDone.jsx'))
 const PrivacyPolicy = React.lazy(() => import('./pages/PrivacyPolicy.jsx'))
 const Terms = React.lazy(() => import('./pages/Terms.jsx'))
 const Login = React.lazy(() => import('./pages/Login.jsx'))
@@ -159,6 +160,7 @@ export default function App() {
   const isTermsPage = path === '/terms' || path === '/terms.html'
   const isLoginPage = path === '/login' || path === '/account'
   const isPaymentPage = path === '/payment' || path === '/upgrade'
+  const isPaymentDonePage = path === '/payment-done'
   const isAboutPage = path === '/about' || path === '/contact'
 
   useEffect(() => {

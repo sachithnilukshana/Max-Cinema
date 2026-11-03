@@ -625,3 +625,84 @@
     order: -1;
   }
 }
+
+
+/* ── Family Loan Button & Alt styles ── */
+.familyLoanBtn {
+  width: 100%;
+  height: 48px;
+  background: linear-gradient(135deg, #c8a96e 0%, #e5c98d 100%);
+  color: #000;
+  border: none;
+  border-radius: 10px;
+  font-family: var(--font);
+  font-size: 14.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.2s, filter 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-decoration: none;
+  margin-top: auto;
+  box-shadow: 0 4px 16px rgba(200, 169, 110, 0.25);
+}
+
+.familyLoanBtn:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.08);
+  box-shadow: 0 6px 22px rgba(200, 169, 110, 0.4);
+}
+
+.manualCardBtn {
+  width: 100%;
+  padding: 8px 10px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.manualCardBtn:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: rgba(200, 169, 110, 0.06);
+}
+
+.loanPriceRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 4px;
+  margin-bottom: 2px;
+}
+
+.loanCurrency {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--gold);
+}
+
+.loanPrice {
+  font-size: 34px;
+  font-weight: 800;
+  color: var(--gold);
+  letter-spacing: -0.5px;
+}
+
+.loanSubtext {
+  font-size: 12px;
+  color: var(--text-dim);
+  text-align: center;
+  margin-bottom: 8px;
+}
