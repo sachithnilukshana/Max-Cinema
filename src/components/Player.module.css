@@ -471,3 +471,230 @@
   color: var(--gold, #c8a96e) !important;
   box-shadow: 0 0 10px rgba(200, 169, 110, 0.2);
 }
+
+
+/* ── Picture-in-Picture (PiP) ── */
+.pipOverlayBtn {
+  position: absolute;
+  z-index: 1;
+  right: 58px;
+  bottom: 12px;
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 50%;
+  background: rgba(18, 18, 18, 0.62);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: #fff;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s ease, background 0.2s ease, transform 0.2s ease, color 0.2s ease;
+}
+
+.playerBox:hover .pipOverlayBtn,
+.pipOverlayBtn:focus-visible {
+  opacity: 1;
+}
+
+.pipOverlayBtn:hover {
+  background: rgba(45, 45, 45, 0.86);
+  transform: scale(1.06);
+  color: var(--gold, #c8a96e);
+}
+
+.pipOverlayBtn svg {
+  width: 19px;
+  height: 19px;
+}
+
+.pipActive {
+  background: rgba(200, 169, 110, 0.22) !important;
+  color: var(--gold, #c8a96e) !important;
+  border-color: var(--gold, #c8a96e) !important;
+  box-shadow: 0 0 10px rgba(200, 169, 110, 0.25);
+}
+
+/* Floating PiP window */
+.floatingPip {
+  position: fixed !important;
+  bottom: 24px;
+  right: 24px;
+  width: min(440px, calc(100vw - 32px)) !important;
+  height: auto !important;
+  aspect-ratio: 16 / 9;
+  z-index: 99999 !important;
+  border-radius: 12px !important;
+  border: 1.5px solid rgba(200, 169, 110, 0.55) !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.88), 0 0 24px rgba(200, 169, 110, 0.2) !important;
+  overflow: hidden !important;
+  animation: pipEnter 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: box-shadow 0.2s ease;
+  background: #000;
+}
+
+.floatingPip:hover {
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.95), 0 0 32px rgba(200, 169, 110, 0.35) !important;
+}
+
+.floatingPip iframe {
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 11px;
+}
+
+@keyframes pipEnter {
+  from {
+    opacity: 0;
+    transform: scale(0.85) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Floating PiP Header Bar */
+.floatingPipBar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 12px;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.88) 0%, rgba(0, 0, 0, 0.45) 75%, transparent 100%);
+  cursor: grab;
+  user-select: none;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.floatingPip:hover .floatingPipBar {
+  opacity: 1;
+}
+
+.floatingPipBar:active {
+  cursor: grabbing;
+}
+
+.floatingPipTitle {
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 70%;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+.floatingPipDragIcon {
+  color: var(--gold, #c8a96e);
+  font-size: 13px;
+  letter-spacing: -2px;
+  opacity: 0.8;
+}
+
+.floatingPipControls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.floatingPipActionBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  background: rgba(25, 25, 25, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  color: #fff;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.floatingPipActionBtn:hover {
+  background: rgba(60, 60, 60, 0.95);
+  border-color: var(--gold, #c8a96e);
+  color: var(--gold, #c8a96e);
+  transform: scale(1.05);
+}
+
+.floatingPipActionBtn svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* In-page placeholder while playing in PiP */
+.pipPlaceholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: clamp(160px, 30vw, 320px);
+  background: #0d0d0d;
+  border: 1px dashed rgba(200, 169, 110, 0.35);
+  border-radius: 10px;
+  margin-bottom: 8px;
+}
+
+.pipPlaceholderContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+  padding: 16px;
+}
+
+.pipPlaceholderIcon {
+  font-size: 32px;
+  line-height: 1;
+}
+
+.pipPlaceholderTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--gold, #c8a96e);
+  margin: 0;
+}
+
+.pipPlaceholderSubtitle {
+  font-size: 13px;
+  color: #888;
+  margin: 0;
+}
+
+.pipRestoreBtn {
+  margin-top: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--gold, #c8a96e);
+  color: #0a0a0a;
+  border: none;
+  border-radius: 6px;
+  padding: 7px 16px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: filter 0.2s ease, transform 0.15s ease;
+}
+
+.pipRestoreBtn:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}

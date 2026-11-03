@@ -8,7 +8,8 @@ import styles from './Player.module.css'
 const SHORTCUTS = [
   { key: 'Space', action: 'Play / Pause (click inside player)' },
   { key: 'F', action: 'Fullscreen toggle' },
-  { key: 'Esc', action: 'Exit fullscreen / Close' },
+  { key: 'P', action: 'Picture-in-Picture (PiP) toggle' },
+  { key: 'Esc', action: 'Exit fullscreen / Exit PiP / Close' },
   { key: 'N', action: 'Next episode' },
   { key: 'M', action: 'Mute toggle (iframe only)' },
   { key: '?', action: 'Show / hide this help' },
@@ -22,6 +23,7 @@ export default function Player({
   const playerBoxRef  = useRef(null)
   const iframeRef     = useRef(null)
   const [isFullscreen, setIsFullscreen] = useState(false)
+  const [isPip, setIsPip] = useState(false)
   const [showShortcuts, setShowShortcuts] = useState(false)
   const [reportOpen, setReportOpen] = useState(false)
   const [reportReason, setReportReason] = useState('')
@@ -31,6 +33,7 @@ export default function Player({
   const [castOpen, setCastOpen] = useState(false)
   const [isCasting, setIsCasting] = useState(() => isCastConnected())
   const [selectedServer, setSelectedServer] = useState('vidlink')
+  const [pipPos, setPipPos] = useState(null) // { x, y }
 
   const s = badge?.match(/S(\d+)/)?.[1]
   const e = badge?.match(/E(\d+)/)?.[1]
@@ -71,6 +74,20 @@ export default function Player({
     return () => document.removeEventListener('fullscreenchange', update)
   }, [])
 
+  // ── PiP toggle ───────────────────────────────────────────────────────────
+  const togglePip = useCallback(async () => {
+    if (isPip) {
+      setIsPip(false)
+      setPipPos(null)
+      return
+    }
+
+    if (document.fullscreenElement) {
+      try { await document.exitFullscreen() } catch {}
+    }
+    setIsPip(true)
+  }, [isPip])
+
   // ── Keyboard shortcuts ──────────────────────────────────────────────────
   const handleKey = useCallback(event => {
     const editable = ['INPUT', 'TEXTAREA', 'SELECT'].includes(event.target.tagName)
@@ -82,6 +99,11 @@ export default function Player({
         event.preventDefault()
         toggleFullscreen()
         break
+      case 'p':
+      case 'P':
+        event.preventDefault()
+        togglePip()
+        break
       case 'n':
       case 'N':
         event.preventDefault()
@@ -89,6 +111,7 @@ export default function Player({
         break
       case 'Escape':
         if (isFullscreen) { document.exitFullscreen().catch(() => {}) }
+        else if (isPip) { setIsPip(false); setPipPos(null) }
         else if (showShortcuts) { setShowShortcuts(false) }
         else if (reportOpen) { setReportOpen(false) }
         break
@@ -99,7 +122,7 @@ export default function Player({
       default:
         break
     }
-  }, [isFullscreen, showShortcuts, reportOpen, onNextEpisode])
+  }, [isFullscreen, isPip, togglePip, showShortcuts, reportOpen, onNextEpisode])
 
   useEffect(() => {
     window.addEventListener('keydown', handleKey)
@@ -109,6 +132,7 @@ export default function Player({
   // ── Fullscreen toggle ───────────────────────────────────────────────────
   async function toggleFullscreen() {
     try {
+      if (isPip) setIsPip(false)
       if (document.fullscreenElement === playerBoxRef.current) {
         await document.exitFullscreen()
       } else {
@@ -119,12 +143,45 @@ export default function Player({
     }
   }
 
+  // ── PiP Dragging logic ───────────────────────────────────────────────────
+  const dragRef = useRef(null)
+  const onPointerDownBar = (e) => {
+    if (!isPip) return
+    const el = playerBoxRef.current
+    if (!el) return
+    const rect = el.getBoundingClientRect()
+    dragRef.current = {
+      startX: e.clientX,
+      startY: e.clientY,
+      boxLeft: rect.left,
+      boxTop: rect.top,
+    }
+    window.addEventListener('pointermove', onPointerMove)
+    window.addEventListener('pointerup', onPointerUp)
+  }
+
+  const onPointerMove = (e) => {
+    if (!dragRef.current) return
+    const deltaX = e.clientX - dragRef.current.startX
+    const deltaY = e.clientY - dragRef.current.startY
+    const newLeft = Math.max(10, Math.min(window.innerWidth - 300, dragRef.current.boxLeft + deltaX))
+    const newTop = Math.max(10, Math.min(window.innerHeight - 180, dragRef.current.boxTop + deltaY))
+    setPipPos({ x: newLeft, y: newTop })
+  }
+
+  const onPointerUp = () => {
+    dragRef.current = null
+    window.removeEventListener('pointermove', onPointerMove)
+    window.removeEventListener('pointerup', onPointerUp)
+  }
+
   if (!src) return null
 
   async function closePlayer() {
     if (document.fullscreenElement === playerBoxRef.current) {
       try { await document.exitFullscreen() } catch {}
     }
+    setIsPip(false)
     onClose?.()
   }
 
@@ -163,6 +220,13 @@ export default function Player({
     setTimeout(() => { setReportOpen(false); setReportSent(false); setReportReason(''); setReportDetails('') }, 2500)
   }
 
+  const pipStyle = isPip && pipPos ? {
+    left: `${pipPos.x}px`,
+    top: `${pipPos.y}px`,
+    right: 'auto',
+    bottom: 'auto',
+  } : undefined
+
   return (
     <div className={styles.wrap}>
       {/* ── Meta ─────────────────────────────────────────────────────────── */}
@@ -181,6 +245,20 @@ export default function Player({
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <path d="M2 16.1A5 5 0 0 1 5.9 20M2 12.05A9 9 0 0 1 9.95 20M2 8V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6"/>
                 <line x1="2" y1="20" x2="2.01" y2="20"/>
+              </svg>
+            </button>
+
+            {/* Picture-in-Picture button */}
+            <button
+              type="button"
+              className={`${styles.iconBtn} ${isPip ? styles.pipActive : ''}`}
+              onClick={togglePip}
+              title={isPip ? 'Exit Picture-in-Picture (P)' : 'Picture-in-Picture (P)'}
+              aria-label="Picture-in-Picture"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <rect x="2" y="4" width="20" height="16" rx="2"/>
+                <rect x="12" y="10" width="8" height="7" rx="1" fill={isPip ? 'var(--gold, #c8a96e)' : 'currentColor'} fillOpacity={isPip ? '0.7' : '0.2'}/>
               </svg>
             </button>
 
@@ -238,7 +316,7 @@ export default function Player({
           {year   && <span className={styles.pill}>{year}</span>}
           {rating && <span className={`${styles.pill} ${styles.gold}`}>★ {rating}</span>}
           {badge  && <span className={`${styles.pill} ${styles.badge}`}>{badge}</span>}
-                    <span className={styles.pill} style={{ opacity: 0.5, fontSize: 9 }}>? = shortcuts</span>
+          <span className={styles.pill} style={{ opacity: 0.5, fontSize: 9 }}>P = PiP · ? = shortcuts</span>
         </div>
 
         {/* ── Video Stream Server Switcher ── */}
@@ -278,8 +356,85 @@ export default function Player({
         )}
       </div>
 
+      {/* ── In-page placeholder when in PiP ──────────────────────────────── */}
+      {isPip && (
+        <div className={styles.pipPlaceholder}>
+          <div className={styles.pipPlaceholderContent}>
+            <span className={styles.pipPlaceholderIcon}>📺</span>
+            <div>
+              <p className={styles.pipPlaceholderTitle}>Playing in Picture-in-Picture</p>
+              <p className={styles.pipPlaceholderSubtitle}>{title}</p>
+            </div>
+            <button
+              type="button"
+              className={styles.pipRestoreBtn}
+              onClick={() => { setIsPip(false); setPipPos(null) }}
+            >
+              Restore Player
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* ── Player box ──────────────────────────────────────────────────── */}
-      <div className={styles.playerBox} ref={playerBoxRef}>
+      <div
+        className={`${styles.playerBox} ${isPip ? styles.floatingPip : ''}`}
+        ref={playerBoxRef}
+        style={pipStyle}
+      >
+        {/* Floating PiP top bar with drag handle, restore, and close */}
+        {isPip && (
+          <div
+            className={styles.floatingPipBar}
+            onPointerDown={onPointerDownBar}
+            title="Click and drag to move window"
+          >
+            <div className={styles.floatingPipTitle}>
+              <span className={styles.floatingPipDragIcon}>⋮⋮</span> {title}
+            </div>
+            <div className={styles.floatingPipControls}>
+              <button
+                type="button"
+                className={styles.floatingPipActionBtn}
+                onClick={() => { setIsPip(false); setPipPos(null) }}
+                title="Restore to page (P)"
+                aria-label="Restore player"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <polyline points="15 3 21 3 21 9" />
+                  <polyline points="9 21 3 21 3 15" />
+                  <line x1="21" y1="3" x2="14" y2="10" />
+                  <line x1="3" y1="21" x2="10" y2="14" />
+                </svg>
+              </button>
+              <button
+                type="button"
+                className={styles.floatingPipActionBtn}
+                onClick={closePlayer}
+                title="Close player"
+                aria-label="Close"
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* PiP button overlay inside player */}
+        <button
+          type="button"
+          className={styles.pipOverlayBtn}
+          onClick={togglePip}
+          aria-label={isPip ? 'Exit Picture-in-Picture' : 'Picture-in-Picture'}
+          title={isPip ? 'Exit Picture-in-Picture (P)' : 'Picture-in-Picture (P)'}
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <rect x="2" y="4" width="20" height="16" rx="2" />
+            <rect x="12" y="10" width="8" height="7" rx="1" fill="currentColor" fillOpacity="0.3" />
+          </svg>
+        </button>
+
+        {/* Fullscreen button */}
         <button
           type="button"
           className={styles.fullscreenBtn}
@@ -297,6 +452,7 @@ export default function Player({
             </svg>
           )}
         </button>
+
         <iframe
           ref={iframeRef}
           src={activeSrc}
