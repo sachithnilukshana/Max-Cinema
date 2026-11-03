@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react'
 import { api, apiErrorMessage, tvEmbedUrl, formatRating, getYear } from '../lib/api.js'
 import { loadLibrary, markEpisodeWatched, recordContinueWatching, setEpisodeWatched } from '../lib/profile.js'
 import { trackSearch, trackTVView } from '../lib/cinescopeApi.js'
-import { usePremium } from '../lib/PremiumContext.jsx'
 import MediaGrid from '../components/MediaGrid.jsx'
 import Player from '../components/Player.jsx'
 import SeasonPicker from '../components/SeasonPicker.jsx'
@@ -29,7 +28,6 @@ export default function TV({ profile, onSelectShow }) {
   const [episodeProgress, setEpisodeProgress] = useState(() => loadLibrary(profile.id).episodeProgress)
   const playerAnchorRef = useRef(null)
   const didRestore = useRef(false)
-  const { isPremium } = usePremium()
 
   // Load trending (24 top TV series) or restore last search
   useEffect(() => {
@@ -110,7 +108,7 @@ export default function TV({ profile, onSelectShow }) {
 
   function playerFor(show, season, episode) {
     return {
-      src: tvEmbedUrl(show.id, season, episode, isPremium),
+      src: tvEmbedUrl(show.id, season, episode),
       title: show.name,
       year: getYear(show.first_air_date),
       rating: formatRating(show.vote_average),

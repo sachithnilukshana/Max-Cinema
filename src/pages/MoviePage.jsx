@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react'
 import { api, apiErrorMessage, movieEmbedUrl, formatRating, getYear } from '../lib/api.js'
 import { recordContinueWatching } from '../lib/profile.js'
 import { trackMovieView } from '../lib/cinescopeApi.js'
-import { usePremium } from '../lib/PremiumContext.jsx'
 import Player from '../components/Player.jsx'
 import PersonalControls from '../components/PersonalControls.jsx'
 import WatchOptions from '../components/WatchOptions.jsx'
@@ -14,7 +13,6 @@ export default function MoviePage({ tmdbId, profile, onBack, onSelectMovie, onSe
   const [movie, setMovie] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const { isPremium, isUnlocked } = usePremium()
 
   useEffect(() => {
     if (!tmdbId) return
@@ -84,7 +82,7 @@ export default function MoviePage({ tmdbId, profile, onBack, onSelectMovie, onSe
 
   const year = getYear(movie.release_date)
   const rating = formatRating(movie.vote_average)
-  const embedUrl = movieEmbedUrl(tmdbId, isPremium || isUnlocked(tmdbId))
+  const embedUrl = movieEmbedUrl(tmdbId)
   const movieItem = { ...movie, media_type: 'movie' }
 
   return (

@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { cinescopeApi } from '../lib/cinescopeApi.js'
-import { usePremium } from '../lib/PremiumContext.jsx'
 import AdUnit from './AdUnit.jsx'
 import styles from './CineScopeAd.module.css'
 
@@ -11,7 +10,6 @@ function getDevice() {
 }
 
 export default function CineScopeAd({ placement = 'HOMEPAGE', slot, className = '' }) {
-  const { isPremium } = usePremium()
   const [ad, setAd] = useState(null)
   const [loaded, setLoaded] = useState(false)
   const containerRef = useRef(null)
@@ -19,7 +17,6 @@ export default function CineScopeAd({ placement = 'HOMEPAGE', slot, className = 
 
   // Fetch the best ad for this placement + device on mount / when placement changes
   useEffect(() => {
-    if (isPremium) return
     let active = true
     setAd(null)
     setLoaded(false)
@@ -38,20 +35,20 @@ export default function CineScopeAd({ placement = 'HOMEPAGE', slot, className = 
       .finally(() => { if (active) setLoaded(true) })
 
     return () => { active = false }
-  }, [placement, isPremium]) // device is stable per render — no need in deps
+  }, [placement]) // device is stable per render — no need in deps
 
   // Inject raw adCode (supports third-party script tags)
   useEffect(() => {
-    if (isPremium || !ad?.adCode || !containerRef.current) return
+    if (!ad?.adCode || !containerRef.current) return
     const container = containerRef.current
     container.innerHTML = ''
     const range = document.createRange()
     range.selectNode(container)
     const fragment = range.createContextualFragment(ad.adCode)
     container.appendChild(fragment)
-  }, [ad, isPremium])
+  }, [ad])
 
-  if (isPremium || !loaded) return null // don't render ads if premium or loading
+  if (!loaded) return null
 
   if (ad?.adCode) {
     return (

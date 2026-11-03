@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react'
 import CastModal from './CastModal.jsx'
 import { isCastConnected, castMediaToReceiver } from '../lib/castSync.js'
-import { usePremium } from '../lib/PremiumContext.jsx'
 import { movieEmbedUrl, tvEmbedUrl } from '../lib/api.js'
 import styles from './Player.module.css'
 
@@ -31,57 +30,16 @@ export default function Player({
   const [shareCopied, setShareCopied] = useState(false)
   const [castOpen, setCastOpen] = useState(false)
   const [isCasting, setIsCasting] = useState(() => isCastConnected())
+  const [selectedServer, setSelectedServer] = useState('vidlink')
 
-  const { isPremium, credits, spendCredit, isUnlocked } = usePremium()
-  const [spending, setSpending] = useState(false)
-  const [creditNotice, setCreditNotice] = useState('')
-  const [localUnlocked, setLocalUnlocked] = useState(() => isUnlocked(tmdbId))
-
-  useEffect(() => {
-    setLocalUnlocked(isUnlocked(tmdbId))
-  }, [tmdbId, isUnlocked])
-
-  const isVipStream = isPremium || localUnlocked
-  const [selectedServer, setSelectedServer] = useState(() => (isPremium || isUnlocked(tmdbId)) ? 'vip' : 'vidlink')
-
-  useEffect(() => {
-    if (isVipStream) {
-      setSelectedServer('vip')
-    }
-  }, [isVipStream])
   const s = badge?.match(/S(\d+)/)?.[1]
   const e = badge?.match(/E(\d+)/)?.[1]
+
   const activeSrc = tmdbId
     ? (mediaType === 'tv'
-        ? tvEmbedUrl(tmdbId, s ? Number(s) : 1, e ? Number(e) : 1, isVipStream && selectedServer === 'vip', selectedServer)
-        : movieEmbedUrl(tmdbId, isVipStream && selectedServer === 'vip', selectedServer))
+        ? tvEmbedUrl(tmdbId, s ? Number(s) : 1, e ? Number(e) : 1, false, selectedServer)
+        : movieEmbedUrl(tmdbId, false, selectedServer))
     : src
-
-  async function handleUseCredit() {
-    if (spending || credits <= 0) return
-    const confirmed = window.confirm(
-      `Use 1 credit to watch "${title}" in VIP Premium (Ad-Free HD)? You currently have ${credits} credit(s).`
-    )
-    if (!confirmed) return
-
-    setSpending(true)
-    setCreditNotice('')
-    try {
-      await spendCredit({
-        tmdbId,
-        mediaType: mediaType || 'movie',
-        title,
-      })
-      setLocalUnlocked(true)
-      setSelectedServer('vip')
-      setCreditNotice('🎉 1 Credit redeemed! Switched to VIP Ad-Free player.')
-      setTimeout(() => setCreditNotice(''), 4500)
-    } catch (err) {
-      alert(err.message || 'Failed to use credit.')
-    } finally {
-      setSpending(false)
-    }
-  }
 
   useEffect(() => {
     const handleCastChange = event => {
@@ -302,20 +260,6 @@ export default function Player({
           >
             🎬 VidSrc TO
           </button>
-          <button
-            type="button"
-            className={`${styles.serverBtn} ${selectedServer === 'vip' ? styles.serverBtnActive : ''} ${styles.serverVipBtn}`}
-            onClick={() => {
-              if (isVipStream) {
-                setSelectedServer('vip')
-              } else {
-                handleUseCredit()
-              }
-            }}
-            title={isVipStream ? 'VIP Ad-Free 1080p Ultra Stream' : 'Use 1 Credit to unlock VIP Ad-Free Stream'}
-          >
-            👑 VIP Ad-Free {isVipStream ? '✓' : '(1 Credit)'}
-          </button>
         </div>
 
         {overview && <p className={styles.overview}>{overview}</p>}
@@ -324,50 +268,6 @@ export default function Player({
             Next episode →
           </button>
         )}
-
-        {/* ── VIP & Credit Status Banner ─────────────────────────────────── */}
-        {!isPremium && (
-          localUnlocked ? (
-            <div className={styles.vipActiveBanner}>
-              <span>✨ VIP Premium Active (Ad-Free HD Player Unlocked)</span>
-              <span className={styles.vipTag}>1 Credit Used</span>
-            </div>
-          ) : (
-            <div className={styles.creditOfferBanner}>
-              <div className={styles.creditOfferLeft}>
-                <span className={styles.creditBadge}>🎟️ {credits} Credit{credits === 1 ? '' : 's'}</span>
-                <span className={styles.creditOfferText}>
-                  {credits > 0
-                    ? 'Watch this title in VIP Premium without any ads.'
-                    : 'Watch in VIP Premium (Ad-Free HD). Request credits from admin on Telegram!'}
-                </span>
-              </div>
-              {credits > 0 ? (
-                <button
-                  type="button"
-                  className={styles.redeemCreditBtn}
-                  onClick={handleUseCredit}
-                  disabled={spending}
-                >
-                  {spending ? 'Redeeming…' : '🎟️ Watch with 1 Credit'}
-                </button>
-              ) : (
-                <a
-                  href="/payment"
-                  className={styles.getCreditBtn}
-                  onClick={(e) => {
-                    e.preventDefault()
-                    window.history.pushState({}, '', '/payment')
-                    window.dispatchEvent(new PopStateEvent('popstate'))
-                  }}
-                >
-                  Buy Credits 🎟️
-                </a>
-              )}
-            </div>
-          )
-        )}
-        {creditNotice && <p className={styles.creditSuccessMsg}>{creditNotice}</p>}
       </div>
 
       {/* ── Player box ──────────────────────────────────────────────────── */}

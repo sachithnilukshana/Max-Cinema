@@ -2,7 +2,6 @@ import React, { useEffect, useState, useRef } from 'react'
 import { api, apiErrorMessage, tvEmbedUrl, formatRating, getYear } from '../lib/api.js'
 import { recordContinueWatching, loadLibrary, setEpisodeWatched, markEpisodeWatched } from '../lib/profile.js'
 import { trackTVView } from '../lib/cinescopeApi.js'
-import { usePremium } from '../lib/PremiumContext.jsx'
 import Player from '../components/Player.jsx'
 import SeasonPicker from '../components/SeasonPicker.jsx'
 import PersonalControls from '../components/PersonalControls.jsx'
@@ -29,7 +28,6 @@ export default function TVShowPage({
   const [episode, setEpisode] = useState(initialEpisode || 1)
   const [isPlaying, setIsPlaying] = useState(true)
   const [episodeProgress, setEpisodeProgress] = useState({})
-  const { isPremium, isUnlocked } = usePremium()
   const playerAnchorRef = useRef(null)
 
   useEffect(() => {
@@ -165,7 +163,7 @@ export default function TVShowPage({
 
   const year = getYear(show.first_air_date)
   const rating = formatRating(show.vote_average)
-  const embedUrl = tvEmbedUrl(tmdbId, season, episode, isPremium || isUnlocked(tmdbId))
+  const embedUrl = tvEmbedUrl(tmdbId, season, episode)
   const currentItem = { ...show, media_type: 'tv', season, episode }
 
   return (

@@ -6,14 +6,11 @@ import {
   resetPassword,
   signOutUser,
   readableAuthError,
-  grantPremium,
 } from '../lib/firebase.js'
-import { usePremium } from '../lib/PremiumContext.jsx'
 import ReferralWidget from '../components/ReferralWidget.jsx'
 import styles from './Login.module.css'
 
 export default function Login({ user, onBack, onBrowseMovies, onBrowseHistory }) {
-  const { isPremium, plan: currentPlan } = usePremium()
   const [mode, setMode] = useState('signin') // 'signin' | 'signup' | 'forgot'
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -23,21 +20,6 @@ export default function Login({ user, onBack, onBrowseMovies, onBrowseHistory })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
-
-  // Payment / Premium upgrade state
-  const [selectedPlan, setSelectedPlan] = useState('yearly') // 'monthly' | 'yearly' | 'lifetime'
-  const [payModalOpen, setPayModalOpen] = useState(false)
-  const [paymentProcessing, setPaymentProcessing] = useState(false)
-  const [cardNumber, setCardNumber] = useState('')
-  const [cardExpiry, setCardExpiry] = useState('')
-  const [cardCvc, setCardCvc] = useState('')
-
-  // Admin User ID Premium Activation state
-  const [adminTargetUid, setAdminTargetUid] = useState('')
-  const [adminTargetPlan, setAdminTargetPlan] = useState('lifetime')
-  const [adminActivating, setAdminActivating] = useState(false)
-  const [adminSuccess, setAdminSuccess] = useState('')
-  const [adminError, setAdminError] = useState('')
 
   const isAdmin = user?.email?.toLowerCase() === 'sachithnilukshana64@gmail.com' || user?.uid?.startsWith('s5q2j8XcSqWz')
 
@@ -144,67 +126,6 @@ export default function Login({ user, onBack, onBrowseMovies, onBrowseHistory })
     }
   }
 
-  async function handleActivatePremium(e) {
-    e?.preventDefault?.()
-    if (!user?.uid) {
-      setError('Please sign in or create an account first to enable Ad-Free.')
-      return
-    }
-
-    setPaymentProcessing(true)
-    setError('')
-    try {
-      const days = selectedPlan === 'monthly' ? 30 : selectedPlan === 'yearly' ? 365 : 3650
-      const cleanCard = (cardNumber || '').replace(/\s+/g, '')
-
-      // Send to server-side virtual card verification endpoint
-      await fetch('/api/virtual-card-pay', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          uid: user.uid,
-          planId: selectedPlan,
-          cardNumber: cleanCard,
-          cardholderName: user.displayName || 'Virtual Card User',
-          expiry: cardExpiry,
-          cvv: cardCvc,
-          amount: selectedPlan === 'monthly' ? '299' : '2499',
-        }),
-      }).catch(() => {})
-
-      await grantPremium(user.uid, selectedPlan, days)
-      setSuccess('🎉 Cash Scan Connect Virtual Card verified! VIP Ad-Free Premium is active.')
-      setPayModalOpen(false)
-    } catch (err) {
-      setError('Virtual Card error: ' + (err.message || 'Please check your Cash Scan Connect card details.'))
-    } finally {
-      setPaymentProcessing(false)
-    }
-  }
-
-  async function handleAdminActivateUser(e) {
-    e.preventDefault()
-    setAdminError('')
-    setAdminSuccess('')
-    const target = adminTargetUid.trim()
-    if (!target) {
-      setAdminError('Please enter a target User ID.')
-      return
-    }
-
-    setAdminActivating(true)
-    try {
-      const days = adminTargetPlan === 'monthly' ? 30 : adminTargetPlan === 'yearly' ? 365 : 3650
-      await grantPremium(target, adminTargetPlan, days)
-      setAdminSuccess(`✓ Successfully granted ${adminTargetPlan.toUpperCase()} Ad-Free VIP to User ID: ${target}`)
-      setAdminTargetUid('')
-    } catch (err) {
-      setAdminError('Activation failed: ' + (err.message || 'Please check the User ID.'))
-    } finally {
-      setAdminActivating(false)
-    }
-  }
-
   return (
     <div className={styles.container}>
       <div className={styles.headerBar}>
@@ -228,8 +149,8 @@ export default function Login({ user, onBack, onBrowseMovies, onBrowseHistory })
                   ? '👑 Admin & Owner'
                   : '★ Max Cinema Member'}
               </span>
-              <span className={isPremium ? styles.premiumBadge : styles.statusBadge}>
-                {isPremium ? '✨ Ad-Free Active' : 'Free Tier (Ads)'}
+              <span className={styles.statusBadge}>
+                Free Account
               </span>
             </div>
 
@@ -264,93 +185,28 @@ export default function Login({ user, onBack, onBrowseMovies, onBrowseHistory })
               </div>
               <div className={styles.metaItem}>
                 <span className={styles.metaLabel}>Ads Status</span>
-                <span className={styles.metaValue}>{isPremium ? 'Blocked' : 'Enabled'}</span>
+                <span className={styles.metaValue}>Free Streaming</span>
               </div>
             </div>
 
-            {/* ── Ad-Free Premium Management Card ── */}
+            {/* ── Free Membership Info ── */}
             <div className={styles.premiumCard}>
               <div className={styles.premiumHeader}>
-                <span className={styles.premiumIcon}>{isPremium ? '🛡️' : '💎'}</span>
+                <span className={styles.premiumIcon}>🎬</span>
                 <div>
-                  <h3 className={styles.premiumTitle}>
-                    {isPremium ? 'Ad-Free Premium Active' : 'Upgrade to Ad-Free'}
-                  </h3>
+                  <h3 className={styles.premiumTitle}>Max Cinema — 100% Free</h3>
                   <p className={styles.premiumSub}>
-                    {isPremium
-                      ? `Enjoy zero banner ads and uninterrupted playback (${currentPlan || 'Active'} Plan).`
-                      : 'Remove all Google AdSense and promotional ads completely.'}
+                    Stream unlimited movies and TV shows completely free. No subscriptions, no hidden fees.
                   </p>
                 </div>
               </div>
-
-              {isPremium ? (
-                <div className={styles.premiumActiveInfo}>
-                  <span>✓ All Google AdSense ads disabled</span>
-                  <span>✓ High-speed streaming activated</span>
-                </div>
-              ) : (
-                <button
-                  type="button"
-                  className={styles.upgradeBtn}
-                  onClick={() => setPayModalOpen(true)}
-                >
-                  ⚡ Remove Ads ($2.99 / mo)
-                </button>
-              )}
+              <div className={styles.premiumActiveInfo}>
+                <span>✓ Unlimited movies &amp; TV shows</span>
+                <span>✓ Watch history &amp; watchlist synced</span>
+              </div>
             </div>
 
-            {/* ── Admin Tool: Activate Premium by User ID ── */}
-            {isAdmin && (
-              <div className={styles.adminBox}>
-                <div className={styles.adminBoxHeader}>
-                  <span className={styles.adminCrown}>👑</span>
-                  <div>
-                    <h4 className={styles.adminBoxTitle}>Admin Command: Grant Premium</h4>
-                    <p className={styles.adminBoxSub}>Activate Ad-Free status for any customer using their User ID.</p>
-                  </div>
-                </div>
-
-                <form onSubmit={handleAdminActivateUser} className={styles.adminForm}>
-                  <div className={styles.inputGroup}>
-                    <label>Target Customer User ID</label>
-                    <input
-                      type="text"
-                      placeholder="Paste customer Firebase UID"
-                      value={adminTargetUid}
-                      onChange={e => setAdminTargetUid(e.target.value)}
-                      required
-                    />
-                  </div>
-
-                  <div className={styles.inputGroup}>
-                    <label>Plan Duration</label>
-                    <select
-                      value={adminTargetPlan}
-                      onChange={e => setAdminTargetPlan(e.target.value)}
-                      className={styles.planDropdown}
-                    >
-                      <option value="monthly">Monthly Pass (30 Days)</option>
-                      <option value="yearly">Annual Pass (365 Days)</option>
-                      <option value="lifetime">Lifetime VIP (Permanent)</option>
-                    </select>
-                  </div>
-
-                  {adminError && <div className={styles.alertError}><span>⚠</span> {adminError}</div>}
-                  {adminSuccess && <div className={styles.alertSuccess}><span>✓</span> {adminSuccess}</div>}
-
-                  <button
-                    type="submit"
-                    className={styles.adminSubmitBtn}
-                    disabled={adminActivating}
-                  >
-                    {adminActivating ? 'Granting VIP…' : '⚡ Activate Premium for User'}
-                  </button>
-                </form>
-              </div>
-            )}
-
-            {/* ── Referral & Free VIP Rewards ── */}
+            {/* ── Referral & Free Rewards ── */}
             <div style={{ marginTop: '20px', marginBottom: '20px' }}>
               <ReferralWidget user={user} />
             </div>
@@ -632,10 +488,6 @@ export default function Login({ user, onBack, onBrowseMovies, onBrowseHistory })
               </form>
             )}
 
-            <div className={styles.adFreePromo}>
-              <span>✨ <b>Want 100% Ad-Free Streaming?</b> Sign in to activate Max Cinema Premium and remove all ads.</span>
-            </div>
-
             <div className={styles.footerNote}>
               <span>Powered by Firebase Authentication · Max Cinema</span>
             </div>
@@ -643,119 +495,6 @@ export default function Login({ user, onBack, onBrowseMovies, onBrowseHistory })
         )}
       </div>
 
-      {/* ── Payment / Upgrade Modal ── */}
-      {payModalOpen && (
-        <div className={styles.modalOverlay} onClick={() => setPayModalOpen(false)}>
-          <div className={styles.modalCard} onClick={e => e.stopPropagation()}>
-            <div className={styles.modalHeader}>
-              <h2>Cash Scan Connect Virtual Card Checkout</h2>
-              <button
-                type="button"
-                className={styles.modalClose}
-                onClick={() => setPayModalOpen(false)}
-              >
-                ✕
-              </button>
-            </div>
-
-            <p className={styles.modalDesc}>
-              This website exclusively accepts Virtual Cards issued by{' '}
-              <a href="https://cash-scan-connect.lovable.app/" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--gold)', textDecoration: 'underline' }}>
-                Cash Scan Connect (Smart Loan ATM)
-              </a>
-              . Real credit and debit cards are not accepted.
-            </p>
-
-            <div className={styles.planSelector}>
-              <button
-                type="button"
-                className={`${styles.planOption} ${selectedPlan === 'monthly' ? styles.planActive : ''}`}
-                onClick={() => setSelectedPlan('monthly')}
-              >
-                <div className={styles.planName}>Monthly Pass</div>
-                <div className={styles.planPrice}>LKR 299<span>/mo</span></div>
-                <div className={styles.planSub}>Cancel anytime</div>
-              </button>
-
-              <button
-                type="button"
-                className={`${styles.planOption} ${selectedPlan === 'yearly' ? styles.planActive : ''}`}
-                onClick={() => setSelectedPlan('yearly')}
-              >
-                <span className={styles.bestValueBadge}>Best Value</span>
-                <div className={styles.planName}>Annual Pass</div>
-                <div className={styles.planPrice}>LKR 2,499<span>/yr</span></div>
-                <div className={styles.planSub}>Save 30%</div>
-              </button>
-            </div>
-
-            <form onSubmit={handleActivatePremium} className={styles.payForm}>
-              <div className={styles.inputGroup}>
-                <label>Virtual Cardholder Name</label>
-                <input
-                  type="text"
-                  placeholder="Full Name"
-                  defaultValue={user?.displayName || ''}
-                  required
-                />
-              </div>
-
-              <div className={styles.inputGroup}>
-                <label>16-Digit Virtual Card Number</label>
-                <input
-                  type="text"
-                  placeholder="5521 •••• •••• ••••"
-                  maxLength="19"
-                  value={cardNumber}
-                  onChange={e => setCardNumber(e.target.value)}
-                  required
-                />
-                <small style={{ color: 'var(--text-dim)', marginTop: 4, display: 'block' }}>
-                  Don't have a virtual card?{' '}
-                  <a href="https://cash-scan-connect.lovable.app/" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--gold)' }}>
-                    Create at Cash Scan Connect ↗
-                  </a>
-                </small>
-              </div>
-
-              <div className={styles.cardRow}>
-                <div className={styles.inputGroup}>
-                  <label>Expiry</label>
-                  <input
-                    type="text"
-                    placeholder="MM/YY"
-                    maxLength="5"
-                    value={cardExpiry}
-                    onChange={e => setCardExpiry(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className={styles.inputGroup}>
-                  <label>CVC</label>
-                  <input
-                    type="text"
-                    placeholder="CVC"
-                    maxLength="4"
-                    value={cardCvc}
-                    onChange={e => setCardCvc(e.target.value)}
-                    required
-                  />
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                className={styles.paySubmitBtn}
-                disabled={paymentProcessing}
-              >
-                {paymentProcessing
-                  ? 'Activating Premium…'
-                  : `Complete Payment (${selectedPlan === 'monthly' ? '$2.99' : '$24.99'})`}
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   )
 }

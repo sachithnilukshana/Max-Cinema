@@ -2,13 +2,11 @@ import { useState, useEffect, useRef } from 'react'
 import { db } from '../lib/firebase.js'
 import { ref, set, get, onValue } from 'firebase/database'
 import { movieEmbedUrl, tvEmbedUrl } from '../lib/api.js'
-import { usePremium } from '../lib/PremiumContext.jsx'
 import styles from './WatchParty.module.css'
 
 const EMOJIS = ['❤️', '😂', '😱', '👏', '🔥', '🍿']
 
 export default function WatchParty({ user, profile, onBack }) {
-  const { isPremium } = usePremium()
   const [roomCode, setRoomCode] = useState('')
   const [joinCodeInput, setJoinCodeInput] = useState('')
   const [currentRoom, setCurrentRoom] = useState(null)
@@ -133,7 +131,7 @@ export default function WatchParty({ user, profile, onBack }) {
     const code = Math.random().toString(36).substring(2, 8).toUpperCase()
     const tmdbId = customTmdbId.trim() || '550' // Default Fight Club if empty
     const title = customTitle.trim() || 'Watch Party Room'
-    const embedUrl = movieEmbedUrl(tmdbId, isPremium)
+    const embedUrl = movieEmbedUrl(tmdbId)
 
     const roomData = {
       code,
@@ -169,7 +167,7 @@ export default function WatchParty({ user, profile, onBack }) {
       code: clean,
       title: 'Synchronized Cinema Room',
       tmdbId: '550',
-      embedUrl: movieEmbedUrl('550', isPremium),
+      embedUrl: movieEmbedUrl('550'),
       membersCount: 2,
     }
     setCurrentRoom(fallback)

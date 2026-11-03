@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react'
 import { api, apiErrorMessage, movieEmbedUrl, formatRating, getYear, posterUrl } from '../lib/api.js'
 import { recordContinueWatching } from '../lib/profile.js'
 import { cinescopeApi, normalizeCinescopeItem, trackMovieView, trackSearch, trackTrailerClick } from '../lib/cinescopeApi.js'
-import { usePremium } from '../lib/PremiumContext.jsx'
 import MediaGrid from '../components/MediaGrid.jsx'
 import Player from '../components/Player.jsx'
 import WatchOptions from '../components/WatchOptions.jsx'
@@ -50,7 +49,6 @@ export default function Movies({ profile, adminConfig, onSelectTitle }) {
   const [apiFeatured, setApiFeatured] = useState([])
   const [apiTrending, setApiTrending] = useState([])
   const playerAnchorRef = useRef(null)
-  const { isPremium } = usePremium()
 
   // Primary data fetch
   useEffect(() => {
@@ -177,7 +175,7 @@ export default function Movies({ profile, adminConfig, onSelectTitle }) {
     const mediaType = item.media_type || 'movie'
     const libraryItem = { ...item, media_type: mediaType }
     const p = {
-      src: movieEmbedUrl(item.tmdbId || item.id, isPremium),
+      src: movieEmbedUrl(item.tmdbId || item.id),
       title: item.title || item.name,
       year: getYear(item.release_date || item.first_air_date),
       rating: formatRating(item.vote_average),
