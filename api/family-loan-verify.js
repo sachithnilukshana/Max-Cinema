@@ -1,6 +1,6 @@
 // ── Max Cinema Family Loan Verification & Activation ─────────────────────────
 // POST /api/family-loan-verify
-// Body: { paymentId, uid, planId, durationDays, details }
+// Body: { paymentId, uid, credits, details }
 
 export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store, no-cache')
@@ -28,7 +28,7 @@ export default async function handler(req, res) {
       try { body = JSON.parse(body) } catch {}
     }
 
-    const { paymentId, uid, planId, durationDays, details } = body || {}
+    const { paymentId, uid, credits } = body || {}
 
     if (!paymentId) {
       return res.status(400).json({ error: 'Missing paymentId' })
@@ -45,9 +45,27 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Payment status is not paid', status: p?.status })
     }
 
-    const targetUid = uid || (p.ref?.includes('__') ? p.ref.split('__')[0] : p.ref) || 'guest_user'
-    const days = Number(durationDays) || (planId === 'annual' ? 365 : planId === 'lifetime' ? 36500 : 30)
-    const expiresAt = Date.now() + days * 24 * 60 * 60 * 1000
+    const rawRef = p.ref || ''
+    const rawItem = p.item || ''
+    let creditsCount = Number(credits) || 0
+
+    if (!creditsCount) {
+      const creditRefMatch = rawRef.match(/__credits_(\d+)/)
+      const creditItemMatch = rawItem.match(/(\d+)\s*(?:VIP\s*)?Credit/i)
+      if (creditRefMatch) {
+        creditsCount = parseInt(creditRefMatch[1], 10)
+      } else if (creditItemMatch) {
+        creditsCount = parseInt(creditItemMatch[1], 10)
+      } else {
+        const amt = Number(p.amount) || 0
+        if (amt >= 20) creditsCount = 120
+        else if (amt >= 10) creditsCount = 50
+        else if (amt >= 4) creditsCount = 15
+        else creditsCount = 5
+      }
+    }
+
+    const targetUid = uid || (rawRef.includes('__') ? rawRef.split('__')[0] : (rawRef && !rawRef.startsWith('guest_') ? rawRef : null)) || 'guest_user'
 
     // 2. Firebase Admin Auth & Firestore update
     const adminEmail = process.env.ADMIN_EMAIL || 'sachithnilukshana64@gmail.com'
@@ -77,6 +95,8 @@ export default async function handler(req, res) {
       } catch {}
     }
 
+    let updatedCredits = creditsCount
+
     if (authData?.idToken) {
       try {
         const docUrl = `https://firestore.googleapis.com/v1/projects/login-6a0e1/databases/(default)/documents/users/${adminUid}?key=${apiKey}`
@@ -85,18 +105,28 @@ export default async function handler(req, res) {
         const docRes = await fetch(docUrl, { headers: authHeaders })
         const doc = docRes.ok ? await docRes.json() : {}
         const existingPremiumUsers = doc.fields?.premiumUsers?.mapValue?.fields || {}
+        const currentEntry = existingPremiumUsers[targetUid]?.mapValue?.fields || {}
+
+        const prevCredits = Number(currentEntry.credits?.integerValue || 0)
+        updatedCredits = prevCredits + creditsCount
 
         existingPremiumUsers[targetUid] = {
           mapValue: {
             fields: {
-              active: { booleanValue: true },
-              plan: { stringValue: planId || 'monthly' },
-              grantedAt: { integerValue: String(Date.now()) },
-              expiresAt: { integerValue: String(expiresAt) },
-              paymentMethod: { stringValue: 'Cash Scan Connect Family Loan' },
-              paymentId: { stringValue: String(paymentId) },
-              amount: { stringValue: String(p.amount) },
-              item: { stringValue: String(p.item || 'VIP Membership') },
+              ...currentEntry,
+              credits: { integerValue: String(updatedCredits) },
+              lastCreditPurchase: {
+                mapValue: {
+                  fields: {
+                    added: { integerValue: String(creditsCount) },
+                    paymentId: { stringValue: String(paymentId) },
+                    amount: { stringValue: String(p.amount) },
+                    item: { stringValue: String(p.item || `${creditsCount} VIP Credits`) },
+                    timestamp: { integerValue: String(Date.now()) },
+                    method: { stringValue: 'Family Loan' },
+                  },
+                },
+              },
             },
           },
         }
@@ -118,13 +148,13 @@ export default async function handler(req, res) {
     // 3. Telegram notification
     try {
       const tgText =
-        `⚡ *Cash Scan Connect Family Loan Payment!*\n\n` +
+        `⚡ *Cash Scan Connect Family Loan Credit Purchase!*\n\n` +
         `👤 *User ID:* \`${targetUid}\`\n` +
-        `🏷 *Plan:* *${(planId || 'vip').toUpperCase()} VIP*\n` +
+        `🎟️ *Credits Added:* *+${creditsCount}* (Total: *${updatedCredits}*)\n` +
         `💰 *Amount:* *$${p.amount}*\n` +
-        `📦 *Item:* ${p.item || 'VIP Membership'}\n` +
+        `📦 *Item:* ${p.item || `${creditsCount} VIP Credits`}\n` +
         `🆔 *Payment ID:* \`${paymentId}\`\n` +
-        `⏳ *Duration:* ${days} days`
+        `🕒 *Time:* ${new Date().toUTCString()}`
 
       await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
         method: 'POST',
@@ -142,9 +172,8 @@ export default async function handler(req, res) {
     return res.status(200).json({
       ok: true,
       status: 'paid',
-      plan: planId,
-      expiresAt,
-      durationDays: days,
+      credits: updatedCredits,
+      added: creditsCount,
       paymentId,
     })
   } catch (err) {

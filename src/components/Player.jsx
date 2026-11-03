@@ -42,12 +42,19 @@ export default function Player({
   }, [tmdbId, isUnlocked])
 
   const isVipStream = isPremium || localUnlocked
+  const [selectedServer, setSelectedServer] = useState(() => (isPremium || isUnlocked(tmdbId)) ? 'vip' : 'vidlink')
+
+  useEffect(() => {
+    if (isVipStream) {
+      setSelectedServer('vip')
+    }
+  }, [isVipStream])
   const s = badge?.match(/S(\d+)/)?.[1]
   const e = badge?.match(/E(\d+)/)?.[1]
-  const activeSrc = isVipStream && tmdbId
+  const activeSrc = tmdbId
     ? (mediaType === 'tv'
-        ? tvEmbedUrl(tmdbId, s ? Number(s) : 1, e ? Number(e) : 1, true)
-        : movieEmbedUrl(tmdbId, true))
+        ? tvEmbedUrl(tmdbId, s ? Number(s) : 1, e ? Number(e) : 1, isVipStream && selectedServer === 'vip', selectedServer)
+        : movieEmbedUrl(tmdbId, isVipStream && selectedServer === 'vip', selectedServer))
     : src
 
   async function handleUseCredit() {
@@ -66,7 +73,8 @@ export default function Player({
         title,
       })
       setLocalUnlocked(true)
-      setCreditNotice('🎉 1 Credit redeemed! Upgraded to VIP Ad-Free player.')
+      setSelectedServer('vip')
+      setCreditNotice('🎉 1 Credit redeemed! Switched to VIP Ad-Free player.')
       setTimeout(() => setCreditNotice(''), 4500)
     } catch (err) {
       alert(err.message || 'Failed to use credit.')
@@ -272,7 +280,42 @@ export default function Player({
           {year   && <span className={styles.pill}>{year}</span>}
           {rating && <span className={`${styles.pill} ${styles.gold}`}>★ {rating}</span>}
           {badge  && <span className={`${styles.pill} ${styles.badge}`}>{badge}</span>}
-          <span className={styles.pill} style={{ opacity: 0.5, fontSize: 9 }}>? = shortcuts</span>
+                    <span className={styles.pill} style={{ opacity: 0.5, fontSize: 9 }}>? = shortcuts</span>
+        </div>
+
+        {/* ── Video Stream Server Switcher ── */}
+        <div className={styles.serverSwitcherRow}>
+          <span className={styles.serverLabel}>Server:</span>
+          <button
+            type="button"
+            className={`${styles.serverBtn} ${selectedServer === 'vidlink' ? styles.serverBtnActive : ''}`}
+            onClick={() => setSelectedServer('vidlink')}
+            title="VidLink PRO (https://vidlink.pro) — Fast HD Streaming"
+          >
+            ⚡ VidLink PRO
+          </button>
+          <button
+            type="button"
+            className={`${styles.serverBtn} ${selectedServer === 'vidsrc' ? styles.serverBtnActive : ''}`}
+            onClick={() => setSelectedServer('vidsrc')}
+            title="VidSrc TO (https://vidsrc.to) — Multi-Source Streaming"
+          >
+            🎬 VidSrc TO
+          </button>
+          <button
+            type="button"
+            className={`${styles.serverBtn} ${selectedServer === 'vip' ? styles.serverBtnActive : ''} ${styles.serverVipBtn}`}
+            onClick={() => {
+              if (isVipStream) {
+                setSelectedServer('vip')
+              } else {
+                handleUseCredit()
+              }
+            }}
+            title={isVipStream ? 'VIP Ad-Free 1080p Ultra Stream' : 'Use 1 Credit to unlock VIP Ad-Free Stream'}
+          >
+            👑 VIP Ad-Free {isVipStream ? '✓' : '(1 Credit)'}
+          </button>
         </div>
 
         {overview && <p className={styles.overview}>{overview}</p>}
@@ -310,12 +353,15 @@ export default function Player({
                 </button>
               ) : (
                 <a
-                  href="https://t.me/MaxCinemaBot"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  href="/payment"
                   className={styles.getCreditBtn}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    window.history.pushState({}, '', '/payment')
+                    window.dispatchEvent(new PopStateEvent('popstate'))
+                  }}
                 >
-                  Get Credits
+                  Buy Credits 🎟️
                 </a>
               )}
             </div>
@@ -348,7 +394,7 @@ export default function Player({
           src={activeSrc}
           allowFullScreen
           allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
-          referrerPolicy="strict-origin-when-cross-origin"
+          referrerPolicy="origin"
           title={title}
         />
       </div>

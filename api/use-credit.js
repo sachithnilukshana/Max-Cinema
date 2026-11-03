@@ -41,11 +41,11 @@ async function getAdminToken() {
   }
   if (!authData?.idToken) throw new Error('Admin auth failed')
 
-  _cachedAdminToken = data.idToken
-  _cachedAdminUid = data.localId
+  _cachedAdminToken = authData.idToken
+  _cachedAdminUid = authData.localId
   _tokenExpiry = Date.now() + 55 * 60 * 1000
 
-  return { token: data.idToken, uid: data.localId }
+  return { token: authData.idToken, uid: authData.localId }
 }
 
 export default async function handler(req, res) {

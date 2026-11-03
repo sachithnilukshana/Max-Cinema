@@ -39,6 +39,14 @@ export function setCredits(uid, amount) {
   } catch {}
 }
 
+export function addCredits(uid, countToAdd) {
+  const current = getCredits(uid)
+  const add = Math.max(0, parseInt(countToAdd, 10) || 0)
+  const newBalance = current + add
+  setCredits(uid, newBalance)
+  return newBalance
+}
+
 export function syncCreditsFromServer(uid, serverCredits) {
   if (!uid || typeof serverCredits !== 'number') return
   const current = getCredits(uid)

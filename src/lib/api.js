@@ -260,20 +260,38 @@ export function getActivePlayerId(isPremium = false) {
   return isPremium ? PREMIUM_PLAYER_ID : FREE_PLAYER_ID
 }
 
+export const STREAM_SERVERS = [
+  { id: 'vidlink', name: 'VidLink PRO', badge: 'HD Fast', icon: '⚡' },
+  { id: 'vidsrc', name: 'VidSrc TO', badge: 'Multi-Source', icon: '🎬' },
+  { id: 'vip', name: 'VIP Ad-Free', badge: '1080p Ultra', icon: '👑' },
+]
+
 /**
- * Movie embed URL — format: https://embedmaster.link/{playerId}/movie/{id}
+ * Movie embed URL — supports VidLink (https://vidlink.pro), VidSrc (https://vidsrc.to), and VIP Ad-Free.
  */
-export function movieEmbedUrl(tmdbId, isPremium = false, customPlayerId = null) {
-  const pid = customPlayerId || getActivePlayerId(isPremium)
-  return `${EMBED_BASE}/${pid}/movie/${tmdbId}`
+export function movieEmbedUrl(tmdbId, isPremium = false, server = 'vidlink') {
+  if (isPremium || server === 'vip') {
+    return `${EMBED_BASE}/${PREMIUM_PLAYER_ID}/movie/${tmdbId}`
+  }
+  if (server === 'vidsrc' || server === 'vidsrc.to') {
+    return `https://vidsrc.to/embed/movie/${tmdbId}`
+  }
+  return `https://vidlink.pro/movie/${tmdbId}?primaryColor=c8a96e&secondaryColor=141414&iconColor=c8a96e`
 }
 
 /**
- * TV embed URL — format: https://embedmaster.link/{playerId}/tv/{id}/{season}/{episode}
+ * TV embed URL — supports VidLink (https://vidlink.pro), VidSrc (https://vidsrc.to), and VIP Ad-Free.
  */
-export function tvEmbedUrl(tmdbId, season, episode, isPremium = false, customPlayerId = null) {
-  const pid = customPlayerId || getActivePlayerId(isPremium)
-  return `${EMBED_BASE}/${pid}/tv/${tmdbId}/${season}/${episode}`
+export function tvEmbedUrl(tmdbId, season = 1, episode = 1, isPremium = false, server = 'vidlink') {
+  const s = season || 1
+  const e = episode || 1
+  if (isPremium || server === 'vip') {
+    return `${EMBED_BASE}/${PREMIUM_PLAYER_ID}/tv/${tmdbId}/${s}/${e}`
+  }
+  if (server === 'vidsrc' || server === 'vidsrc.to') {
+    return `https://vidsrc.to/embed/tv/${tmdbId}/${s}/${e}`
+  }
+  return `https://vidlink.pro/tv/${tmdbId}/${s}/${e}?primaryColor=c8a96e&secondaryColor=141414&iconColor=c8a96e`
 }
 
 export function posterUrl(path, large = false) {

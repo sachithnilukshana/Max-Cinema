@@ -45,7 +45,7 @@ async function getAdminToken() {
   _cachedAdminUid = authData.localId
   _tokenExpiry = Date.now() + 55 * 60 * 1000 // 55 minutes
 
-  return { token: data.idToken, uid: data.localId }
+  return { token: authData.idToken, uid: authData.localId }
 }
 
 export default async function handler(req, res) {

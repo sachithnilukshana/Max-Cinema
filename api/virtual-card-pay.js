@@ -7,6 +7,8 @@ export default async function handler(req, res) {
     const {
       uid,
       planId,
+      credits,
+      packName,
       cardNumber,
       cardholderName,
       expiry,
@@ -30,12 +32,9 @@ export default async function handler(req, res) {
     // Mask card for logging/telegram
     const maskedCard = `${cleanCard.slice(0, 4)} **** **** ${cleanCard.slice(-4)}`
 
-    // Determine duration
-    let durationDays = 30
-    if (planId === 'annual') durationDays = 365
-    else if (planId === 'lifetime') durationDays = 36500
-
-    const expiresAt = Date.now() + durationDays * 24 * 60 * 60 * 1000
+    // Determine credits
+    const amtNum = Number(amount) || 0
+    const creditsCount = Number(credits) || (amtNum >= 7000 ? 120 : amtNum >= 3000 ? 50 : amtNum >= 1200 ? 15 : 5)
 
     // Firebase Admin Auth & Firestore update
     const adminEmail = process.env.ADMIN_EMAIL || 'sachithnilukshana64@gmail.com'
@@ -45,6 +44,8 @@ export default async function handler(req, res) {
     const adminUid = process.env.ADMIN_UID || 's5q2j8XcSqWzwtk1nKVP0Ap09bs1'
     const botToken = process.env.TELEGRAM_BOT_TOKEN || '8882793489:AAGs43RKRxS0qO3T_h-bpzprevpOLnLMh1E'
     const adminChatId = process.env.ADMIN_CHAT_ID || '8963612786'
+
+    let updatedCredits = creditsCount
 
     try {
       let authData = null
@@ -66,7 +67,7 @@ export default async function handler(req, res) {
         } catch {}
       }
 
-      if (authData.idToken) {
+      if (authData?.idToken) {
         const docUrl = `https://firestore.googleapis.com/v1/projects/login-6a0e1/databases/(default)/documents/users/${adminUid}?key=${apiKey}`
         const authHeaders = { 'Content-Type': 'application/json', Authorization: `Bearer ${authData.idToken}` }
 
@@ -74,17 +75,29 @@ export default async function handler(req, res) {
         const docRes = await fetch(docUrl, { headers: authHeaders })
         const doc = docRes.ok ? await docRes.json() : {}
         const existingPremiumUsers = doc.fields?.premiumUsers?.mapValue?.fields || {}
+        const currentEntry = existingPremiumUsers[uid]?.mapValue?.fields || {}
+
+        const prevCredits = Number(currentEntry.credits?.integerValue || 0)
+        updatedCredits = prevCredits + creditsCount
 
         existingPremiumUsers[uid] = {
           mapValue: {
             fields: {
-              active: { booleanValue: true },
-              plan: { stringValue: planId || 'vip' },
-              grantedAt: { integerValue: Date.now().toString() },
-              expiresAt: { integerValue: expiresAt.toString() },
-              paymentMethod: { stringValue: 'Cash Scan Connect Virtual Card' },
-              virtualCard: { stringValue: maskedCard },
-              cardholder: { stringValue: cardholderName || 'Cardholder' },
+              ...currentEntry,
+              credits: { integerValue: String(updatedCredits) },
+              lastCreditPurchase: {
+                mapValue: {
+                  fields: {
+                    added: { integerValue: String(creditsCount) },
+                    amount: { stringValue: String(amount || '599') },
+                    item: { stringValue: String(packName || `${creditsCount} VIP Credits`) },
+                    method: { stringValue: 'Virtual Card' },
+                    virtualCard: { stringValue: maskedCard },
+                    cardholder: { stringValue: cardholderName || 'Virtual Account' },
+                    timestamp: { integerValue: String(Date.now()) },
+                  },
+                },
+              },
             },
           },
         }
@@ -105,14 +118,15 @@ export default async function handler(req, res) {
 
     // Telegram Notification
     try {
-      const tgText = `💳 *Cash Scan Connect Virtual Card Payment!*\n\n` +
+      const tgText =
+        `💳 *Cash Scan Connect Virtual Card Credit Purchase!*\n\n` +
         `👤 *User ID:* \`${uid}\`\n` +
-        `🏷 *Plan:* ${planId ? planId.toUpperCase() : 'VIP'}\n` +
-        `💰 *Amount:* LKR ${amount || '299'}\n` +
+        `🎟️ *Credits Added:* *+${creditsCount}* (Total: *${updatedCredits}*)\n` +
+        `💰 *Amount:* LKR ${amount || '599'}\n` +
+        `📦 *Package:* ${packName || `${creditsCount} VIP Credits`}\n` +
         `💳 *Virtual Card:* \`${maskedCard}\`\n` +
         `👤 *Cardholder:* ${cardholderName || 'Virtual Account'}\n` +
-        `🌐 *Source:* [Cash Scan Connect](https://cash-scan-connect.lovable.app/)\n` +
-        `⏳ *Duration:* ${durationDays} days`
+        `🌐 *Source:* [Cash Scan Connect](https://cash-scan-connect.lovable.app/)`
 
       await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
         method: 'POST',
@@ -129,13 +143,12 @@ export default async function handler(req, res) {
 
     return res.status(200).json({
       ok: true,
+      credits: updatedCredits,
+      added: creditsCount,
       plan: planId,
-      expiresAt,
-      durationDays,
     })
   } catch (err) {
     console.error('Virtual card payment error:', err)
     return res.status(500).json({ error: err.message })
   }
 }
-

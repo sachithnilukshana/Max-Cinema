@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { grantPremium } from '../lib/firebase.js'
+import { addCredits, getCredits } from '../lib/credits.js'
 import styles from './PaymentDone.module.css'
 
 export default function PaymentDone({ user, onBack, onGoToPayment }) {
@@ -32,39 +32,41 @@ export default function PaymentDone({ user, onBack, onGoToPayment }) {
         const p = await res.json()
 
         if (p && p.status === 'paid') {
-          // Determine plan from item, ref, or amount
-          const itemLower = (p.item || '').toLowerCase()
+          // Determine credit quantity from ref or item
           const rawRef = p.ref || ''
-          let planId = 'monthly'
-          let planName = 'Monthly VIP'
-          let durationDays = 30
+          const rawItem = p.item || ''
+          let creditsCount = 15
 
-          if (rawRef.includes('lifetime') || itemLower.includes('lifetime') || Number(p.amount) >= 90) {
-            planId = 'lifetime'
-            planName = 'Lifetime VIP'
-            durationDays = 36500
-          } else if (rawRef.includes('annual') || itemLower.includes('annual') || Number(p.amount) >= 40) {
-            planId = 'annual'
-            planName = 'Annual VIP'
-            durationDays = 365
+          const creditRefMatch = rawRef.match(/__credits_(\d+)/)
+          const creditItemMatch = rawItem.match(/(\d+)\s*(?:VIP\s*)?Credit/i)
+
+          if (creditRefMatch) {
+            creditsCount = parseInt(creditRefMatch[1], 10)
+          } else if (creditItemMatch) {
+            creditsCount = parseInt(creditItemMatch[1], 10)
+          } else {
+            const amt = Number(p.amount) || 0
+            if (amt >= 20) creditsCount = 120
+            else if (amt >= 10) creditsCount = 50
+            else if (amt >= 4) creditsCount = 15
+            else creditsCount = 5
           }
 
           // Determine user UID to credit
           const refUid = rawRef.includes('__') ? rawRef.split('__')[0] : (rawRef && !rawRef.startsWith('guest_') ? rawRef : null)
-          const targetUid = user?.uid || refUid || 'guest_user'
+          const targetUid = user?.uid || refUid || (typeof localStorage !== 'undefined' && localStorage.getItem('cs_user_id')) || 'guest_user'
 
-          // Activate VIP membership locally & in Firebase RTDB
-          await grantPremium(targetUid, planId, durationDays)
+          // Add credits to user's local balance & trigger event
+          const updatedBalance = addCredits(targetUid, creditsCount)
 
-          // Call backend verification to sync Firestore and trigger admin notification
+          // Call backend verification to sync Firestore and trigger Telegram admin notification
           fetch('/api/family-loan-verify', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               paymentId,
               uid: targetUid,
-              planId,
-              durationDays,
+              credits: creditsCount,
               details: p,
             }),
           }).catch(err => console.warn('Family loan backend sync warning:', err))
@@ -72,9 +74,9 @@ export default function PaymentDone({ user, onBack, onGoToPayment }) {
           setPaymentData({
             ...p,
             id: paymentId,
-            planName,
-            planId,
-            durationDays,
+            creditsAdded: creditsCount,
+            newBalance: updatedBalance,
+            packName: `${creditsCount} VIP Credits`,
           })
           setState('paid')
         } else {
@@ -123,7 +125,7 @@ export default function PaymentDone({ user, onBack, onGoToPayment }) {
               className={styles.primaryBtn}
               onClick={() => (onGoToPayment ? onGoToPayment() : (window.location.href = '/payment'))}
             >
-              Choose a VIP Plan
+              Choose a Credit Pack
             </button>
             <button
               type="button"
@@ -150,10 +152,10 @@ export default function PaymentDone({ user, onBack, onGoToPayment }) {
     return (
       <div className={styles.page}>
         <div className={styles.card}>
-          <span className={styles.icon}>🎉</span>
-          <h1 className={`${styles.title} ${styles.goldTitle}`}>VIP Membership Activated!</h1>
+          <span className={styles.icon}>🎟️</span>
+          <h1 className={`${styles.title} ${styles.goldTitle}`}>VIP Credits Added!</h1>
           <p className={styles.subtitle}>
-            Your Family Loan payment has been confirmed. All advertisements are now removed and high-speed streaming is active!
+            Your Family Loan payment of <strong>${Number(paymentData.amount).toFixed(2)}</strong> has been confirmed. <strong>+{paymentData.creditsAdded} VIP Credits</strong> were added to your account!
           </p>
 
           <div className={styles.receipt}>
@@ -162,8 +164,16 @@ export default function PaymentDone({ user, onBack, onGoToPayment }) {
               <span className={styles.badgeSuccess}>✓ Paid &amp; Verified</span>
             </div>
             <div className={styles.receiptRow}>
-              <span className={styles.receiptLabel}>Membership</span>
-              <span className={styles.receiptHighlight}>{paymentData.planName}</span>
+              <span className={styles.receiptLabel}>Package</span>
+              <span className={styles.receiptHighlight}>{paymentData.packName}</span>
+            </div>
+            <div className={styles.receiptRow}>
+              <span className={styles.receiptLabel}>Credits Added</span>
+              <span className={styles.receiptHighlight}>+{paymentData.creditsAdded} Credits</span>
+            </div>
+            <div className={styles.receiptRow}>
+              <span className={styles.receiptLabel}>New Credit Balance</span>
+              <span className={styles.receiptHighlight}>🎟️ {paymentData.newBalance} Credits</span>
             </div>
             <div className={styles.receiptRow}>
               <span className={styles.receiptLabel}>Amount Paid</span>
@@ -187,14 +197,14 @@ export default function PaymentDone({ user, onBack, onGoToPayment }) {
               className={styles.primaryBtn}
               onClick={() => (onBack ? onBack() : (window.location.href = '/'))}
             >
-              🎬 Start Watching Ad-Free Now
+              🎬 Start Watching Movies &amp; Series
             </button>
             <button
               type="button"
               className={styles.secondaryBtn}
               onClick={() => (onGoToPayment ? onGoToPayment() : (window.location.href = '/payment'))}
             >
-              View Membership Details
+              🎟️ Buy More Credits
             </button>
           </div>
 
@@ -226,7 +236,7 @@ export default function PaymentDone({ user, onBack, onGoToPayment }) {
             className={styles.primaryBtn}
             onClick={() => (onGoToPayment ? onGoToPayment() : (window.location.href = '/payment'))}
           >
-            Return to VIP Plans
+            Return to Credit Packs
           </button>
           <button
             type="button"

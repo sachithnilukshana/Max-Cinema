@@ -1,79 +1,106 @@
 import { useState, useEffect } from 'react'
-import { grantPremium } from '../lib/firebase.js'
+import { getCredits, addCredits } from '../lib/credits.js'
+import { usePremium } from '../lib/PremiumContext.jsx'
 import styles from './Payment.module.css'
 
 const CASH_SCAN_CONNECT_URL = 'https://cash-scan-connect.lovable.app/'
 
-const PLANS = [
+export const CREDIT_PACKS = [
   {
-    id: 'monthly',
-    name: 'Monthly VIP',
-    icon: '⚡',
-    price: '299',
-    rawAmount: '299',
-    loanAmount: '9.99',
-    period: '/ month',
-    days: 30,
+    id: 'pack_5',
+    name: '5 VIP Credits',
+    credits: 5,
+    icon: '🎟️',
+    price: '599',
+    rawAmount: '599',
+    loanAmount: '1.99',
+    unitPrice: '$0.40 / title',
+    period: '5 VIP movies or episodes',
     featured: false,
     saveText: null,
     features: [
-      '100% Ad-Free Streaming',
-      'High-Speed Premium Player',
+      '5 Ad-Free Movies or Series',
+      'High-Speed Premium Stream',
       'Full HD & 4K Quality',
-      'Multi-Device Synchronization',
-      'Watch Party Access',
+      'Credits Never Expire',
+      'Any Device (PC, Phone, Fire TV)',
     ],
   },
   {
-    id: 'annual',
-    name: 'Annual VIP',
-    icon: '👑',
-    price: '2,499',
-    rawAmount: '2499',
-    loanAmount: '49.99',
-    period: '/ year',
-    days: 365,
+    id: 'pack_15',
+    name: '15 VIP Credits',
+    credits: 15,
+    icon: '⚡',
+    price: '1,499',
+    rawAmount: '1499',
+    loanAmount: '4.99',
+    unitPrice: '$0.33 / title',
+    period: '15 VIP movies or episodes',
     featured: true,
-    saveText: 'Save 30%',
+    saveText: 'Most Popular',
     features: [
-      'Everything in Monthly',
-      '30% Discount (Best Value)',
-      'VIP Discord & Community Badge',
-      'Early Access to New Releases',
-      'Priority High-Speed CDN',
+      '15 Ad-Free Movies or Series',
+      'Save 18% per VIP title',
+      'Instant Server Unlocking',
+      'Credits Never Expire',
+      'Watch anytime at your own pace',
     ],
   },
   {
-    id: 'lifetime',
-    name: 'Lifetime VIP',
-    icon: '💎',
-    price: '4,999',
-    rawAmount: '4999',
-    loanAmount: '99.99',
-    period: 'one-time payment',
-    days: 36500,
+    id: 'pack_50',
+    name: '50 VIP Credits',
+    credits: 50,
+    icon: '👑',
+    price: '3,899',
+    rawAmount: '3899',
+    loanAmount: '12.99',
+    unitPrice: '$0.26 / title',
+    period: '50 VIP movies or episodes',
     featured: false,
-    saveText: 'Forever Access',
+    saveText: 'Best Value',
     features: [
-      'Permanent Lifetime Access',
-      'Never pay a subscription again',
-      'Exclusive Golden Diamond Badge',
-      'VIP Feature Requests Priority',
-      'All Future Updates Included',
+      '50 Ad-Free Movies or Series',
+      'Unlock entire TV seasons',
+      'Save 35% per VIP title',
+      'Credits Never Expire',
+      'Priority High-Speed Server',
+    ],
+  },
+  {
+    id: 'pack_120',
+    name: '120 VIP Credits',
+    credits: 120,
+    icon: '💎',
+    price: '7,499',
+    rawAmount: '7499',
+    loanAmount: '24.99',
+    unitPrice: '$0.20 / title',
+    period: '120 VIP movies or episodes',
+    featured: false,
+    saveText: 'Marathon Pack',
+    features: [
+      '120 Ad-Free Movies or Series',
+      'Massive 50% discount per title',
+      'Ultimate Binge-Watcher Bundle',
+      'Credits Never Expire',
+      'VIP Discord & Community Recognition',
     ],
   },
 ]
 
-function getFamilyLoanCheckoutUrl(plan, user) {
-  const uid = user?.uid || (typeof localStorage !== 'undefined' && localStorage.getItem('cs_user_id')) || 'USER123'
-  const ref = `${uid}__${plan.id}`
-  const item = `${plan.name} Membership`
-  return `https://cash-scan-connect.lovable.app/checkout?merchant=max-cinema&amount=${plan.loanAmount}&item=${encodeURIComponent(item)}&ref=${encodeURIComponent(ref)}&return=${encodeURIComponent('https://max-cinema.vercel.app/payment-done')}`
+function getFamilyLoanCheckoutUrl(pack, user) {
+  const uid = user?.uid || (typeof localStorage !== 'undefined' && localStorage.getItem('cs_user_id')) || 'guest_user'
+  const ref = `${uid}__credits_${pack.credits}`
+  const item = `${pack.name} (${pack.credits} Credits)`
+  return `https://cash-scan-connect.lovable.app/checkout?merchant=max-cinema&amount=${pack.loanAmount}&item=${encodeURIComponent(item)}&ref=${encodeURIComponent(ref)}&return=${encodeURIComponent('https://max-cinema.vercel.app/payment-done')}`
 }
 
-export default function Payment({ user, isPremium = false, onBack }) {
+export default function Payment({ user, onBack }) {
+  const { credits, isPremium } = usePremium()
+  const [userCredits, setUserCredits] = useState(() => getCredits(user?.uid))
   const [isSuccess, setIsSuccess] = useState(false)
-  const [selectedPlan, setSelectedPlan] = useState(null)
+  const [successCreditsAdded, setSuccessCreditsAdded] = useState(0)
+  const [selectedPack, setSelectedPack] = useState(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   // Virtual Card Form State
@@ -85,14 +112,11 @@ export default function Payment({ user, isPremium = false, onBack }) {
   const [errorMessage, setErrorMessage] = useState('')
 
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search)
-    if (urlParams.get('payment') === 'success') {
-      setIsSuccess(true)
-    }
-  }, [])
+    setUserCredits(getCredits(user?.uid))
+  }, [user, credits])
 
-  const handleOpenCheckout = (plan) => {
-    setSelectedPlan(plan)
+  const handleOpenCheckout = (pack) => {
+    setSelectedPack(pack)
     setIsModalOpen(true)
     setErrorMessage('')
   }
@@ -118,6 +142,7 @@ export default function Payment({ user, isPremium = false, onBack }) {
     setErrorMessage('')
 
     const cleanCard = cardNumber.replace(/\s+/g, '')
+
     if (cleanCard.length < 16) {
       setErrorMessage('Please enter a complete 16-digit Virtual Card Number.')
       return
@@ -141,8 +166,9 @@ export default function Payment({ user, isPremium = false, onBack }) {
     setIsProcessing(true)
 
     try {
-      const uid = user?.uid || 'guest_user'
-      const amount = selectedPlan?.rawAmount || '299'
+      const uid = user?.uid || (typeof localStorage !== 'undefined' && localStorage.getItem('cs_user_id')) || 'guest_user'
+      const amount = selectedPack?.rawAmount || '599'
+      const packCredits = selectedPack?.credits || 5
 
       // Call Virtual Card Payment API
       const res = await fetch('/api/virtual-card-pay', {
@@ -150,7 +176,9 @@ export default function Payment({ user, isPremium = false, onBack }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           uid,
-          planId: selectedPlan?.id || 'monthly',
+          credits: packCredits,
+          planId: selectedPack?.id || 'pack_5',
+          packName: selectedPack?.name || `${packCredits} VIP Credits`,
           cardNumber: cleanCard,
           cardholderName: cardholderName.trim(),
           expiry,
@@ -164,9 +192,11 @@ export default function Payment({ user, isPremium = false, onBack }) {
         throw new Error(data.error || 'Payment failed with this Virtual Card.')
       }
 
-      // Activate VIP locally & in Firebase
-      await grantPremium(uid, selectedPlan?.id, selectedPlan?.days)
+      // Add credits locally & dispatch sync
+      const newBalance = addCredits(uid, packCredits)
+      setUserCredits(newBalance)
 
+      setSuccessCreditsAdded(packCredits)
       setIsProcessing(false)
       setIsModalOpen(false)
       setIsSuccess(true)
@@ -180,9 +210,10 @@ export default function Payment({ user, isPremium = false, onBack }) {
     return (
       <div className={styles.successPage}>
         <div className={styles.successIcon}>🎉</div>
-        <h1 className={styles.successTitle}>Payment Successful!</h1>
+        <h1 className={styles.successTitle}>Credits Added Successfully!</h1>
         <p className={styles.successText}>
-          Your payment has been authorized and your Max Cinema VIP subscription is now active! All ads are blocked.
+          {successCreditsAdded} VIP Credits have been added to your account! You now have a total of{' '}
+          <strong style={{ color: 'var(--gold)' }}>{userCredits} Credits</strong> to watch movies and series ad-free.
         </p>
         <button
           className={styles.successBtn}
@@ -191,7 +222,7 @@ export default function Payment({ user, isPremium = false, onBack }) {
             else window.location.href = '/'
           }}
         >
-          Start Watching Now
+          🎬 Start Watching Now
         </button>
       </div>
     )
@@ -200,11 +231,19 @@ export default function Payment({ user, isPremium = false, onBack }) {
   return (
     <div className={styles.page}>
       <div className={styles.hero}>
-        <span className={styles.crown}>👑</span>
-        <h1 className={styles.title}>Max Cinema VIP Membership</h1>
+        <span className={styles.crown}>🎟️</span>
+        <h1 className={styles.title}>Buy VIP Streaming Credits</h1>
         <p className={styles.subtitle}>
-          Stream without ads on our high-speed premium server with pure cinematic quality.
+          Watch any movie or TV episode 100% Ad-Free in high-definition. <strong>1 Credit = 1 VIP Title</strong>. Credits never expire!
         </p>
+      </div>
+
+      <div style={{ textAlign: 'center' }}>
+        <div className={styles.balanceBox}>
+          <span>Your VIP Credit Balance:</span>
+          <span className={styles.balanceCount}>🎟️ {userCredits} Credit{userCredits === 1 ? '' : 's'}</span>
+          {isPremium && <span style={{ color: 'var(--gold)', marginLeft: 6 }}>· (👑 VIP Pass Active)</span>}
+        </div>
       </div>
 
       {/* ── Virtual Card & Family Loan Notice ── */}
@@ -232,38 +271,27 @@ export default function Payment({ user, isPremium = false, onBack }) {
         </a>
       </div>
 
-      {isPremium && (
-        <div className={styles.premiumBanner}>
-          <span>💎</span>
-          <div>
-            <strong>You are an active VIP Member!</strong>
-            <div>Your account currently has active VIP privileges with ad-free playback.</div>
-          </div>
-        </div>
-      )}
-
-      {/* ── Plans Grid ── */}
+      {/* ── Credit Packs Grid ── */}
       <div className={styles.plansGrid}>
-        {PLANS.map((plan) => (
+        {CREDIT_PACKS.map((pack) => (
           <div
-            key={plan.id}
-            className={`${styles.planCard} ${plan.featured ? styles.featured : ''}`}
+            key={pack.id}
+            className={`${styles.planCard} ${pack.featured ? styles.featured : ''}`}
           >
-            {plan.featured && <div className={styles.popularBadge}>Most Popular</div>}
-            <span className={styles.planIcon}>{plan.icon}</span>
-            <h2 className={styles.planName}>{plan.name}</h2>
+            {pack.featured && <div className={styles.popularBadge}>Most Popular</div>}
+            <span className={styles.planIcon}>{pack.icon}</span>
+            <h2 className={styles.planName}>{pack.name}</h2>
 
             <div className={styles.loanPriceRow}>
               <span className={styles.loanCurrency}>$</span>
-              <span className={styles.loanPrice}>{plan.loanAmount}</span>
-              <span className={styles.planPeriod}>{plan.period}</span>
+              <span className={styles.loanPrice}>{pack.loanAmount}</span>
             </div>
-            <div className={styles.loanSubtext}>or LKR {plan.price} via Virtual Card</div>
+            <div className={styles.loanSubtext}>{pack.unitPrice} · or LKR {pack.price}</div>
 
-            {plan.saveText && <div className={styles.saveBadge}>{plan.saveText}</div>}
+            {pack.saveText && <div className={styles.saveBadge}>{pack.saveText}</div>}
             <div className={styles.divider} />
             <ul className={styles.features}>
-              {plan.features.map((feat, i) => (
+              {pack.features.map((feat, i) => (
                 <li key={i} className={styles.feature}>
                   <span className={styles.featureCheck}>✓</span>
                   <span>{feat}</span>
@@ -273,7 +301,7 @@ export default function Payment({ user, isPremium = false, onBack }) {
 
             {/* Pay with Family Loan button */}
             <a
-              href={getFamilyLoanCheckoutUrl(plan, user)}
+              href={getFamilyLoanCheckoutUrl(pack, user)}
               className={styles.familyLoanBtn}
             >
               Pay with Family Loan card
@@ -282,7 +310,7 @@ export default function Payment({ user, isPremium = false, onBack }) {
             <button
               type="button"
               className={styles.manualCardBtn}
-              onClick={() => handleOpenCheckout(plan)}
+              onClick={() => handleOpenCheckout(pack)}
             >
               Or enter Virtual Card manually
             </button>
@@ -299,7 +327,7 @@ export default function Payment({ user, isPremium = false, onBack }) {
       </div>
 
       {/* ── Virtual Card Checkout Modal ── */}
-      {isModalOpen && selectedPlan && (
+      {isModalOpen && selectedPack && (
         <div className={styles.modalOverlay} onClick={() => !isProcessing && setIsModalOpen(false)}>
           <div className={styles.modalBox} onClick={(e) => e.stopPropagation()}>
             <button
@@ -313,7 +341,7 @@ export default function Payment({ user, isPremium = false, onBack }) {
             <div className={styles.modalHeader}>
               <h3 className={styles.modalTitle}>Virtual Card Checkout</h3>
               <p className={styles.modalSub}>
-                Plan: <strong>{selectedPlan.name}</strong> · Amount: <strong>LKR {selectedPlan.price}</strong> (${selectedPlan.loanAmount})
+                Package: <strong>{selectedPack.name}</strong> · Amount: <strong>LKR {selectedPack.price}</strong> (${selectedPack.loanAmount})
               </p>
             </div>
 
@@ -321,7 +349,7 @@ export default function Payment({ user, isPremium = false, onBack }) {
             <div style={{ textAlign: 'center', margin: '-4px 0 16px', fontSize: '13px' }}>
               <span style={{ color: 'var(--text-muted)' }}>Have a loan balance? </span>
               <a
-                href={getFamilyLoanCheckoutUrl(selectedPlan, user)}
+                href={getFamilyLoanCheckoutUrl(selectedPack, user)}
                 style={{ color: 'var(--gold)', fontWeight: 600, textDecoration: 'none' }}
               >
                 Pay with Family Loan card ↗
@@ -428,7 +456,7 @@ export default function Payment({ user, isPremium = false, onBack }) {
                 className={styles.submitCardBtn}
                 disabled={isProcessing}
               >
-                {isProcessing ? 'Authorizing Virtual Card…' : `Pay LKR ${selectedPlan.price} with Virtual Card`}
+                {isProcessing ? 'Authorizing Virtual Card…' : `Pay LKR ${selectedPack.price} (${selectedPack.credits} Credits)`}
               </button>
             </form>
           </div>

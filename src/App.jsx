@@ -172,7 +172,7 @@ export default function App() {
         : isLoginPage
           ? 'Account & Sign In | Max Cinema'
           : isPaymentPage
-            ? 'VIP Upgrade | Max Cinema'
+            ? 'Buy VIP Credits | Max Cinema'
             : isAboutPage
               ? 'About Us & Contact | Max Cinema'
               : 'Max Cinema — Free Movies, TV Shows & Streaming Discovery'
@@ -270,7 +270,7 @@ export default function App() {
               style={{ color: 'var(--gold)', fontWeight: 700 }}
               onClick={() => navigate('/payment')}
             >
-              👑 VIP
+              🎟️ Credits
             </button>
           </nav>
           <div className={styles.headerRight}>
@@ -370,6 +370,12 @@ export default function App() {
                 onBack={goHome}
                 onBrowseMovies={() => goTab('movies')}
                 onBrowseHistory={() => goTab('history')}
+              />
+            ) : isPaymentDonePage ? (
+              <PaymentDone
+                user={user}
+                onBack={goHome}
+                onGoToPayment={() => navigate('/payment')}
               />
             ) : isPaymentPage || tab === 'payment' ? (
               <Payment user={user} onBack={goHome} />
