@@ -263,14 +263,14 @@ export function getActivePlayerId(isPremium = false) {
 export const STREAM_SERVERS = [
   { id: 'vidlink', name: 'VidLink PRO', badge: 'HD Fast', icon: '⚡' },
   { id: 'vidsrc', name: 'VidSrc TO', badge: 'Multi-Source', icon: '🎬' },
-  { id: 'vip', name: 'VIP Ad-Free', badge: '1080p Ultra', icon: '👑' },
+  { id: 'embedmaster', name: 'EmbedMaster', badge: 'Ultra HD', icon: '🌐' },
 ]
 
 /**
  * Movie embed URL — supports VidLink (https://vidlink.pro), VidSrc (https://vidsrc.to), and VIP Ad-Free.
  */
 export function movieEmbedUrl(tmdbId, isPremium = false, server = 'vidlink') {
-  if (isPremium || server === 'vip') {
+  if (isPremium || server === 'vip' || server === 'embedmaster') {
     return `${EMBED_BASE}/${PREMIUM_PLAYER_ID}/movie/${tmdbId}`
   }
   if (server === 'vidsrc' || server === 'vidsrc.to') {
@@ -285,7 +285,7 @@ export function movieEmbedUrl(tmdbId, isPremium = false, server = 'vidlink') {
 export function tvEmbedUrl(tmdbId, season = 1, episode = 1, isPremium = false, server = 'vidlink') {
   const s = season || 1
   const e = episode || 1
-  if (isPremium || server === 'vip') {
+  if (isPremium || server === 'vip' || server === 'embedmaster') {
     return `${EMBED_BASE}/${PREMIUM_PLAYER_ID}/tv/${tmdbId}/${s}/${e}`
   }
   if (server === 'vidsrc' || server === 'vidsrc.to') {

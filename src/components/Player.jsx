@@ -260,6 +260,14 @@ export default function Player({
           >
             🎬 VidSrc TO
           </button>
+          <button
+            type="button"
+            className={`${styles.serverBtn} ${selectedServer === 'embedmaster' ? styles.serverBtnActive : ''}`}
+            onClick={() => setSelectedServer('embedmaster')}
+            title="EmbedMaster — High Quality Player"
+          >
+            🌐 EmbedMaster
+          </button>
         </div>
 
         {overview && <p className={styles.overview}>{overview}</p>}
